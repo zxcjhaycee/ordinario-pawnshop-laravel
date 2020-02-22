@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/index', 'OrdinarioController@index')->name('dashboard');
+Route::get('/pawn_auction/pawn', 'PawnAuctionController@pawnView')->name('pawn');
