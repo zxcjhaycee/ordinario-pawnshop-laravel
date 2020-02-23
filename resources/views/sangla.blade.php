@@ -140,8 +140,9 @@
         </div>
       </div>
       <div class="card">
-        <form action="reports/pawn_print.php">
-        <section class="batch1" style="display:none">
+        <form action="{{ route('pawn_print') }}" method="GET">
+        <!-- {{ csrf_field() }} -->
+        <section class="batch1">
           <div class="card-header card-header-primary text-center">
             TICKET DETAILS
           </div> <br>
@@ -317,7 +318,7 @@
           </div>
         </section>
         <!-- Computation Tab -->
-        <section class="batch4">
+        <section class="batch4" style="display:none">
           <div class="card-header card-header-primary text-center">
             COMPUTATION
           </div> <br>

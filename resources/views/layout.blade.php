@@ -470,7 +470,8 @@
       var dd = newdate.getDate();
       var mm = newdate.getMonth() + 1;
       var y = newdate.getFullYear();
-
+      dd = dd.toString().length == 1 ? "0"+dd : dd;
+      mm = mm.toString().length == 1 ? "0"+mm : mm;
       var someFormattedDate = mm + '/' + dd + '/' + y;
     
       // expiration date
@@ -481,7 +482,8 @@
       var dd_2 = newdate_2.getDate();
       var mm_2 = newdate_2.getMonth() + 1;
       var y_2 = newdate_2.getFullYear();
-
+      dd_2 = dd_2.toString().length == 1 ? "0"+dd_2 : dd_2;
+      mm_2 = mm_2.toString().length == 1 ? "0"+mm_2 : mm_2;
       var someFormattedDate_2 = mm_2 + '/' + dd_2 + '/' + y_2;
 
       // auction date
@@ -492,7 +494,8 @@
       var dd_3 = newdate_3.getDate();
       var mm_3 = newdate_3.getMonth() + 1;
       var y_3 = newdate_3.getFullYear();
-
+      dd_3 = dd_3.toString().length == 1 ? "0"+dd_3 : dd_3;
+      mm_3 = mm_3.toString().length == 1 ? "0"+mm_3 : mm_3;
       var someFormattedDate_3 = mm_3 + '/' + dd_3 + '/' + y_3;
 
       if(someFormattedDate != 'NaN/NaN/NaN'){
