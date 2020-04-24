@@ -181,15 +181,6 @@
 <script src="/js/datepicker.js"></script>
 <script src="/js/datepicker.en.js"></script>
 <script>
-    $('.air_date_picker').datepicker({
-    language: 'en',
-    todayButton: new Date(),
-    autoClose : true
-    // inline : true,
-    // minDate: new Date() // Now can select only dates, which goes after today
-});
-</script>
-<script>
     $(document).ready(function() {
       $().ready(function() {
         $sidebar = $('.sidebar');
@@ -648,7 +639,8 @@
     $('.air_date_picker').datepicker({
     language: 'en',
     todayButton: new Date(),
-    autoClose : true
+    autoClose : true,
+    position: "bottom center"
     // inline : true,
     // minDate: new Date() // Now can select only dates, which goes after today
 });

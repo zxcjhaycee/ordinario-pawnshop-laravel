@@ -36,8 +36,8 @@
       }
 
       .col-7-jc-amount{
-        flex:0 0 74.378%;
-        margin-left:3%;
+        flex:0 0 67.2%;
+        margin-left:5%;
       }
 
       .col-7-jc{
@@ -103,9 +103,6 @@
     }
 
 
-
-
-
   table{
     text-align: center;
     font-size: 11pt !important;
@@ -140,8 +137,8 @@
         </div>
       </div>
       <div class="card">
-        <form action="{{ route('pawn_print') }}" method="GET">
-        <!-- {{ csrf_field() }} -->
+        <form action="{{ route('pawn_store') }}" method="POST">
+        {{ csrf_field() }}
         <section class="batch1">
           <div class="card-header card-header-primary text-center">
             TICKET DETAILS
@@ -361,12 +358,13 @@
                 </div>
                 <div class="row">
                 <label class="col-xl-3 mt-3 ml-3">Amount</label>
-                <div class="col-xl-12-jc-amount col-lg-7-jc-amount col-md-7-jc-amount col-sm-7-jc-amount col-7-jc-amount mx-auto-jc">
+                <div class="col-xl-12-jc-amount col-lg-7-jc-amount col-md-7-jc-amount col-sm-7-jc-amount col-7-jc-amount mx-auto-jc" style="height:0px">
                     <input class="form-control" type="number" value="0">
                   </div>
-                    <button type="button" class="btn btn-success btn-sm px-2 py-1"><i class="material-icons">add</i></button>
-                    <button type="button" class="btn btn-danger btn-sm px-2 py-1"><i class="material-icons">remove</i></button>
+                    <button type="button" class="btn btn-success btn-sm px-1 py-2"><i class="material-icons">add</i></button>
+                    <button type="button" class="btn btn-danger btn-sm px-1 py-2"><i class="material-icons">remove</i></button>
                 </div>
+                
               </div>
             </div>
             <button type="button" class="btn btn-primary float-left-jc" id="back3"><i class="material-icons">arrow_back</i></button>
