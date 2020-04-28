@@ -1273,3 +1273,16 @@ footer .pull-center {
   text-align: center;
 }
 
+@media (max-width: 576px) {
+  .btn-responsive {
+    font-size:10px;
+    padding:4px 4px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .btn-responsive {
+    padding:12px 30px;
+    font-size:12px;
+  }
+} 

@@ -288,7 +288,7 @@ class PawnController extends Controller
      * @param  \App\PawnAuction  $pawnAuction
      * @return \Illuminate\Http\Response
      */
-    public function edit(PawnAuction $pawnAuction)
+    public function edit(Pawn $pawnAuction)
     {
         //
     }
@@ -300,7 +300,7 @@ class PawnController extends Controller
      * @param  \App\PawnAuction  $pawnAuction
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PawnAuction $pawnAuction)
+    public function update(Request $request, Pawn $pawnAuction)
     {
         //
     }
@@ -311,7 +311,7 @@ class PawnController extends Controller
      * @param  \App\PawnAuction  $pawnAuction
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PawnAuction $pawnAuction)
+    public function destroy(Pawn $pawnAuction)
     {
         //
     }

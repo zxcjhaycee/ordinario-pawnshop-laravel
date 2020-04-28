@@ -47,10 +47,10 @@
               <div class="card">
                 <div class="card-header card-header-icon">
                   <div class="card-icon" style="background: linear-gradient(60deg,#702230,#702230)">
-                    <i class="material-icons">person</i>
+                    <i class="material-icons">list</i>
                   </div>
-                    <a href="{{ route('user.create') }}" class="btn float-right btn-responsive">Add User</a>
-                    <h4 class="card-title">User</h4>
+                    <a href="{{ route('branch.create') }}" class="btn float-right btn-responsive">Add Branch</a>
+                    <h4 class="card-title">Branch</h4>
 
                 </div>
     
@@ -61,45 +61,35 @@
                             <thead>
                                 <tr>
                                   <th>#</th>
-                                  <th>Full Name</th>
-                                  <th>Username</th>
                                   <th>Branch</th>
-                                  <th>Access</th>
-                                  <th>Auth Code</th>
                                   <th>Status</th>
                                   <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
-                                  $count = 1;
+                                    $count = 1;
                                 @endphp
-                                @foreach($user as $key => $value)
-                                  <tr>
-                                    <td>{{ $count++ }}</td>
-                                    <td>{{ ucwords($value->first_name." ".$value->last_name) }}</td>
-                                    <td>{{ $value->username }}</td>
-                                    <td>{{ $value->branch['branch'] }}</td>
-                                    <td>{{ ucwords($value->access) }}</td>
-                                    <td>{{ $value->auth_code }}</td>
-                                    <td class="text-{{ !isset($value->deleted_at) ? 'success' : 'danger' }}" style="width:17%">
+                                @foreach($branch as $key => $value)
+                                    <tr>
+                                        <td>{{ $count++ }}</td>
+                                        <td>{{ $value->branch }}</td>
+                                        <td class="text-{{ !isset($value->deleted_at) ? 'success' : 'danger' }}" style="width:20%">
                                             {!! !isset($value->deleted_at) ? 'Active' : 'Inactive <i class="text-muted">('.date('F d, Y', strtotime($value->deleted_at)).')</i> ' !!}
                                         </td>
-
-                                    <td style="width:15%">
-                                            <a href="{{ route('user.edit', $value->id) }}" class="btn btn-sm ordinario-button"><span class="material-icons">edit</span></a>
-                                            <form action="{{ route('user.destroy', $value->id) }}" method="POST" style="display:inline">
+                                        <td style="width:15%">
+                                            <a href="{{ route('branch.edit', $value->id) }}" class="btn btn-sm ordinario-button"><span class="material-icons">edit</span></a>
+                                            <form action="{{ route('branch.destroy', $value->id) }}" method="POST" style="display:inline">
                                                 @method('DELETE')
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-warning"><span class="material-icons">{{ !isset($value->deleted_at) ? 'delete' : 'restore' }}</span></button>
                                             </form>
                                             <!-- <a href="branch/delete/{{ $value->id }}" class="btn btn-sm btn-warning"><span class="material-icons">delete</span></a> -->
-                                    </td>
-                                  </tr>
-
+                                        </td>
+                                    </tr>
                                 @endforeach
+
                             </tbody>
-                            
                         </table>
 
                     </div>

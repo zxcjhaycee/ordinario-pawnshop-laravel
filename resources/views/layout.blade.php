@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" /> -->
+    <link rel="stylesheet" type="text/css" href="/css/googlefont.css" />
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="/css/font-awesome.min.css"> 
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css"> -->
     <link rel="stylesheet" href="/css/material/material-dashboard-pro.min.css">
-    <link rel="stylesheet" href="/css/material/material.min.css">
+    <!-- <link rel="stylesheet" href="/css/material/material.min.css"> -->
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/datepicker.css">
     <title>Ordinario Pawnshop</title>
@@ -15,154 +17,9 @@
 <body>
 <!-- sidebar -->
 <div class="wrapper">
-    <div class="sidebar" data-color="danger" data-background-color="white">
-      <!-- data-color="purple | azure | green | orange | danger" data-image="../assets/img/ordinario.jpg" -->
-      <div class="logo">
-        <a class="simple-text logo-normal">
-          <img style="width:90%;" src="/img/Ordinario_Pawnshop_Logo.png">
-        </a>
-      </div>
-      <div class="sidebar-wrapper">
-        <ul class="nav">
-          <li class="nav-item {{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }} ">
-            <a class="nav-link" href="{{ route('dashboard') }}">
-              <i class="material-icons">dashboard</i>
-              <p>Dashboard</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {{ class_basename(Route::current()->controller) == 'PawnAuctionController' ? '' : 'collapsed'  }}" data-toggle="collapse" href="#pagesExamples" 
-              aria-expanded="{{ class_basename(Route::current()->controller) == 'PawnAuctionController' ? 'true' : 'false' }}">
-              <i class="material-icons">star</i>
-              <p> Pawn & Auction
-                <b class="caret"></b>
-              </p>   
-
-            </a>
-            <div class="collapse {{ class_basename(Route::current()->controller) == 'PawnAuctionController' ? 'show' : ''  }} " id="pagesExamples">
-              <ul class="nav">
-                <li class="nav-item {{ Route::currentRouteName() == 'pawn' ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ route('pawn') }}">
-                    <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
-                    <span class="sidebar-normal"> Sangla </span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="">
-                    <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
-                    <span class="sidebar-normal"> Renew & Redeem </span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="">
-                    <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
-                    <span class="sidebar-normal"> Auction </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item ">
-            <a class="nav-link" data-toggle="collapse" href="#reports" 
-              aria-expanded="">
-              <i class="material-icons">build</i>
-              <p> Reports
-                <b class="caret"></b>
-              </p>
-            </a>
-            <div class="collapse" id="reports" style="">
-              <ul class="nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="">
-                    <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
-                    <span class="sidebar-normal"> Notice Listing </span>
-                  </a>
-                </li>
-
-
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item ">
-            <a class="nav-link" data-toggle="collapse" href="#settings" 
-              aria-expanded="false">
-              <i class="material-icons">build</i>
-              <p> Settings
-                <b class="caret"></b>
-              </p>
-            </a>
-            <div class="collapse" id="settings" style="">
-              <ul class="nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="">
-                    <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
-                    <span class="sidebar-normal"> Karat Rates </span>
-                  </a>
-                </li>
-
-
-              </ul>
-            </div>
-          </li>
-
-        </ul>
-      </div>
-    </div>
+    @include('sidebar')
     <div class="main-panel">
-      <!-- Start of Navigation -->
-      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-        <div class="container-fluid">
-          <div class="navbar-wrapper">
-            <a class="navbar-brand" href="#pablo">
-                
-            </a>
-          </div>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="navbar-toggler-icon icon-bar"></span>
-            <span class="navbar-toggler-icon icon-bar"></span>
-            <span class="navbar-toggler-icon icon-bar"></span>
-          </button>
-          <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#pablo">
-                  <i class="material-icons">dashboard</i>
-                  <p class="d-lg-none d-md-block">
-                    Stats
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="material-icons">notifications</i>
-                  <span class="notification">0</span>
-                  <p class="d-lg-none d-md-block">Notifications</p>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">Notification</a>
-                </div>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="material-icons">person</i>
-                  <p class="d-lg-none d-md-block">
-                    Account
-                  </p>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                  <a class="dropdown-item" href="#">Profile</a>
-                  <a class="dropdown-item" href="#">Settings</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="../../">Log out</a>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+   @include('nav')
 
 <!-- end sidebar -->
 @yield('content')
@@ -645,6 +502,41 @@
     // minDate: new Date() // Now can select only dates, which goes after today
 });
 // $("#selectpicker").selectpicker();
+
+  $(document).on('click', '.addButton', function(){
+    // console.log($(this).attr('data-id'));
+    let counter = parseInt($(this).attr('data-id')) + 1;
+    // console.log($(this).closest('section').attr('id'));
+    $(this).css('display', 'none');
+    $(this).parent().parent().parent().append('<section id="'+counter+'">'+
+                '<div class="form-group row">'+
+                  '<label class="col-xl-3 mt-3">Other Charges</label>'+
+                    '<div class="col-xl-6 col-lg-8 col-md-9 col-sm-8 col-12 mt-3 pb-3 mx-auto-jc">'+ 
+                      '<select class="form-control col-charges">'+
+                        '<option></option>'+
+                      '</select>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                '<label class="col-xl-3 mt-3 ml-3">Amount</label>'+
+                '<div class="col-xl-12-jc-amount col-lg-7-jc-amount col-md-7-jc-amount col-sm-7-jc-amount col-7-jc-amount mx-auto-jc" style="height:0px">'+
+                    '<input class="form-control" type="number" value="0">'+
+                  '</div>'+
+                    '<button type="button" class="btn btn-success btn-sm px-1 py-2 addButton" data-id="'+counter+'"><i class="material-icons">add</i></button>'+
+                    '<button type="button" class="btn btn-danger btn-sm px-1 py-2 removeButton" data-id="'+counter+'"><i class="material-icons">remove</i></button>'+
+                '</div>'+                
+                '</section>');
+  });
+
+ $(document).on('click', '.removeButton', function(){
+   let counter = $(this).attr('data-id');
+   const prev = $(this).closest('section').prev().attr('id');
+  if($('.addButton[data-id='+counter+']').css('display') == 'block'){
+    $('.addButton[data-id='+prev+']').css('display', 'block');
+  }
+  $(this).closest('section').remove();
+
+ });
 
  });
 </script>

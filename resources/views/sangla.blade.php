@@ -139,7 +139,7 @@
       <div class="card">
         <form action="{{ route('pawn_store') }}" method="POST">
         {{ csrf_field() }}
-        <section class="batch1">
+        <section class="batch1" style="display:none">
           <div class="card-header card-header-primary text-center">
             TICKET DETAILS
           </div> <br>
@@ -315,7 +315,7 @@
           </div>
         </section>
         <!-- Computation Tab -->
-        <section class="batch4" style="display:none">
+        <section class="batch4">
           <div class="card-header card-header-primary text-center">
             COMPUTATION
           </div> <br>
@@ -348,6 +348,7 @@
                 </div>
               </div>
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 text-md-center-jc">
+                <section id="1">
                 <div class="form-group row">
                   <label class="col-xl-3 mt-3">Other Charges</label>
                     <div class="col-xl-6 col-lg-8 col-md-9 col-sm-8 col-12 mt-3 pb-3 mx-auto-jc"> 
@@ -361,9 +362,12 @@
                 <div class="col-xl-12-jc-amount col-lg-7-jc-amount col-md-7-jc-amount col-sm-7-jc-amount col-7-jc-amount mx-auto-jc" style="height:0px">
                     <input class="form-control" type="number" value="0">
                   </div>
-                    <button type="button" class="btn btn-success btn-sm px-1 py-2"><i class="material-icons">add</i></button>
-                    <button type="button" class="btn btn-danger btn-sm px-1 py-2"><i class="material-icons">remove</i></button>
+                    <button type="button" class="btn btn-success btn-sm px-1 py-2 addButton" data-id="1"><i class="material-icons">add</i></button>
+                    <!-- <button type="button" class="btn btn-danger btn-sm px-1 py-2"><i class="material-icons">remove</i></button> -->
                 </div>
+                
+                </section>
+
                 
               </div>
             </div>
