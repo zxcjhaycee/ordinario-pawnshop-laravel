@@ -8,10 +8,16 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="/css/font-awesome.min.css"> 
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css"> -->
+    <!-- <link rel="stylesheet" href="/css/material/material-dashboard.min.css"> -->
     <link rel="stylesheet" href="/css/material/material-dashboard-pro.min.css">
     <!-- <link rel="stylesheet" href="/css/material/material.min.css"> -->
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/datepicker.css">
+    <link rel="stylesheet" href="/css/select2.min.css">
+    <!-- <link rel="stylesheet" href="/css/material/datatables-material.min.css"> -->
+
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"> -->
+    
     <title>Ordinario Pawnshop</title>
 </head>
 <body>
@@ -37,177 +43,13 @@
 <script src="/js/form.js"></script>
 <script src="/js/datepicker.js"></script>
 <script src="/js/datepicker.en.js"></script>
+<script src="/js/select2.min.js"></script>
+<script src="/js/material/plugins/dataTables.material.min.js"></script>
+<script src="/js/material/plugins/jquery.dataTables-2.min.js"></script>
+@stack('scripts')
+
 <script>
-    $(document).ready(function() {
-      $().ready(function() {
-        $sidebar = $('.sidebar');
-
-        $sidebar_img_container = $sidebar.find('.sidebar-background');
-
-        $full_page = $('.full-page');
-
-        $sidebar_responsive = $('body > .navbar-collapse');
-
-        window_width = $(window).width();
-
-        fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
-
-        if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
-          if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
-            $('.fixed-plugin .dropdown').addClass('open');
-          }
-
-        }
-
-        $('.fixed-plugin a').click(function(event) {
-          // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
-          if ($(this).hasClass('switch-trigger')) {
-            if (event.stopPropagation) {
-              event.stopPropagation();
-            } else if (window.event) {
-              window.event.cancelBubble = true;
-            }
-          }
-        });
-
-        $('.fixed-plugin .active-color span').click(function() {
-          $full_page_background = $('.full-page-background');
-
-          $(this).siblings().removeClass('active');
-          $(this).addClass('active');
-
-          var new_color = $(this).data('color');
-
-          if ($sidebar.length != 0) {
-            $sidebar.attr('data-color', new_color);
-          }
-
-          if ($full_page.length != 0) {
-            $full_page.attr('filter-color', new_color);
-          }
-
-          if ($sidebar_responsive.length != 0) {
-            $sidebar_responsive.attr('data-color', new_color);
-          }
-        });
-
-        $('.fixed-plugin .background-color .badge').click(function() {
-          $(this).siblings().removeClass('active');
-          $(this).addClass('active');
-
-          var new_color = $(this).data('background-color');
-
-          if ($sidebar.length != 0) {
-            $sidebar.attr('data-background-color', new_color);
-          }
-        });
-
-        $('.fixed-plugin .img-holder').click(function() {
-          $full_page_background = $('.full-page-background');
-
-          $(this).parent('li').siblings().removeClass('active');
-          $(this).parent('li').addClass('active');
-
-
-          var new_image = $(this).find("img").attr('src');
-
-          if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-            $sidebar_img_container.fadeOut('fast', function() {
-              $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-              $sidebar_img_container.fadeIn('fast');
-            });
-          }
-
-          if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-            var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-            $full_page_background.fadeOut('fast', function() {
-              $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-              $full_page_background.fadeIn('fast');
-            });
-          }
-
-          if ($('.switch-sidebar-image input:checked').length == 0) {
-            var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
-            var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-            $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-            $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-          }
-
-          if ($sidebar_responsive.length != 0) {
-            $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
-          }
-        });
-
-        $('.switch-sidebar-image input').change(function() {
-          $full_page_background = $('.full-page-background');
-
-          $input = $(this);
-
-          if ($input.is(':checked')) {
-            if ($sidebar_img_container.length != 0) {
-              $sidebar_img_container.fadeIn('fast');
-              $sidebar.attr('data-image', '#');
-            }
-
-            if ($full_page_background.length != 0) {
-              $full_page_background.fadeIn('fast');
-              $full_page.attr('data-image', '#');
-            }
-
-            background_image = true;
-          } else {
-            if ($sidebar_img_container.length != 0) {
-              $sidebar.removeAttr('data-image');
-              $sidebar_img_container.fadeOut('fast');
-            }
-
-            if ($full_page_background.length != 0) {
-              $full_page.removeAttr('data-image', '#');
-              $full_page_background.fadeOut('fast');
-            }
-
-            background_image = false;
-          }
-        });
-
-        $('.switch-sidebar-mini input').change(function() {
-          $body = $('body');
-
-          $input = $(this);
-
-          if (md.misc.sidebar_mini_active == true) {
-            $('body').removeClass('sidebar-mini');
-            md.misc.sidebar_mini_active = false;
-
-            $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
-
-          } else {
-
-            $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
-
-            setTimeout(function() {
-              $('body').addClass('sidebar-mini');
-
-              md.misc.sidebar_mini_active = true;
-            }, 300);
-          }
-
-          // we simulate the window Resize so the charts will get updated in realtime.
-          var simulateWindowResize = setInterval(function() {
-            window.dispatchEvent(new Event('resize'));
-          }, 180);
-
-          // we stop the simulation of Window Resize after the animations are completed
-          setTimeout(function() {
-            clearInterval(simulateWindowResize);
-          }, 1000);
-
-        });
-      });
-    });
-
+ 
     $(document).ready(function(){
       $(document).on('click', '#showPassword', function(){
         let state = $(this).attr('data-id');
@@ -438,60 +280,6 @@
     $('#itemTable').on('click','.remove',function() {
       $(this).closest('table').remove();
     });
-    /*
-  $(document).ready(function(){
-    var sampleTable = $('#dataTableExample').DataTable({
-      columnDefs: [
-            {
-                targets: [ 0, 1, 2,3,4,5 ],
-                className: 'mdl-data-table__cell--non-numeric'
-            }
-        ]
-    });
-    $('#datatbl tfoot th').each( function () {
-      var title = $(this).text();
-      $(this).html( '<input class="form-control" type="text" placeholder="Search '+title+'" />' );
-    } );
-    var table = $('#datatbl').DataTable({
-      "lengthMenu": [[10, 25, 50,100, -1], [10, 25, 50,100, "All"]],
-      "processing": true,
-      "serverSide": true,
-      "ajax":"../pages/scripts/datatables.php?data_type=<?=isset($_GET['sub']) ? $_GET['sub']:'' ;?>",
-      "columnDefs": [{
-        "data":null,
-        "render":function(data, type, row, meta){
-            return data[-1];
-        }},
-        {
-          targets: [ -1, 0, 1, 2 ],
-          className: 'mdl-data-table__cell--non-numeric'
-        },
-        {
-          "targets":-1,
-          "data":null,
-            "render":function(data, type, row, meta){
-            <?php 
-              // include("actions.php");
-               ?>
-        }
-        }]
-    });
-    table.columns().every( function () {
-      var that = this;
-
-      $( 'input', this.footer() ).on( 'keyup change clear', function () {
-        if ( that.search() !== this.value ) {
-            that
-                .search( this.value )
-                .draw();
-        }
-      } );
-    } );
-    $('#datatbl tbody').on( 'click', 'button', function () {
-      var data = table.row( $(this).parents('tr') ).data();
-    });
-  });
-      */
   $(document).ready(function(){
     $('.air_date_picker').datepicker({
     language: 'en',
@@ -538,6 +326,221 @@
 
  });
 
+ let counter = 1;
+  $(document).on('click', '.add_section', function(){
+    // let counter = 0;
+    // let counterTwo = ++counter;    
+    $('.attachment_section:last').after('<section class="attachment_section">'+
+                        '<div class="card">'+
+                            '<div class="card-header card-header-text card-header-primary">'+
+                                '<div class="card-text">'+
+                                '<h4 class="card-title">Attachment</h4>'+
+                                '</div>'+
+                                '<button type="button" class="btn btn-sm btn-danger pull-right remove_section" data-id="'+counter+'"><span class="material-icons">remove_circle</span></button>'+
+
+                            '</div>'+
+                            '<div class="card-body card-body-form">'+
+                            '<div class="row d-flex justify-content-center">'+
+                                '<label for="attachment_type" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Type: </label>'+
+                                '<div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 attachment_type_'+counter+'_error"  style="top:-20px;">'+
+                                    '<div class="form-group input @error("attachment_type") has-error is-focused @enderror">'+
+                                        '<select name="attachment_type['+counter+']" id="attachment_type'+counter+'" class="form-control attachment_type_select">'+
+                                          '<option></option>'+
+                                        '</select>'+                                     
+                                    '</div>'+
+                                    '@error("attachment_type")'+
+                                     '<label class="text-danger">{{ $message }}</label>'+
+                                    '@enderror'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row d-flex justify-content-center">'+
+                                '<label for="attachment_number" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Number: </label>'+
+                                '<div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 attachment_number_'+counter+'_error" style="top:-20px;">'+
+                                    '<div class="form-group input @error("attachment_number") has-error is-focused @enderror">'+
+                                    '<input type="text" id="attachment_number" name="attachment_number['+counter+']" class="form-control" value="{{ isset($data->attachment_number) && $errors->isEmpty() ? $data->attachment_number : old("attachment_number") }}"/>'+
+                       
+                                        '<span class="material-icons form-control-feedback">clear</span>'+
+                                    '</div>'+
+                                    '@error("attachment_number")'+
+                                     '<label class="text-danger">{{ $message }}</label>'
+                                    '@enderror'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row d-flex justify-content-center">'+
+                                '<label for="attachment" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">File: </label>'+
+                                '<div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 attachment_'+counter+'_error" style="top:-20px;">'+
+                                    '<div class="form-group input @error("attachment") has-error is-focused @enderror">'+
+                                                '<input type="file" name="attachment['+counter+']">'+
+                                            '<div class="input-group">'+
+                                                '<input type="text" name="attachment['+counter+']" readonly="" class="form-control" placeholder="Add Attachment">'+
+                                                '<button type="button" class="btn btn-fab btn-fab-mini">'+
+                                                     '<i class="material-icons">attach_file</i>'+
+                                                '</button>'+
+                                            '</div>'+
+                                        
+                                    '</div>'+
+                                    '@error("attachment")'+
+                                     '<label class="text-danger">{{ $message }}</label>'+
+                                    '@enderror'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+     
+                    '</section>');
+
+                    $(".attachment_type_select").select2({
+                      width: '100%',
+                      ajax: {
+                        url: '{{ route('attachment.search') }}',
+                        data: function (params) {
+                          return {
+                            search: params.term,
+                          }
+                        // Query parameters will be ?search=[term]&type=public
+                        },
+                        processResults: function (data) {
+                          return {
+                            results : data
+                          }
+                        },
+                       }
+                    });
+
+
+          $(".attachment_type_select").on("select2:select", function (e) {
+            // console.log(e.params);
+            if(e.params.data.text == 'Can\'t find? Add Attachment'){
+              window.open('{{ route('attachment.create') }}');
+              // console.log("Hello!");
+              // console.log($(this).text());
+              $(this).val(null).trigger("change");
+
+            }
+
+          });
+
+    counter++;
+
+  });
+
+  $(document).on('click', '.remove_section', function(){
+      // let counter = $(this).data('id');
+      $(this).parent().closest('section').remove();
+      // counter--;
+
+  });
+
+    $(document).on('submit', 'form#customerForm', function(e){
+      const checkValue = $('input[name="_method"]').val();
+      // const method = checkValue == null ? 'POST' : 'PUT';
+      const url = checkValue == null ? '{{ route('customer.store') }}' : '{{ route('customer.update', $data->id ?? '') }}'; 
+      $('.error_message').css('display', 'none');
+      $('.input').removeClass('has-error is-focused');
+      e.preventDefault();
+      var form_data = new FormData(this);
+        $.ajax({
+          headers: {
+              'X-CSRF-TOKEN': "{{ csrf_token() }}"
+          },
+          url : url,
+          type : "POST",
+          data : form_data,
+          cache: false,
+          contentType : false,
+          processData : false,
+          success: (data) => {
+            // console.log(data.success);
+            if(data.success === true){
+              alert_message('Success', data.status);
+             location.reload();
+            }else{
+              alert_message('Danger', 'Error occured. Pleasse contact administrator');
+
+            }
+
+          },
+          error: (data) => {
+            const error = data.responseJSON.errors;
+            for(let errorValue in error){
+              if (!error.hasOwnProperty(errorValue)) continue;
+                 $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
+                  $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
+                  // console.log('.'+errorValue+'_error');
+                  // console.log(errorValue.replace(/\D/g,''));
+
+            }
+            // $('.first_name_error').html(error.first_name).css('display','block');
+          }
+        });
+        
+    });
+
+    $('.attachment_type_select').select2({
+      width: '100%',
+      ajax: {
+    url: '{{ route('attachment.search') }}',
+    data: function (params) {
+      return {
+        search: params.term,
+      }
+
+      // Query parameters will be ?search=[term]&type=public
+    },
+    processResults: function (data) {
+        return {
+          results : data
+        }
+    },
+
+  }
+    });
+    $(".attachment_type_select").on("select2:select", function (e) {
+      // console.log(e.params);
+      if(e.params.data.text == 'Can\'t find? Add Attachment'){
+        window.open('{{ route('attachment.create') }}');
+        // console.log("Hello!");
+        // console.log($(this).text());
+        $(this).val(null).trigger("change");
+
+      }
+
+    });
+
+    $(document).on('click', '.remove_attachment', function(){
+      const id = $(this).data('id');
+      let url = '{{ route('customer.delete_attachment', ":id") }}';
+      url = url.replace(':id', id);
+      const r = confirm("Do you want to continue?");
+        if(r == true){
+          $.ajax({
+            headers: {
+              'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            type: "DELETE",
+            url : url,
+
+            success: (data) => {
+              // console.log(data);
+              location.reload();
+              alert_message('Success', data.status);
+              
+            }
+
+          })
+        }
+    });
  });
+ 
+ function alert_message(status, message){
+   $('.alert_message').html('<div class="col-xl-7 col-lg-9 col-md-8 col-sm-12 col-12 mx-auto">'+
+        '<div class="alert alert-'+status.toLowerCase()+' alert-dismissible fade show text-center" style="font-size:15px" role="alert">'+
+            '<strong>'+status+'!</strong> '+message+ 
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+                    '<span aria-hidden="true">&times;</span>'+
+                '</button>'+
+        '</div>'+
+    '</div>');
+  
+ }
 </script>
 </html>

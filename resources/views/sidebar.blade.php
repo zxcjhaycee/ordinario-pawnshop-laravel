@@ -78,6 +78,18 @@
             </a>
             <div class="collapse {{  Route::current()->getPrefix() == '/settings' ? 'show' : ''  }}" id="settings" style="">
               <ul class="nav">
+              <li class="nav-item {{ class_basename(Route::current()->controller) == 'BranchController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('branch.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">list</i> </span>
+                    <span class="sidebar-normal"> Branch </span>
+                  </a>
+                </li>
+                <li class="nav-item {{ class_basename(Route::current()->controller) == 'CustomerController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('customer.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">group</i> </span>
+                    <span class="sidebar-normal"> Customer </span>
+                  </a>
+                </li>
                 <li class="nav-item {{ Route::currentRouteName() == 'rates' ? 'active' : '' }}">
                   <a class="nav-link" href="/settings/rates">
                     <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
@@ -86,16 +98,11 @@
                 </li>
                 <li class="nav-item {{ class_basename(Route::current()->controller) == 'UserController' ? 'active' : '' }}">
                   <a class="nav-link" href="{{ route('user.index') }}">
-                    <span class="sidebar-mini"> <i class="material-icons">people</i> </span>
+                    <span class="sidebar-mini"> <i class="material-icons">person_pin</i> </span>
                     <span class="sidebar-normal"> User </span>
                   </a>
                 </li>
-                <li class="nav-item {{ class_basename(Route::current()->controller) == 'BranchController' ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ route('branch.index') }}">
-                    <span class="sidebar-mini"> <i class="material-icons">list</i> </span>
-                    <span class="sidebar-normal"> Branch </span>
-                  </a>
-                </li>
+                
 
 
               </ul>

@@ -1,3 +1,14 @@
+<style>
+@media(max-width: 992px){
+  .sidebar .nav li .dropdown-menu a, .sidebar .nav li a {
+  color: #ffffff;
+  }
+  .sidebar .nav li:hover>a {
+    color: #ffffff;
+  }
+}
+
+</style>
    <!-- Start of Navigation -->
    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -34,9 +45,11 @@
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <span> {{--  Auth::user()->first_name --}} </span>  
                   <i class="material-icons">person</i>
+
                   <p class="d-lg-none d-md-block">
-                    Account
+                    
                   </p>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
