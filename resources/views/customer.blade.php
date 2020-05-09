@@ -69,7 +69,8 @@
     
                  <div class="card-body">
                         @include('alert')
-                  <div class="table-responsive material-datatables">
+                        <div class="alert_message"></div>
+                  <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                       <table class="table table-hover customer_table">
                             <thead>
                                 <tr>
@@ -100,18 +101,19 @@
 
 @endsection
 @push('scripts')
-    <!-- <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script> -->
 
     <script type="text/javascript">
-  $(function () {
+  $(tableFunction = () => {
     
-    var table = $('.customer_table').DataTable({
+    let table = $('.customer_table').DataTable({
         processing: true,
         serverSide: true,
+        stateSave: true, // statesaving of datatable
+        bDestroy: true, // for re-initialized 
         ajax: "{{ route('customer.index') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-            {data: 'first_name', name: 'first_name'},
+            {data: 'full_name', name: 'full_name'},
             {data: 'birthdate', name: 'birthdate'},
             {data: 'sex', name: 'sex'},
             {data: 'email', name: 'email'},
@@ -119,7 +121,9 @@
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
     });
-    
+    // console.log(table.state());
+
+
   });
 </script>
 @endpush

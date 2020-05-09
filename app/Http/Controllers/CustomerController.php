@@ -14,14 +14,27 @@ class CustomerController extends Controller
     public function index(Request $request){
         // $customer = Customer::withTrashed()->get();
         // return view('customer', compact('customer'));
-        if ($request->ajax()) {
+        if ($request->ajax()){
         $customer = Customer::withTrashed()->get();
+        // $customer = Customer::all();
             return Datatables::of($customer)
                     ->addIndexColumn()
+                    ->addColumn('full_name', function($row){
+                        return $row->first_name.' '.$row->last_name.' '.$row->suffix;
+                    })
+                    ->editColumn('birthdate', function ($data) {
+                        return date('m/d/Y', strtotime($data->birthdate));
+                    })
+                    ->editColumn('sex', function ($data) {
+                        return ucwords($data->sex);
+                    })
                     ->addColumn('action', function($row){
-   
-                           $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm">View</a>';
-     
+                        // dd($row->deleted_at);
+                        $view_route = route('customer.show', ['id' => $row['id']]);
+                        $icon = isset($row->deleted_at) ? 'restore' : 'delete';
+                        $btn = '<a href="'.$view_route.'" class="btn btn-responsive ordinario-button btn-sm"><span class="material-icons">view_list</span></a>'; 
+                        $btn .= '<button type="button" class="btn btn-sm btn-warning remove" id="'.$row['id'].'" data-name="customer"><span class="material-icons">'.$icon.'</span></button> ';
+
                             return $btn;
                     })
                     ->rawColumns(['action'])
@@ -39,7 +52,7 @@ class CustomerController extends Controller
     public function show(Request $request){
         
         // $customer = Customer::find($request->id);
-        $customer = Customer::with('attachments')->find($request->id);
+        $customer = Customer::withTrashed()->with('attachments')->find($request->id);
 
         return view('view_customer', compact('customer'));
 
@@ -183,7 +196,7 @@ class CustomerController extends Controller
             $message = array('status' => 'The customer was successfully deleted!');
         }
 
-        return back()->with($message);
+        return response()->json($message);
 
     }
     public function remove_attachment(Request $request){

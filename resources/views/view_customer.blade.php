@@ -69,8 +69,8 @@
                                 <div class="row d-flex justify-content-center">
                                     <label for="middle_name" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Middle Name: </label>
                                     <div class="col-xl-8 col-lg-5 col-md-5 col-sm-7" style="top:-10px;">
-                                        <div class="form-group">
-                                            <h5 >{{ $customer->middle_name }}</h5> 
+                                        <div class="form-group" style="min-height:38px">
+                                            <h5 >{{ $customer->middle_name  }}</h5> 
                                         </div>
 
                                     </div>
@@ -78,7 +78,7 @@
                                 <div class="row d-flex justify-content-center">
                                     <label for="last_name" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Last Name: </label>
                                     <div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 " style="top:-10px;">
-                                        <div class="form-group">
+                                     <div class="form-group" style="min-height:38px">
                                         <h5 >{{ $customer->last_name }}</h5> 
 
                                         </div>
@@ -169,8 +169,8 @@
                                     <label for="present_address" class="col-xl-3 col-lg-2 col-md-2 col-sm-4 ">Address Line: </label>
                                     <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-10px;">
                                         <div class="form-group">
-                                            <!-- <h5 >{{ $customer->present_address }}</h5>  -->
-                                            <h5 >The quick brown fox jumps over the lazy dog near the riverbanks. The quick brown fox jumps over the lazy dog near the riverbanks</h5> 
+                                            <h5 >{{ $customer->present_address }}</h5> 
+                                            <!-- <h5 >The quick brown fox jumps over the lazy dog near the riverbanks. The quick brown fox jumps over the lazy dog near the riverbanks</h5>  -->
 
                                         </div>
 

@@ -529,6 +529,34 @@
           })
         }
     });
+
+    $(document).on('click', '.remove', function(){
+      const id = $(this).attr('id');
+      const name = $(this).data('name');
+      let url = name+'/'+id;
+
+      const r = confirm("Do you want to continue?");
+        if(r == true){
+          $.ajax({
+            headers: {
+              'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            type: "POST",
+            url : url,
+            data: {
+              "_method": 'DELETE'
+            },
+            success: (data) => {
+              console.log(data);
+              // location.reload();
+              alert_message('Success', data.status);
+              tableFunction();
+              
+            }
+
+          })
+        }
+    });
  });
  
  function alert_message(status, message){

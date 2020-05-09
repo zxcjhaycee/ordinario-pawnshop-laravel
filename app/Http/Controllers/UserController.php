@@ -7,14 +7,41 @@ use Illuminate\Support\Facades\Hash;
 
 use App\User;
 use App\Branch;
-
+use DataTables;
 class UserController extends Controller
 {
     //
-    public function index(){
+    public function index(Request $request){
 
-        $user = User::with('branch')->withTrashed()->get();
-        return view('user', compact('user'));
+        if ($request->ajax()){
+            $user = User::with('branch')->withTrashed()->get();
+            // dd($user);
+                return Datatables::of($user)
+                        ->addIndexColumn()
+                        ->addColumn('full_name', function($row){
+                            return $row->first_name.' '.$row->last_name;
+                        })
+                        ->addColumn('status', function($row){
+                            return isset($row->deleted_at) ? '<span class="text-danger">Inactive</span>' : '<span class="text-success">Active</span>';
+                        })
+                        ->editColumn('branch', function ($data) {
+                            return $data->branch->branch;
+                        })
+                        ->editColumn('access', function ($data) {
+                            return ucwords($data->access);
+                        })
+                        ->addColumn('action', function($row){
+                            $view_route = route('user.edit', ['id' => $row['id']]);
+                            $icon = isset($row->deleted_at) ? 'restore' : 'delete';
+                            $btn = '<a href="'.$view_route.'" class="btn btn-sm ordinario-button"><span class="material-icons">edit</span></a>';                           
+                            $btn .= '<button type="button" class="btn btn-sm btn-warning remove" id="'.$row['id'].'" data-name="user"><span class="material-icons">'.$icon.'</span></button> ';
+                            // $btn = '';
+                                return $btn;
+                        })
+                        ->rawColumns(['action','status'])
+                        ->make(true);
+            }
+        return view('user');
         
     }
 
@@ -78,6 +105,7 @@ class UserController extends Controller
             $message = array('status' => 'The user was successfully deleted!');
         }
 
-        return back()->with($message);
+        // return back()->with($message);
+        return response()->json($message);
     }
 }

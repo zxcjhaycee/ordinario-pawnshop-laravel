@@ -4,15 +4,33 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Branch;
-
+use DataTables;
 class BranchController extends Controller
 {
     //
 
-    public function index(){
+    public function index(Request $request){
 
-        $branch = Branch::withTrashed()->get();
-        return view('branch', compact('branch'));
+        if ($request->ajax()){
+            $branch = Branch::withTrashed()->get();
+                return Datatables::of($branch)
+                        ->addIndexColumn()
+                        ->addColumn('status', function($row){
+                            return isset($row->deleted_at) ? '<span class="text-danger">Inactive</span>' : '<span class="text-success">Active</span>';
+                        })
+                        ->addColumn('action', function($row){
+                            $view_route = route('branch.edit', ['id' => $row['id']]);
+                            $icon = isset($row->deleted_at) ? 'restore' : 'delete';
+                            $btn = '<a href="'.$view_route.'" class="btn btn-sm ordinario-button"><span class="material-icons">edit</span></a>';                           
+                            $btn .= '<button type="button" class="btn btn-sm btn-warning remove" id="'.$row['id'].'" data-name="branch"><span class="material-icons">'.$icon.'</span></button> ';
+                            // $btn = '';
+                                return $btn;
+                        })
+                        ->rawColumns(['action','status'])
+                        ->make(true);
+            }
+
+        return view('branch');
     }
 
     public function store(Request $request){
@@ -59,6 +77,7 @@ class BranchController extends Controller
             $message = array('status' => 'The branch was successfully deleted!');
         }
 
-        return back()->with($message);
+        // return back()->with($message);
+        return response()->json($message);
     }
 }

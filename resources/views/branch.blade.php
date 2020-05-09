@@ -40,7 +40,9 @@
     font-size:12px;
   }
 } 
-
+.pagination{
+  flex-wrap:wrap;
+}
 </style>
 <div class="content">
     <div class="col-xl-12">
@@ -56,38 +58,18 @@
     
                  <div class="card-body">
                         @include('alert')
-                  <div class="table-responsive">
-                      <table class="table table-hover">
+                    <div class="alert_message"></div>
+                    <div class="table-responsive material-datatables" style="overflow-y: hidden;">
+                      <table class="table table-hover branch_table">
                             <thead>
                                 <tr>
                                   <th>#</th>
                                   <th>Branch</th>
                                   <th>Status</th>
-                                  <th>Actions</th>
+                                  <th style="width:15%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    $count = 1;
-                                @endphp
-                                @foreach($branch as $key => $value)
-                                    <tr>
-                                        <td>{{ $count++ }}</td>
-                                        <td>{{ $value->branch }}</td>
-                                        <td class="text-{{ !isset($value->deleted_at) ? 'success' : 'danger' }}" style="width:20%">
-                                            {!! !isset($value->deleted_at) ? 'Active' : 'Inactive <i class="text-muted">('.date('F d, Y', strtotime($value->deleted_at)).')</i> ' !!}
-                                        </td>
-                                        <td style="width:15%">
-                                            <a href="{{ route('branch.edit', $value->id) }}" class="btn btn-sm ordinario-button"><span class="material-icons">edit</span></a>
-                                            <form action="{{ route('branch.destroy', $value->id) }}" method="POST" style="display:inline">
-                                                @method('DELETE')
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-warning"><span class="material-icons">{{ !isset($value->deleted_at) ? 'delete' : 'restore' }}</span></button>
-                                            </form>
-                                            <!-- <a href="branch/delete/{{ $value->id }}" class="btn btn-sm btn-warning"><span class="material-icons">delete</span></a> -->
-                                        </td>
-                                    </tr>
-                                @endforeach
 
                             </tbody>
                         </table>
@@ -104,3 +86,27 @@
 </div>
 
 @endsection
+@push('scripts')
+
+    <script type="text/javascript">
+  $(tableFunction = () => {
+    
+    let table = $('.branch_table').DataTable({
+        processing: true,
+        serverSide: true,
+        stateSave: true, // statesaving of datatable
+        bDestroy: true, // for re-initialized 
+        ajax: "{{ route('branch.index') }}",
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+            {data: 'branch', name: 'branch'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ]
+    });
+    // console.log(table.state());
+
+
+  });
+</script>
+@endpush
