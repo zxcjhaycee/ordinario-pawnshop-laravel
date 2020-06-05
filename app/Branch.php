@@ -15,4 +15,8 @@ class Branch extends Model
     public function user(){
         return $this->hasOne('App\User');
     }
+
+    public function rates(){
+        return $this->hasMany(Rate::class);
+    }
 }
