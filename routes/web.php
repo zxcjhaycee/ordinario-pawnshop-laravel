@@ -29,9 +29,9 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
     });
 
     Route::prefix('settings')->group(function () {
-        Route::get('rates', 'RatesController@index')->name('rates');
-
-        // Route::get('user', 'UserController@index')->name('user');
+        Route::resource('rates', 'RatesController')->except(['index']);
+        Route::get('/rates/{branch_id?}/{item_category_id?}', 'RatesController@index')->name('rates.index');
+        Route::get('rates.getBranchItem', 'RatesController@getBranchItem')->name('rates.getBranchItem');
 
         Route::resource('branch', 'BranchController')->parameters(['branch' => 'id']);
         Route::resource('user', 'UserController')->parameters(['user' => 'id']);
