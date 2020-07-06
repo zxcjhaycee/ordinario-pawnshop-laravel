@@ -290,7 +290,7 @@
                                 <div class="card-text">
                                 <h4 class="card-title">Attachment</h4>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-danger pull-right remove_attachment" data-id="{{ $value->pivot->id }}"><span class="material-icons">remove_circle</span></button>
+                                <button type="button" class="btn btn-sm btn-danger pull-right remove" data-name="delete_attachment" id="{{ $value->pivot->id }}"><span class="material-icons">remove_circle</span></button>
                             </div>
                             <div class="card-body card-body-form">
                             <div class="row d-flex justify-content-center">

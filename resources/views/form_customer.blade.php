@@ -44,9 +44,10 @@
                     <!-- @include('alert') -->
                     <div class="alert_message"></div>
                     
-                 <form method="POST" enctype="multipart/form-data" id="customerForm">
+                 <form method="POST" enctype="multipart/form-data" id="customerForm" onSubmit="customerForm(event, this)">
                         @if(isset($data->id))
                             @method('PUT')
+                            <input type="hidden" id="id" name="id" value="{{ $data->id }}">
                         @endif
                         @csrf
                     <div class="mt-5 row">
@@ -424,7 +425,7 @@
                         </section>
                     <!-- end of card attachment -->
                            
-                            <button type="button" class="btn btn-warning btn-sm add_section"> Add Another Attachment </button>
+                            <button type="button" class="btn btn-warning btn-sm add_section" onClick="addAttachment()"> Add Another Attachment </button>
                         </div>
                             <div class="text-center mx-auto">
                                             <button type="submit" class="btn btn-success">Submit</button>
@@ -443,3 +444,19 @@
 </div>
 
 @endsection
+@push('scripts')
+<script>
+    const attachment = document.querySelector('.attachment_type_select');
+    const route = '{{ route('attachment.search') }}';
+    select2Initialized(attachment, route);    
+    $(".attachment_type_select").on("select2:select", function (e) {
+    //   console.log(e.params);
+      if(e.params.data.text == 'Can\'t find? Add Attachment'){
+        window.open('{{ route('attachment.create') }}');
+        $(this).val(null).trigger("change");
+
+      }
+
+    });
+</script>
+@endpush

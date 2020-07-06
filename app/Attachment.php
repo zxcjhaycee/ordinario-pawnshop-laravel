@@ -8,4 +8,6 @@ class Attachment extends Model
 {
     //
     protected $fillable = ['type'];
+
+
 }

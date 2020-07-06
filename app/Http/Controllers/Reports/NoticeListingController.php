@@ -45,6 +45,7 @@ class NoticeListingController extends Controller
         $fpdf->SetY(70);
         $fpdf->SetLeftMargin(15);
         $fpdf->SetFont('Arial','B',11);
+        // $fpdf->SetHeight(array(5,5,5,5));
 
         $fpdf->SetWidths(array(20,60,70,30));
         $fpdf->SetAligns(array('C','C','C','C'));
@@ -58,6 +59,7 @@ class NoticeListingController extends Controller
         // $fpdf->SetXY(175, 65);
         $number = 1;
         while($number <= 30){
+            
             $fpdf->SetX(15);
             $fpdf->SetFont('Arial','',11);
             $customer = 'The quick brown fox jumps over the lazy dog near the riverbanks';

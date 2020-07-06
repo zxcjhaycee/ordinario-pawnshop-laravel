@@ -202,7 +202,48 @@ class CustomerController extends Controller
     public function remove_attachment(Request $request){
 
         $customerattacment = CustomerAttachment::findOrFail($request->id)->delete();
-        return response()->json(['status' => 'The attachment was successfully removed!', 'success' => true]);
+        return response()->json(['status' => 'The attachment was successfully removed!', 'success' => true, 'reload' => true]);
 
+    }
+
+    public function search(Request $request){
+        $data = array();
+        if(isset($request->search)){
+            $customer = Customer::where(\DB::raw('concat(first_name," ",last_name," ", suffix)'), 'like', '%'.$request->search.'%')->take(10)->get();
+            // dd($attachments[0]);
+            if($customer->count() > 0){
+                foreach($customer as $key => $value){
+                    $data[] = array(
+                        'action' => 'attachment',
+                        'id' => $value->id,
+                        'text' => $value->first_name." ".$value->last_name." ".$value->suffix
+                    );
+                }
+            }else{
+                $data[] = array(
+                    'link' => '/settings/customer/create',
+                    'id' => 'link',
+                    'text' => 'Can\'t find? Add Customer'
+                );
+            }
+
+        }
+
+        return response()->json($data);
+    }
+
+    public function search_attachment(Request $request){
+        $attachment = Customer::find($request->customer_id)->attachments()->orderBy('type')->get();
+        $data = array();
+        foreach($attachment as $key => $value){
+            // echo $value->type;
+            $data['type'][] = $value->type;
+            $data['id'][] = $value->id;
+            $data['attachment_number'][] = $value->pivot->number;
+
+
+        }
+        
+        return response()->json($data);
     }
 }

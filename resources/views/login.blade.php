@@ -68,7 +68,7 @@
 							<div class="input-group col-sm-8 col-12 col-lg-9 col-xl-8">
 								<input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
 								<div class="input-group-append" style="border :1px solid #ced4da;border-left:0px;border-radius:.25rem;margin-left:-5px;margin-top:0px;height:38px">
-									<button type="button" class="btn btn-outline" id="showPassword" data-id="off"><i class="fas fa-eye"></i></button>
+									<button type="button" class="btn btn-outline" id="showPassword" data-id="off" onClick="togglePassword(this)"><i class="fas fa-eye"></i></button>
 								</div>
 
 							</div>
@@ -107,6 +107,7 @@
 
   <!-- Bootstrap core JavaScript -->
   <script src="js/login/jquery.min.js"></script>
+  <script src="js/function.js"></script>
   <script src="js/login/bootstrap.bundle.min.js"></script>
 
   <!-- Plugin JavaScript -->
@@ -118,25 +119,7 @@
 
   <script src="js/login/popper.min.js"></script>
   <script src="js/login/bootstrap.min.js"></script>
-  <script>
-        $(document).ready(function(){
-      $(document).on('click', '#showPassword', function(){
-        let state = $(this).attr('data-id');
-        if(state == 'off'){
-          // $(this).data('id', 'on');
-          $(this).attr('data-id', 'on');
-          $('#password').attr('type', 'text');
-          $(this).html('<i class="fas fa-eye-slash"></i>');
-        }else{
-          // $(this).data('id', 'off');
-          $(this).attr('data-id', 'off');
-          $('#password').attr('type', 'password');
-          $(this).html('<i class="fas fa-eye"></i>');
-        }
-      });
-    });
 
-  </script>
 </body>
 
 </html>

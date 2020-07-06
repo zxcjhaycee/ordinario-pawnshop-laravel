@@ -8,7 +8,8 @@ class MC_TableFpdf extends Fpdf{
 
     var $widths;
     var $aligns;
-
+    var $height;
+    /*
     function Header(){
         $this->Image('img/Logo Only.png',33,5,12);
         // Arial bold 15
@@ -35,9 +36,15 @@ class MC_TableFpdf extends Fpdf{
         // Line break
         $this->Ln(23);
     }
+    */
     function SetWidths($w){
         //Set the array of column widths
         $this->widths=$w;
+    }
+
+    function SetHeight($h){
+        //Set the value of column height
+        $this->height=$h;
     }
 
     function SetAligns($a){
@@ -47,16 +54,19 @@ class MC_TableFpdf extends Fpdf{
 
     function Row($data){
         //Calculate the height of the row
+        $height = $this->height; 
         $nb=0;
         for($i=0;$i<count((array)$data);$i++)
             $nb=max($nb,$this->NbLines($this->widths[$i],$data[$i]));
-        $h=5*$nb;
+        $h=$height*$nb;
         //Issue a page break first if needed
         $this->CheckPageBreak($h);
         //Draw the cells of the row
         for($i=0;$i<count((array)$data);$i++)
         {
             $w=$this->widths[$i];
+            // $height=$this->height[$i];
+
             $a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
             //Save the current position
             $x=$this->GetX();
@@ -64,7 +74,8 @@ class MC_TableFpdf extends Fpdf{
             //Draw the border
             $this->Rect($x,$y,$w,$h);
             //Print the text
-            $this->MultiCell($w,5,$data[$i],0,$a);
+            // $this->MultiCell($w,5,$data[$i],0,$a);
+            $this->MultiCell($w,$height,$data[$i],0,$a);
             //Put the position to the right of the cell
             $this->SetXY($x+$w,$y);
         }

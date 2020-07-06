@@ -14,16 +14,23 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ class_basename(Route::current()->controller) == 'PawnController' ? '' : 'collapsed'  }}" data-toggle="collapse" href="#pagesExamples" 
-              aria-expanded="{{ class_basename(Route::current()->controller) == 'PawnController' ? 'true' : 'false' }}">
+            <a class="nav-link {{ Route::current()->getPrefix() == '/pawn_auction' ? '' : 'collapsed'  }}" data-toggle="collapse" href="#pagesExamples" 
+              aria-expanded="{{ Route::current()->getPrefix() == '/pawn_auction' ? 'true' : 'false' }}">
               <i class="material-icons">star</i>
               <p> Pawn & Auction
                 <b class="caret"></b>
               </p>   
 
             </a>
-            <div class="collapse {{ class_basename(Route::current()->controller) == 'PawnController' ? 'show' : ''  }} " id="pagesExamples">
+            <div class="collapse {{ Route::current()->getPrefix() == '/pawn_auction' ? 'show' : ''  }} " id="pagesExamples">
               <ul class="nav">
+              <li class="nav-item {{ class_basename(Route::current()->controller) == 'InventoryController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('inventory.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
+                    <span class="sidebar-normal"> Pawn </span>
+                  </a>
+                </li>
+              <!--                 
                 <li class="nav-item {{ Route::currentRouteName() == 'pawn' ? 'active' : '' }}">
                   <a class="nav-link" href="{{ route('pawn') }}">
                     <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
@@ -42,6 +49,7 @@
                     <span class="sidebar-normal"> Auction </span>
                   </a>
                 </li>
+                 -->
               </ul>
             </div>
           </li>
@@ -90,7 +98,7 @@
                     <span class="sidebar-normal"> Customer </span>
                   </a>
                 </li>
-                <li class="nav-item {{ Route::currentRouteName() == 'rates' ? 'active' : '' }}">
+                <li class="nav-item {{ class_basename(Route::current()->controller) == 'RatesController' ? 'active' : '' }}">
                   <a class="nav-link" href="/settings/rates">
                     <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
                     <span class="sidebar-normal"> Rates </span>

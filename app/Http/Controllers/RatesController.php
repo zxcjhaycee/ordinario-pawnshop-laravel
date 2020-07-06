@@ -104,4 +104,17 @@ class RatesController extends Controller
         $branchItem = $request->only('branch_id', 'item_category_id');
         return redirect('/settings/rates/' . $branchItem['branch_id'] . '/' . $branchItem['item_category_id']);
     }
+
+    public function getItemType(Request $request){
+         $item_type = Item_type::where('item_category_id', $request->id)->get();
+
+        return response()->json($item_type);
+    }
+
+    public function getKarat(Request $request){
+        $item_karat = Rate::where('item_type_id', $request->id)->where('branch_id', \Auth::user()->branch_id)->orderBy('id')->get();
+        // dd($request->id);
+        return response()->json($item_karat);
+
+    }
 }

@@ -381,15 +381,7 @@
   </div>
 </div>
 <script>
-  function getSuki(radio){
-    if(document.getElementById("category_jewelry").checked){
-        document.getElementById("suki").style.display = "block";
-        document.getElementById("suki_check").disabled = false;
-    }else {
-        document.getElementById("suki").style.display = "none";
-        document.getElementById("suki_check").disabled = true;
-    }
-  }
+
 
 
 </script>

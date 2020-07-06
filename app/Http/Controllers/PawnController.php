@@ -6,6 +6,10 @@ use App\Pawn;
 use Illuminate\Http\Request;
 use Codedge\Fpdf\Fpdf\Fpdf;
 use \NumberFormatter;
+use App\Inventory;
+use App\Ticket;
+use App\Http\Controllers\MC_TableFpdf;
+
 // use Carbon\Carbon; 
 
 class PawnController extends Controller
@@ -54,8 +58,14 @@ class PawnController extends Controller
         return redirect()->route('pawn_print', $print_value);
         // return redirect()->route('pawn_print');
     }
-    public function pawnPrint(Fpdf $fpdf, Request $request){
-        // dd($request);
+    public function pawnPrint(MC_TableFpdf $fpdf, Request $request){
+        // dd($request->id);
+        $data = Inventory::with(['pawnTickets' => function($query){
+            $query->where('pawnTickets.transaction_type', '=', 'pawn');
+        }])
+        ->with(['pawnTickets.encoder', 'customer', 'inventoryItems', 'pawnTickets.other_charges', 'pawnTickets.attachment', 'inventoryItems.item_type'])
+        ->find($request->id);
+        // dd($data);
         // dd(Carbon::now());
         $formatter = new NumberFormatter("en", \NumberFormatter::SPELLOUT);
 
@@ -63,7 +73,7 @@ class PawnController extends Controller
 
         $fpdf->SetFont('Arial','',8.5);
         $fpdf->SetX(10);
-        $fpdf->Write(0,'Processed By: XXX');
+        $fpdf->Write(0,'Processed By: '. $data->pawnTickets->encoder->first_name." " .$data->pawnTickets->encoder->last_name);
         
         $fpdf->SetX(75);
         $fpdf->Write(0,'OPEN Monday - Sunday 08:00 AM to 05:00 PM');
@@ -94,44 +104,44 @@ class PawnController extends Controller
         
         $fpdf->SetFont('Arial','',10);
         $fpdf->SetXY(170,30);
-        $fpdf->Write(0,'PT 00001');
+        $fpdf->Write(0,'PT'. $data->pawnTickets->ticket_number);
         
         $fpdf->SetFont('Arial','',8);
         $fpdf->SetXY(10,45);
         $fpdf->Write(0,'Date Loan Granted: ');
         $fpdf->SetFont('Arial','I',8);
-        $fpdf->Write(0, date('M d, Y', strtotime($request->transaction_date)));
+        $fpdf->Write(0, date('M d, Y', strtotime($data->pawnTickets->transaction_date)));
         
         $fpdf->SetFont('Arial','',8);
         $fpdf->SetXY(156,45);
         $fpdf->Write(0,'Maturity Date: ');
         $fpdf->SetFont('Arial','I',8);
-        $fpdf->Write(0, date('M d, Y', strtotime($request->maturity_date)));
+        $fpdf->Write(0, date('M d, Y', strtotime($data->pawnTickets->maturity_date)));
         $fpdf->SetXY(135,50);
         $fpdf->SetFont('Arial','',8);
         $fpdf->Write(0,'Loan Redemption Expiry Date: ');
         $fpdf->SetFont('Arial','I',8);
-        $fpdf->Write(0, date('M d, Y', strtotime($request->expiration_date)));
+        $fpdf->Write(0, date('M d, Y', strtotime($data->pawnTickets->expiration_date)));
         $fpdf->SetFont('Arial','',8);
         $fpdf->SetXY(10,55);
         $fpdf->Write(5,'Pawnee ');
         $fpdf->SetFont('Arial','B',8);
-        $fpdf->Write(5, $request->customer);
+        $fpdf->Write(5, $data->customer->first_name." ".$data->customer->last_name." ".$data->customer->suffix);
         $fpdf->SetFont('Arial','',8);
         $fpdf->Write(5,', residing at ');
         $fpdf->SetFont('Arial','I',8);
-        $fpdf->Write(5,'Brgy. VI, Daet Camarines Norte ');
+        $fpdf->Write(5,$data->customer->present_address);
         $fpdf->SetFont('Arial','',8);
-        $fpdf->Write(5,'for a loan of ');
+        $fpdf->Write(5,' for a loan of ');
         $fpdf->SetFont('Arial','B',8);
-        $fpdf->Write(5, strtoupper($formatter->format($request->appraised_value)).' (P '.number_format($request->appraised_value,2 ).'),');
+        $fpdf->Write(5, strtoupper($formatter->format($data->inventoryItems->sum('item_type_appraised_value'))).' (P '.number_format($data->inventoryItems->sum('item_type_appraised_value'),2 ).'),');
 
         $fpdf->SetFont('Arial','',8);
         $fpdf->Write(5,' with ');
         $fpdf->SetFont('Arial','I',8);
         $fpdf->Write(5,'three ');
         $fpdf->SetFont('Arial','',8);
-        $fpdf->Write(5,'percent (3.00%) interest per month, pledged in security for the loan as described and appraised at SIX THOUSAND PESOS (P 6,000.00), subject to the terms and conditions of the pawn.');
+        $fpdf->Write(5,'percent ('.number_format($data->interest_percentage,2).'%) interest per month, pledged in security for the loan as described and appraised at '.strtoupper($formatter->format($data->inventoryItems->sum('item_type_appraised_value'))).' (P '.number_format($data->inventoryItems->sum('item_type_appraised_value'),2).'), subject to the terms and conditions of the pawn.');
         
         
         $fpdf->SetXY(30,75);
@@ -140,16 +150,26 @@ class PawnController extends Controller
         
         $fpdf->SetXY(10,82);
         $fpdf->SetFont('Arial','',8);
-        $i = 0;
+        $item = array();
+        $rate = array();
+        foreach($data->inventoryItems as $key => $value){
+
+            $fpdf->MultiCell(85, 3, ucwords($value->item_type->item_type). " " .$value->item_name. " " . $value->item_karat."K " . $value->item_type_weight ."(g) (" .$value->description.") ");
+            $fpdf->Ln(2);
+            $item[] = ucwords($value->item_type->item_type). " " .$value->item_name. " " . $value->item_karat."K " . $value->item_type_weight ."(g) (" .$value->description.") ";
+            $rate[] = "(".ucwords($value->item_type->item_type).") ".number_format($value->item_type_appraised_value,2);
+        }
+        /*
         while($i <= 1){
             // $fpdf->Write(5,'Gold Ring 24K 5g (The quick brown fox jumps over the lazy dog near the riverbanks) ');
             $fpdf->MultiCell(85, 3, 'Gold Ring 24K 5g (Gold with damage) ');
             $fpdf->Ln(2);
             $i++;
         }
-        $fpdf->Write(5,' ID Presented :  SSS');
+        */
+        $fpdf->Write(5,' ID Presented : '.$data->pawnTickets->attachment->type);
         $fpdf->Ln();
-        $fpdf->Write(5,' ID Number : 12312312 ');
+        $fpdf->Write(5,' ID Number : '.$data->pawnTickets->attachment_number);
         $fpdf->Ln();
         
         $fpdf->SetXY(15,142);
@@ -170,19 +190,19 @@ class PawnController extends Controller
         // left
         $fpdf->SetXY(155,80);
         $fpdf->SetFont('Arial','',8);
-        $fpdf->MultiCell(45, 7, 'P 250,000.00',1,'C');
+        $fpdf->MultiCell(45, 7, 'P '.number_format($data->principal,2),1,'C');
         $fpdf->SetXY(155,87);
-        $fpdf->MultiCell(45, 7, 'P 150,000.00',1,'C');
+        $fpdf->MultiCell(45, 7,'P '.number_format($data->pawnTickets->other_charges->sum('amount'), 2),1,'C');
         $fpdf->SetXY(155,94);
-        $fpdf->MultiCell(45, 7, 'P 50,000.00',1,'C');
+        $fpdf->MultiCell(45, 7, 'P '.number_format($data->net, 2),1,'C');
         
         $fpdf->SetXY(118,103);
         
-        $fpdf->Write(5,' Monthly Effective Interest Rate :  2%');
+        $fpdf->Write(5,' Monthly Effective Interest Rate :  '.$data->interest_percentage.'%');
         $fpdf->Ln();
         $fpdf->SetXY(118,108);
         
-        $fpdf->Write(5,' Contact Number : 0912345678 ');
+        $fpdf->Write(5,' Contact Number : '. $data->customer->contact_number);
         $fpdf->SetXY(118,142);
         
         $fpdf->Write(10,' ________________________________________________ ');
@@ -196,7 +216,7 @@ class PawnController extends Controller
         // $fpdf->SetFont('Arial','I',8);
         // $fpdf->MultiCell(190, 4,date('M d, Y', strtotime($_GET['auction_date'])) ,0,'C');
         
-        $fpdf->MultiCell(190, 4, date('M d, Y', strtotime($request->auction_date)). ' AT ABOVE ADDRESS IF NOT REDEEMED OR RENEWED WITHIN THE REDEMPTION PERIOD',0,'C');
+        $fpdf->MultiCell(190, 4, date('M d, Y', strtotime($data->pawnTickets->auction_date)). ' AT ABOVE ADDRESS IF NOT REDEEMED OR RENEWED WITHIN THE REDEMPTION PERIOD',0,'C');
         
         $fpdf->Ln();
         $fpdf->SetXY(45,185);
@@ -206,6 +226,7 @@ class PawnController extends Controller
         // $fpdf->Write(0, date('M d, Y', strtotime($_GET['auction_date'])));
         
         $fpdf->AddPage();
+        /*
         $fpdf->SetXY(20,20);
         $fpdf->SetFont('Arial','',8);
         $fpdf->MultiCell(35, 7, 'PT# : ',1,'C');
@@ -235,31 +256,61 @@ class PawnController extends Controller
         
         $fpdf->SetXY(55,20);
         $fpdf->SetFont('Arial','',8);
-        $fpdf->MultiCell(130, 7, '00001',1,'L');
+        $fpdf->MultiCell(130, 7, $data->pawnTickets->ticket_number,1,'L');
         $fpdf->SetXY(55,27);
-        $fpdf->MultiCell(130, 7, date('M d, Y', strtotime($request->transaction_date)) ,1,'L');
+        $fpdf->MultiCell(130, 7, date('M d, Y', strtotime($data->pawnTickets->transaction_date)) ,1,'L');
         $fpdf->SetXY(55,34);
-        $fpdf->MultiCell(130, 7, date('M d, Y', strtotime($request->maturity_date)),1,'L');
+        $fpdf->MultiCell(130, 7, date('M d, Y', strtotime($data->pawnTickets->maturity_date)),1,'L');
         $fpdf->SetXY(55,41);
-        $fpdf->MultiCell(130, 7, strtoupper($request->customer),1,'L');
+        $fpdf->MultiCell(130, 7, strtoupper($data->customer->first_name). " " .strtoupper($data->customer->last_name). " " .strtoupper($data->customer->suffix),1,'L');
         $fpdf->SetXY(55,48);
-        $fpdf->MultiCell(130, 7, date('M d, Y'),1,'L');
+        $fpdf->MultiCell(130, 7, date('M d, Y', strtotime($data->customer->birthdate)),1,'L');
         $fpdf->SetXY(55,55);
-        $fpdf->MultiCell(130, 7, 'The quick brown fox jumps over the lazy dog near the riverbanks ',1,'L');
+        $fpdf->MultiCell(130, 7, $data->customer->present_address,1,'L');
         $fpdf->SetXY(55,62);
-        $fpdf->MultiCell(130, 7, ' ',1,'L');
+        $fpdf->MultiCell(130, 7, " Hello",1,'L');
         $fpdf->SetXY(55,69);
-        $fpdf->MultiCell(130, 7, ' ',1,'L');
+        $fpdf->MultiCell(130, 7, number_format($data->pawnTickets->net,2),1,'L');
         $fpdf->SetXY(55,76);
-        $fpdf->MultiCell(130, 7, '',1,'L');
+        $fpdf->MultiCell(130, 7, ' ',1,'L');
         $fpdf->SetXY(55,83);
-        $fpdf->MultiCell(130, 7, '0912345678 ',1,'L');
+        $fpdf->MultiCell(130, 7,  $data->customer->contact_number,1,'L');
         $fpdf->SetXY(55,90);
-        $fpdf->MultiCell(130, 7, 'XXX',1,'L');
+        $fpdf->MultiCell(130, 7, 'XXX, '. $data->pawnTickets->encoder->first_name,1,'L');
         $fpdf->SetXY(55,97);
         $fpdf->MultiCell(130, 7, '20,000.00 ',1,'L');
-        
         // $fpdf->Output();
+        */
+        // $fpdf->SetXY(20,110);
+        $fpdf->SetXY(20,20);
+
+        $fpdf->SetWidths(array(35,130));
+        $fpdf->SetHeight(5);
+        $fpdf->SetAligns(array('C','L'));
+        $fpdf->Row(array('PT# : ', $data->pawnTickets->ticket_number));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Date of Loan : ',  date('M d, Y', strtotime($data->pawnTickets->transaction_date))));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Maturity Date : ',  date('M d, Y', strtotime($data->pawnTickets->maturity_date))));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Name : ',  strtoupper($data->customer->first_name). " " .strtoupper($data->customer->last_name). " " .strtoupper($data->customer->suffix)));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Birthdate : ',  date('M d, Y', strtotime($data->customer->birthdate))));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Address : ',  $data->customer->present_address));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Description of Pawn : ', implode("\n", $item)));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Pledge Loan : ',  number_format($data->pawnTickets->net,2)));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Signature : ',  " "));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Contact Number : ', $data->customer->contact_number));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('Appraiser : ', 'XXX, '. $data->pawnTickets->encoder->first_name));
+        $fpdf->SetX(20);
+        $fpdf->Row(array('CPG : ', implode("\n" , $rate)));
+
         $pdfContent = $fpdf->Output('', "S");
     
          return response($pdfContent, 200,
