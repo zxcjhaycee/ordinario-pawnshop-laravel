@@ -45,7 +45,6 @@
                         <input type="hidden" name="inventory_id" value="{{ $id }}">
                       <input type="submit" value="Auction" class="btn btn-success float-right btn-responsive">
                     </form>
-                    <a href="{{ route('pawn_print', $id) }}" class="btn ordinario-button float-right btn-responsive">Print Pawn</a>
                   @endif
 
                     <h4 class="card-title"> {{ ucwords($routeName) }} Inventory</h4>
@@ -88,7 +87,12 @@
                                       <td>{{ $value->attachment->type }}<br/>{{ $value->attachment_number }}</td>
 
                                       <td>{{ ucwords($value->encoder->first_name)." ".ucwords($value->encoder->last_name) }}</td>
-                                      <td></td>
+                                      <td>
+                                          <a href="{{ route('pawn_print', ['id' => $id, 'ticket_id' => $value->id ]) }}" target="_blank" class="btn ordinario-button btn-sm btn-responsive">Print</a>
+                                          @if($value->transaction_type == 'renew')
+                                             <a href="{{ route('renew_update', ['ticket_id' => $value->id, 'id' => $id ]) }}" target="_blank" class="btn btn-success btn-sm btn-responsive"><span class="material-icons">edit</span></a>
+                                          @endif                                      
+                                      </td>
                                     </tr>
                                   @endforeach
                                 @endisset

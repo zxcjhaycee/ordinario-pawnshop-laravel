@@ -60,10 +60,11 @@ class PawnController extends Controller
     }
     public function pawnPrint(MC_TableFpdf $fpdf, Request $request){
         // dd($request->id);
-        $data = Inventory::with(['pawnTickets' => function($query){
-            $query->where('pawnTickets.transaction_type', '=', 'pawn');
-        }])
-        ->with(['pawnTickets.encoder', 'customer', 'inventoryItems', 'pawnTickets.other_charges', 'pawnTickets.attachment', 'inventoryItems.item_type'])
+        $ticket_id = $request['ticket_id'];
+        $data = Inventory::with(['pawnTickets' => function($query) use ($ticket_id){
+            $query->where('pawnTickets.id', '=', $ticket_id);
+        }, 'pawnTickets.encoder', 'pawnTickets.other_charges'])
+        ->with(['customer', 'inventoryItems', 'inventoryItems.item_type', 'branch' , 'pawnTickets.attachment'])
         ->find($request->id);
         // dd($data);
         // dd(Carbon::now());
@@ -90,18 +91,20 @@ class PawnController extends Controller
         $fpdf->Write(0,'ORIGINAL');
         
         $fpdf->SetFont('Arial','',7);
-        $fpdf->SetXY(98,28);
-        $fpdf->Write(0,'Daet A. Branch');
+        $fpdf->SetXY(95,28);
+        $fpdf->Write(0, $data->branch->branch.' Branch');
+        $fpdf->SetXY(17,32);
+        // $fpdf->Write(0, $data->branch->address);
+        $fpdf->Cell(0, 0, $data->branch->address, 0, 0, 'C');
         
-        $fpdf->SetXY(94,32);
-        $fpdf->Write(0,'Daet, Camarines Norte');
-        
-        $fpdf->SetXY(90,36);
-        $fpdf->Write(0,'FOR INQUIRY Call/Text 1234');
-        
-        $fpdf->SetXY(94,40);
-        $fpdf->Write(0,'TIN 11111111 Non-Vat');
-        
+        $fpdf->SetXY(17,36);
+        // $fpdf->Write(0,'FOR INQUIRY Call/Text');
+        $fpdf->Cell(0, 0,'FOR INQUIRY Call/Text '.$data->branch->contact_number, 0, 0, 'C');
+
+        $fpdf->SetXY(17,40);
+        // $fpdf->Write(0,'TIN '.$data->branch->tin.' Non-Vat');
+        $fpdf->Cell(0, 0,'TIN '.$data->branch->tin.' Non-Vat', 0, 0, 'C');
+
         $fpdf->SetFont('Arial','',10);
         $fpdf->SetXY(170,30);
         $fpdf->Write(0,'PT'. $data->pawnTickets->ticket_number);

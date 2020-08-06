@@ -77,10 +77,21 @@ class InventoryController extends Controller
         foreach($data['inventoryItems'] as $key => $value){
             $rate_data[] = Rate::where('item_type_id', $value->item_type_id)->where('branch_id', \Auth::user()->branch_id)->orderBy('id')->get();
         }
+        $other_charges['discount'] = 0;
+        $other_charges['charges'] = 0;
+        foreach($data->pawnTickets->other_charges as $key => $value){
+            if($value->inventory_other_charges->charge_type == 'discount'){
+                $other_charges['discount'] += $value->amount;
+            }
+            if($value->inventory_other_charges->charge_type == 'charges'){
+                $other_charges['charges'] += $value->amount;
+            }
+
+        }
         // dd($rate_data);
         // dd($data);
         // dd($data->pawnTickets->other_charges->sum('amount'));
-        return view('form_inventory', compact('data', 'item_type_data', 'rate_data'));
+        return view('form_inventory', compact('data', 'item_type_data', 'rate_data', 'other_charges'));
     }
     public function show(Request $request){
         $id = $request->id;
@@ -98,37 +109,76 @@ class InventoryController extends Controller
 
     public function store(Request $request){
         // dd($request);
-        $request['is_special_rate'] = isset($request['is_special_rate']) ? $request['is_special_rate'] : 0;
+
+
+       
         // dd($request);
         try{
+            // dd(($request['item_type_id']));
             \DB::beginTransaction();
-            $request['net'] = $request['net_proceeds'];
-            $request['transaction_date'] = date('Y-m-d', strtotime($request['transaction_date']));
-            $request['maturity_date'] = date('Y-m-d', strtotime($request['maturity_date']));
-            $request['expiration_date'] = date('Y-m-d', strtotime($request['expiration_date']));
-            $request['auction_date'] = date('Y-m-d', strtotime($request['auction_date']));
+            $data = $request->validate([
+                'transaction_type' => 'required',
+                'inventory_number' => 'required',
+                'transaction_status' => 'required',
+                'customer_id' => 'required',
+                'branch_id' => 'required',
+                'item_category_id' => 'required',
+                'net_proceeds' => 'required',
+                'ticket_number' => ' required',
+                'principal' => 'required',
+                'processed_by' => 'required',
+                'transaction_date' => 'required',
+                'maturity_date' => 'required',
+                'expiration_date' => 'required',
+                'auction_date' => 'required', 
+                'appraised_value' => 'required',
+                'attachment_id' => 'required',
+                'attachment_number' => 'required',
+                'item_type_id.*' => 'required',
+                'item_type_weight.*' => 'required',
+                'description.*' => 'required',
+                'item_type_appraised_value.*' => 'required',
+                'image.*' => 'required',
+                'item_name.*' => 'required',
+                'item_name_weight.*' => 'required',
+                'item_name_appraised_value.*' => 'required',
+                'item_karat.*' => 'required',
+                'item_karat_weight.*' => 'required',
+                'item_category_id' => 'required',
 
-             $Inventory = Inventory::create($request->only('transaction_type','inventory_number','transaction_status','customer_id','branch_id','item_category_id','is_special_rate','net', 'ticket_number', 'principal', 'processed_by', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'appraised_value'));
-             $request['inventory_id'] = $Inventory->id;
-             $ticket = Ticket::create($request->only('inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date','processed_by', 'net', 'attachment_number'));
-             $request['ticket_id'] = $ticket->id;
+            ]);
+            $data['is_special_rate'] = isset($request['is_special_rate']) ? $request['is_special_rate'] : 0;
+            $data['net'] = $request['net_proceeds'];
+            $data['transaction_date'] = date('Y-m-d', strtotime($request['transaction_date']));
+            $data['maturity_date'] = date('Y-m-d', strtotime($request['maturity_date']));
+            $data['expiration_date'] = date('Y-m-d', strtotime($request['expiration_date']));
+            $data['auction_date'] = date('Y-m-d', strtotime($request['auction_date']));
+            $data['charges'] = $request['other_charges'];
+            $data['discount'] = $request['discount'];
+            $inventory_data = collect($data);
+            $Inventory = Inventory::create($inventory_data->only('transaction_type','inventory_number','transaction_status','customer_id','branch_id','item_category_id','is_special_rate','net', 'ticket_number', 'principal', 'processed_by', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'appraised_value', 'charges', 'discount')->toArray());
+            $data['inventory_id'] = $Inventory->id;
 
-             foreach($request['item_type_id'] as $key => $value){
+            $ticket_data = collect($data);
+            $ticket = Ticket::create($ticket_data->only('inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date','processed_by', 'net', 'attachment_number', 'discount', 'charges')->toArray());
+            $data['ticket_id'] = $ticket->id;
+
+             foreach($data['item_type_id'] as $key => $value){
                  $image_path = $key.'_'.time().'.'.$request->image[$key]->extension(); 
                  $request->image[$key]->move(public_path('item_image'), $image_path);
      
                  $inventory_item_data[] = array(
-                     'inventory_id' => $request['inventory_id'],
+                     'inventory_id' => $data['inventory_id'],
                      'item_type_id' => $value,
-                     'item_type_weight' => $request['item_type_weight'][$key],
-                     'item_type_appraised_value' => $request['item_type_appraised_value'][$key],
-                     'description' => $request['description'][$key],
+                     'item_type_weight' => $data['item_type_weight'][$key],
+                     'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                     'description' => $data['description'][$key],
                      'image' => $image_path,
-                     'item_name' => $request['item_name'][$key],
-                     'item_name_weight' => $request['item_name_weight'][$key],
-                     'item_name_appraised_value' => $request['item_name_appraised_value'][$key],
-                     'item_karat' => $request['item_karat'][$key],
-                     'item_karat_weight' => $request['item_karat_weight'][$key],
+                     'item_name' => $data['item_name'][$key],
+                     'item_name_weight' => $data['item_name_weight'][$key],
+                     'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
+                     'item_karat' => $data['item_karat'][$key],
+                     'item_karat_weight' => $data['item_karat_weight'][$key],
                      'created_at'=>date('Y-m-d H:i:s'),
                      'updated_at'=> date('Y-m-d H:i:s')
                  );
@@ -139,8 +189,8 @@ class InventoryController extends Controller
                 foreach($request['other_charges_id'] as $key => $value){
                         if($value != null){
                             $inventory_charges_data[] = array(
-                                'inventory_id' => $request['inventory_id'],
-                                'ticket_id' => $request['ticket_id'],
+                                'inventory_id' => $data['inventory_id'],
+                                'ticket_id' => $data['ticket_id'],
                                 'other_charges_id' => $value,
                                 'amount' => $request['other_charges_amount'][$key]
                             );
@@ -153,7 +203,9 @@ class InventoryController extends Controller
 
              \DB::commit();
              $request->session()->flash('status', 'The pawn was successfully created!');
-             return response()->json(['success' => true, 'link' => route('pawn_print', $request['inventory_id']), 'create' => true]);
+            //  return response()->json(['success' => true, 'link' => route('pawn_print', $request['inventory_id']), 'create' => true]);
+             return response()->json(['success' => true, 'create' => true, 'link' => route('inventory.show', $data['inventory_id'])]);
+            
          }catch(\PDOException $e){
              \DB::rollBack();
              //  dd($e->getMessage());
@@ -172,25 +224,57 @@ class InventoryController extends Controller
     public function removeOtherCharges(Request $request){
 
         $inventory_other_charges = Inventory_other_charges::findOrFail($request->id)->delete();
+        
         return response()->json(['status' => 'The other_charges was successfully removed!', 'success' => true, 'other_charges' => true]);
     }
 
     public function update(Request $request){
         // dd($request);
         // dd($request);
+        $data = $request->validate([
+            'transaction_type' => 'required',
+            'inventory_number' => 'required',
+            'transaction_status' => 'required',
+            'customer_id' => 'required',
+            'branch_id' => 'required',
+            'item_category_id' => 'required',
+            'net_proceeds' => 'required',
+            'ticket_number' => ' required',
+            'principal' => 'required',
+            'processed_by' => 'required',
+            'transaction_date' => 'required',
+            'maturity_date' => 'required',
+            'expiration_date' => 'required',
+            'auction_date' => 'required', 
+            'appraised_value' => 'required',
+            'attachment_id' => 'required',
+            'attachment_number' => 'required',
+            'item_type_id.*' => 'required',
+            'item_type_weight.*' => 'required',
+            'description.*' => 'required',
+            'item_type_appraised_value.*' => 'required',
+            'item_name.*' => 'required',
+            'item_name_weight.*' => 'required',
+            'item_name_appraised_value.*' => 'required',
+            'item_karat.*' => 'required',
+            'item_karat_weight.*' => 'required',
+            'item_category_id' => 'required',
+
+        ]);
         try{
             \DB::beginTransaction();
-            $request['net'] = $request['net_proceeds'];
-            $request['transaction_date'] = date('Y-m-d', strtotime($request['transaction_date']));
-            $request['maturity_date'] = date('Y-m-d', strtotime($request['maturity_date']));
-            $request['expiration_date'] = date('Y-m-d', strtotime($request['expiration_date']));
-            $request['auction_date'] = date('Y-m-d', strtotime($request['auction_date']));
-            $request['is_special_rate'] = isset($request['is_special_rate']) ? $request['is_special_rate'] : 0;
-             $inventory = Inventory::findOrfail($request->id)->update($request->only('transaction_type','inventory_number','transaction_status','customer_id','branch_id','item_category_id','is_special_rate','net', 'ticket_number', 'principal', 'processed_by', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'appraised_value'));
-             $ticket = Ticket::findOrfail($request->ticket_id)->update($request->only('inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date','processed_by', 'net', 'attachment_number'));
+            $data['net'] = $request['net_proceeds'];
+            $data['transaction_date'] = date('Y-m-d', strtotime($request['transaction_date']));
+            $data['maturity_date'] = date('Y-m-d', strtotime($request['maturity_date']));
+            $data['expiration_date'] = date('Y-m-d', strtotime($request['expiration_date']));
+            $data['auction_date'] = date('Y-m-d', strtotime($request['auction_date']));
+            $data['is_special_rate'] = isset($request['is_special_rate']) ? $request['is_special_rate'] : 0;
+            $inventory_data = collect($data);
+            $inventory = Inventory::findOrfail($request->id)->update($inventory_data->only('transaction_type','inventory_number','transaction_status','customer_id','branch_id','item_category_id','is_special_rate','net', 'ticket_number', 'principal', 'processed_by', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'appraised_value')->toArray());
+            $ticket = Ticket::findOrfail($request->ticket_id)->update($inventory_data->only('inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date','processed_by', 'net', 'attachment_number')->toArray());
             //  $request['ticket_id'] = $ticket->id;
 
-             foreach($request['item_type_id'] as $key => $value){
+             foreach($data['item_type_id'] as $key => $value){
 
                  if($request['image'][$key] != null){
                     $image_path = $key.'_'.time().'.'.$request->image[$key]->extension(); 
@@ -201,14 +285,14 @@ class InventoryController extends Controller
                  if(isset($request['inventory_item_id'][$key])){
                      $inventory_item_data = array(
                         'item_type_id' => $value,
-                        'item_type_weight' => $request['item_type_weight'][$key],
-                        'item_type_appraised_value' => $request['item_type_appraised_value'][$key],
-                        'description' => $request['description'][$key],
-                        'item_name' => $request['item_name'][$key],
-                        'item_name_weight' => $request['item_name_weight'][$key],
-                        'item_name_appraised_value' => $request['item_name_appraised_value'][$key],
-                        'item_karat' => $request['item_karat'][$key],
-                        'item_karat_weight' => $request['item_karat_weight'][$key],
+                        'item_type_weight' => $data['item_type_weight'][$key],
+                        'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                        'description' => $data['description'][$key],
+                        'item_name' => $data['item_name'][$key],
+                        'item_name_weight' => $data['item_name_weight'][$key],
+                        'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
+                        'item_karat' => $data['item_karat'][$key],
+                        'item_karat_weight' => $data['item_karat_weight'][$key],
                         'updated_at'=> date('Y-m-d H:i:s')
                      );
                     if($request['image'][$key] != null){
@@ -221,15 +305,15 @@ class InventoryController extends Controller
                         $inventory_item_data = array(
                             'inventory_id' => $request['id'],
                             'item_type_id' => $value,
-                            'item_type_weight' => $request['item_type_weight'][$key],
-                            'item_type_appraised_value' => $request['item_type_appraised_value'][$key],
-                            'description' => $request['description'][$key],
+                            'item_type_weight' => $data['item_type_weight'][$key],
+                            'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                            'description' => $data['description'][$key],
                             'image' => $image_path,
-                            'item_name' => $request['item_name'][$key],
-                            'item_name_weight' => $request['item_name_weight'][$key],
-                            'item_name_appraised_value' => $request['item_name_appraised_value'][$key],
-                            'item_karat' => $request['item_karat'][$key],
-                            'item_karat_weight' => $request['item_karat_weight'][$key],
+                            'item_name' => $data['item_name'][$key],
+                            'item_name_weight' => $data['item_name_weight'][$key],
+                            'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
+                            'item_karat' => $data['item_karat'][$key],
+                            'item_karat_weight' => $data['item_karat_weight'][$key],
                             'created_at'=>date('Y-m-d H:i:s'),
                             'updated_at'=> date('Y-m-d H:i:s')
                         );
@@ -301,7 +385,14 @@ class InventoryController extends Controller
 
     public function submitRenew(Request $request){
         // dd($request);
-
+        $data = $request->validate([
+            'transaction_date' => 'required',
+            'maturity_date' => 'required',
+            'expiration_date' => 'required',
+            'auction_date' => 'required',
+            'attachment_number' => 'required',
+            'attachment_id' => 'required'
+        ]);
         try{
             $request['transaction_date'] = date('Y-m-d', strtotime($request['transaction_date']));
             $request['maturity_date'] = date('Y-m-d', strtotime($request['maturity_date']));
@@ -310,25 +401,26 @@ class InventoryController extends Controller
             $request['authorized_representative'] = isset($request['authorized_representative']) ? $request['authorized_representative'] : 0;
             $request['interbranch'] = isset($request['interbranch']) ? $request['interbranch'] : 0;
             $request['interbranch_renewal'] = isset($request['interbranch_renewal']) ? $request['interbranch_renewal'] : 0;
-            $request['discount_remarks'] = isset($request['remarks']) ? $request['remarks'] : "";
-
+            $request['charges'] = $request['other_charges'];
             $ticket = Ticket::create(
                 $request->only('inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date',
-                'processed_by', 'net', 'attachment_number', 'authorized_representative', 'discount_remarks','discount', 'interest', 'interest_text',
-                'penalty', 'penalty_text', 'advance_interest', 'transaction_type', 'interbranch', 'interbranch_renewal')
+                'processed_by', 'net', 'attachment_number', 'authorized_representative','discount', 'interest', 'interest_text',
+                'penalty', 'penalty_text', 'advance_interest', 'transaction_type', 'interbranch', 'interbranch_renewal', 'charges')
             );
-
+            // dd($ticket);
 
             $inventory_data = Inventory::findOrfail($request->inventory_id)->first();
             $interest = $inventory_data['interest'];
             $penalty = $inventory_data['penalty'];
             $discount = $inventory_data['discount'];
+            $charges = $inventory_data['charges'];
             $net = $inventory_data['net'];
             $request['interest'] = $request['interest'] + $request['interest_text'] + $interest;
             $request['penalty'] = $request['penalty'] + $request['penalty_text'] + $penalty; 
             $request['discount'] = $request['discount'] + $discount; 
+            $request['charges'] = $request['charges'] + $charges; 
             $request['net'] = $request['net'] + $net;
-            $inventory = Inventory::findOrfail($request->inventory_id)->update($request->only('interest','penalty','discount','net','ticket_number','transaction_date','maturity_date','expiration_date','auction_date'));
+            $inventory = Inventory::findOrfail($request->inventory_id)->update($request->only('interest','penalty','discount','net','ticket_number','transaction_date','maturity_date','expiration_date','auction_date', 'charges'));
 
             if(isset($request['other_charges_id'])){
                 foreach($request['other_charges_id'] as $key => $value){
@@ -381,8 +473,10 @@ class InventoryController extends Controller
         $ticket_number = sprintf('%05d', $ticket);
         $inventory = Inventory::with(['pawnTickets' => function($query){
             $query->where('transaction_type', '=', 'pawn');
-        }])
-        ->with(['branch', 'pawnTickets.encoder', 'customer', 'customer.attachments', 'item_category', 'item', 'item.item_type', 'item_category'])
+        }, 'item' => function($query){
+            $query->where('status', '=', 0);
+        }, 'item.item_type'])
+        ->with(['branch', 'pawnTickets.encoder', 'customer', 'customer.attachments', 'item_category', 'item_category'])
         ->find($request->id);
         // dd($inventory);
         $tickets = Ticket::where('inventory_id', $request->id)->get();
@@ -450,6 +544,30 @@ class InventoryController extends Controller
              return response()->json(['status' => $e->getMessage(), 'success' => false]);
         
         } 
+
+    }
+
+    public function showUpdateRenew(Request $request){
+        // dd($request);
+        $ticket_id = $request['ticket_id'];
+        $id = $request->id;
+        $inventory = Inventory::with(['pawnTickets' => function($query){
+                $query->where('transaction_type', '=', 'pawn');
+            },'pawnTickets.encoder'])
+        ->with(['item' => function ($query){
+            $query->where('status', '=', 0);
+        }, 'item.item_type'])
+        ->with(['branch' , 'customer', 'customer.attachments', 'item_category'])
+        ->find($request->id);
+        $tickets_latest = Ticket::where('inventory_id', $request->id)->latest()->first();
+        $tickets_current = Inventory::with(['pawnTickets' => function($query) use ($ticket_id){
+            $query->where('id', $ticket_id);
+        }, 'pawnTickets.other_charges', 'pawnTickets.other_charges.inventory_other_charges'])->find($request->id);
+        // dd($tickets_current);
+        // $tickets = Ticket::where([['inventory_id', $request->id], ['id', '!=', $ticket_id]])->get();
+        $tickets = Ticket::where('inventory_id', $request->id)->whereNotIn('id', [$ticket_id])->get();
+        // dd($tickets_current);
+              return view('form_renew', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id'));
 
     }
 }

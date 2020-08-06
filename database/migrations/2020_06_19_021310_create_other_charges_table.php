@@ -15,7 +15,8 @@ class CreateOtherChargesTable extends Migration
     {
         Schema::create('other_charges', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('charge_type', 50);
+            $table->enum('charge_type', ['discount', 'charges']);	
+            $table->string('charge_name', 50);
             $table->double('amount', 10, 4);
             $table->softDeletes();
             $table->timestamps();

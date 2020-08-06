@@ -20,7 +20,8 @@ Route::middleware('auth')->group(function (){
     Route::prefix('pawn_auction')->group(function(){
         Route::get('pawn', 'PawnController@index')->name('pawn');
         Route::post('pawn_store', 'PawnController@store')->name('pawn_store');
-        Route::get('pawn_print/{id}', 'PawnController@pawnPrint')->name('pawn_print');
+        Route::get('pawn_print/{id}/ticket_id/{ticket_id}', 'PawnController@pawnPrint')->name('pawn_print');
+        Route::get('pawn/renew/{ticket_id}/{id}', 'InventoryController@showUpdateRenew')->name('renew_update');
         Route::get('inventory/add/pawn/{id}', 'InventoryController@form_pawn')->name('inventory.add.pawn');
         Route::delete('inventory_item/{id}', 'InventoryController@removeItem')->name('inventory.removeItem');
         Route::delete('inventory_other_charges/{id}', 'InventoryController@removeOtherCharges')->name('inventory.removeOtherCharges');
@@ -52,8 +53,8 @@ Route::middleware('auth')->group(function (){
         Route::get('customer/search', 'CustomerController@search')->name('customer.search');
         Route::get('customer/search_attachment', 'CustomerController@search_attachment')->name('customer.search_attachment');
         Route::resource('customer', 'CustomerController')->parameters(['customer' => 'id']);
+        Route::get('attachment/search', 'AttachmentController@search')->name('attachment.search');
         Route::resource('attachment', 'AttachmentController')->parameters(['attachment' => 'id']);
-        Route::get('attachment', 'AttachmentController@search')->name('attachment.search');
         Route::delete('customer/delete_attachment/{id}', 'CustomerController@remove_attachment')->name('customer.delete_attachment');
         Route::get('other_charges/search', 'OtherChargesController@search')->name('other_charges.search');
         Route::resource('other_charges', 'OtherChargesController')->parameters(['other_charges' => 'id']);

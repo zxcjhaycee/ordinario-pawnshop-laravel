@@ -36,7 +36,10 @@ class BranchController extends Controller
     public function store(Request $request){
 
         $data = $request->validate([
-            'branch' => 'required'
+            'branch' => 'required',
+            'address' => 'required',
+            'tin' => 'required',
+            'contact_number' => 'required'
         ]);
 
         $branch = Branch::create($data);
@@ -57,8 +60,12 @@ class BranchController extends Controller
 
     public function update(Request $request){
         $data = $request->validate([
-            'branch' => 'required'
+            'branch' => 'required',
+            'address' => 'required',
+            'tin' => 'required',
+            'contact_number' => 'required'
         ]);
+        
         $branch = Branch::withTrashed()->findOrfail($request->id)->update($data);
 
         return back()->with('status', 'The branch was successfully updated');

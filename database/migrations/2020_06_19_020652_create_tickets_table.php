@@ -29,6 +29,7 @@ class CreateTicketsTable extends Migration
             $table->double('interest_text', 10, 4)->nullable();
             $table->double('penalty_text', 10, 4)->nullable();
             $table->double('discount', 10, 4)->nullable();
+            $table->double('charges', 10, 4)->nullable();
             $table->integer('attachment_number');
             $table->double('net', 10, 4)->nullable();
             $table->smallInteger('interbranch')->nullable();

@@ -20,6 +20,9 @@ class OtherChargesController extends Controller
                         ->addColumn('status', function($row){
                             return isset($row->deleted_at) ? '<span class="text-danger">Inactive</span>' : '<span class="text-success">Active</span>';
                         })
+                        ->editColumn('charge_type', function($row){
+                            return ucwords($row->charge_type);
+                        })
                         ->addColumn('action', function($row){
                             $view_route = route('other_charges.edit', ['id' => $row['id']]);
                             $icon = isset($row->deleted_at) ? 'restore' : 'delete';
@@ -48,6 +51,7 @@ class OtherChargesController extends Controller
         // dd($request);
         $data = $request->validate([
             'charge_type' => 'required',
+            'charge_name' => 'required',
             'amount' => 'required|numeric'
         ]);
 
@@ -66,6 +70,7 @@ class OtherChargesController extends Controller
         // dd($request);
         $data = $request->validate([
             'charge_type' => 'required',
+            'charge_name' => 'required',
             'amount' => 'required|numeric'
         ]);
 
@@ -95,15 +100,21 @@ class OtherChargesController extends Controller
         $data = array();
         if(isset($request->search)){
             // $customer = Customer::where(\DB::raw('concat(first_name," ",last_name," ", suffix)'), 'like', '%'.$request->search.'%')->take(10)->get();
-            $other_charges = Other_charges::where('charge_type', 'like', '%'.$request->search.'%')->take(10)->get();
+            $other_charges = Other_charges::where([
+                    ['charge_type', '=', $request->table],
+                    ['charge_name', 'like', '%'.$request->search.'%']
+                ]
+                )->take(10)->get();
             if($other_charges->count() > 0){
                 foreach($other_charges as $key => $value){
+                    $action = $value->charge_type == 'discount' ? 'discount' : 'amount';
                     $data[] = array(
-                        'action' => 'amount',
+                        'action' => $action,
                         'id' => $value->id,
                         'data-amount' => $value->amount,
-                        'text' => $value->charge_type
+                        'text' => $value->charge_name
                     );
+
                 }
             }else{
                 $data[] = array(

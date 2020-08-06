@@ -86,10 +86,22 @@
             </a>
             <div class="collapse {{  Route::current()->getPrefix() == '/settings' ? 'show' : ''  }}" id="settings" style="">
               <ul class="nav">
+              <li class="nav-item {{ class_basename(Route::current()->controller) == 'AttachmentController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('attachment.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">attach_file</i> </span>
+                    <span class="sidebar-normal"> Attachment </span>
+                  </a>
+                </li>
               <li class="nav-item {{ class_basename(Route::current()->controller) == 'BranchController' ? 'active' : '' }}">
                   <a class="nav-link" href="{{ route('branch.index') }}">
                     <span class="sidebar-mini"> <i class="material-icons">list</i> </span>
                     <span class="sidebar-normal"> Branch </span>
+                  </a>
+                </li>
+                <li class="nav-item {{ class_basename(Route::current()->controller) == 'OtherChargesController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('other_charges.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">attach_money</i> </span>
+                    <span class="sidebar-normal"> Charges </span>
                   </a>
                 </li>
                 <li class="nav-item {{ class_basename(Route::current()->controller) == 'CustomerController' ? 'active' : '' }}">

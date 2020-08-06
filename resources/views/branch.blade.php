@@ -65,6 +65,9 @@
                                 <tr>
                                   <th>#</th>
                                   <th>Branch</th>
+                                  <th>Address</th>
+                                  <th>Contact Number</th>
+                                  <th>Tin</th>
                                   <th>Status</th>
                                   <th style="width:15%">Actions</th>
                                 </tr>
@@ -100,6 +103,9 @@
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex'},
             {data: 'branch', name: 'branch'},
+            {data: 'address', name: 'address'},
+            {data: 'contact_number', name: 'contact_number'},
+            {data: 'tin', name: 'tin'},
             {data: 'status', name: 'status'},
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]

@@ -33,7 +33,7 @@
                     <i class="material-icons">star</i>
                   </div>
 
-                    <h4 class="card-title">Renew Pawn</h4>
+                    <h4 class="card-title">{{ isset($tickets_current) ? 'Update Renewal' : 'Renew Pawn' }}</h4>
 
                 </div>
     
@@ -45,7 +45,7 @@
                                 <div class="card-header card-header-text card-header-primary">
                                 
                                     <div class="card-text">
-                                    <h4 class="card-title">Pawn Ticket : {{ $inventory->pawnTickets->ticket_number }}</h4>
+                                    <h4 class="card-title">Pawn Ticket : {{ isset($tickets_current) ? $tickets_current->pawnTickets->ticket_number : $inventory->pawnTickets->ticket_number }}</h4>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -53,18 +53,40 @@
                                 
                                   <div class="col-xl-6">
                                       <!-- <h3 class="display-4">Details</h3> -->
+
                                       <div class="col-xl-12 mt-4">
                                         <ul style="list-style-type:none;padding-left: 5px;">
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Inventory #</label> : <span class="font-weight-normal col-xl-5">{{ $inventory->inventory_number }}</span></li>
-                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">PT #</label> : <span class="font-weight-normal col-xl-5">{{ $ticket_number }}</span></li>
+                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">PT #</label> : <span class="font-weight-normal col-xl-5">{{ isset($tickets_current) ? $tickets_current->pawnTickets->ticket_number : $ticket_number }}</span></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">OR #</label> : <span class="font-weight-normal col-xl-5"></span></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Transaction Type</label> : <span class="font-weight-normal col-xl-5">Renew</span></li>
-                                            <li class="form-inline" style="height:40px"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Transaction Date </label> : <input type="text" class="form-control transaction_picker" style="margin-left:20px" onblur="transaction_dates(this)" name="transaction_date" autocomplete="off"></li>
-                                            <li class="form-inline" style="height:40px"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Maturity Date </label> : <input type="text" class="form-control" style="margin-left:20px" id="maturity_date" readonly name="maturity_date"></li>
-                                            <li class="form-inline" style="height:40px"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Expiration Date </label> : <input type="text" class="form-control" style="margin-left:20px" id="expiration_date" readonly name="expiration_date"></li>
-                                            <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Auction Date </label> : <input type="text" class="form-control" style="margin-left:20px" id="auction_date" readonly name="auction_date"></li>
-                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interbranch Transaction </label> : <input type="checkbox" style="width:50px;box-shadow:none" value="1" name="interbranch"></li>
-                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interbranch Renewal </label> : <input type="checkbox" style="width:50px;box-shadow:none" name="interbranch_renewal" value="1"></li>
+                                            <div class="form-group input transaction_date_error" style="margin-bottom:-15px">
+                                                <li class="form-inline" style="height:40px">
+                                                        <label for="transaction_date" class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Transaction Date </label> : 
+                                                        <input type="text" class="form-control transaction_picker" style="margin-left:20px" onblur="transaction_dates(this)" name="transaction_date" autocomplete="off" value="{{ isset($tickets_current) ? date('m/d/Y', strtotime($tickets_current->pawnTickets->transaction_date)) : '' }}">
+                                                </li>
+                                            </div>
+                                            <div class="form-group input maturity_date_error" style="margin-bottom:-15px">
+                                                <li class="form-inline" style="height:40px">
+                                                        <label for="maturity_date" class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Maturity Date </label> :
+                                                        <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($tickets_current) ? date('m/d/Y', strtotime($tickets_current->pawnTickets->maturity_date)) : '' }}" style="margin-left:20px" >
+                                                    </li>
+                                            </div>
+
+                                            <div class="form-group input expiration_date_error" style="margin-bottom:-15px">
+                                                <li class="form-inline" style="height:40px">
+                                                    <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Expiration Date </label> : 
+                                                    <input type="text"  name="expiration_date" id="expiration_date" class="form-control" style="margin-left:20px" value="{{ isset($tickets_current) ? date('m/d/Y', strtotime($tickets_current->pawnTickets->expiration_date)) : '' }}" readonly>
+                                                </li>
+                                            </div>
+                                            <div class="form-group input auction_date_error">
+                                                <li class="form-inline">
+                                                    <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Auction Date </label> : 
+                                                    <input type="text" class="form-control" style="margin-left:20px" id="auction_date" readonly name="auction_date" value="{{ isset($tickets_current) ? date('m/d/Y', strtotime($tickets_current->pawnTickets->auction_date)) : '' }}">
+                                                </li>
+                                            </div>  
+                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interbranch Transaction </label> : <input type="checkbox" style="width:50px;box-shadow:none" value="1" name="interbranch" {{ isset($tickets_current) && $tickets_current->pawnTickets->interbranch == 1 ? 'checked' : '' }}></li>
+                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interbranch Renewal </label> : <input type="checkbox" style="width:50px;box-shadow:none" name="interbranch_renewal" value="1" {{ isset($tickets_current) && $tickets_current->pawnTickets->interbranch_renewal == 1 ? 'checked' : '' }}></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Branch </label> : <span class="font-weight-normal col-xl-5">{{ $inventory->branch->branch }}</span></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Processed By</label> : <span class="font-weight-normal col-xl-5">{{ $inventory->pawnTickets->encoder->first_name." ".$inventory->pawnTickets->encoder->last_name }}</span></li>
                                         </ul>
@@ -110,18 +132,28 @@
                                         <ul style="list-style-type:none;padding-left: 5px;">
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Name </label> : <span class="font-weight-normal col-xl-5">{{ $inventory->customer->first_name." ".$inventory->customer->last_name." ".$inventory->customer->suffix }}</span></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Customer Image</label> : <img src="http://getdrawings.com/free-icon-bw/facebook-avatar-icon-25.png" class="rounded" alt="..." style="width:150px"></li>
-                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Authorized Representative</label> : <input type="checkbox" style="width:50px;box-shadow:none" name="authorized_representative" value="1"></li>
-                                            <li class="form-inline"  style="height:40px"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">ID Presented</label> : 
-                                            <select name="attachment_id" id="attachment_id" class="form-control attachment_select" style="width:200px;margin-left:20px" onChange="getAttachmentNumber(this.options[this.selectedIndex])" name="attachment_id">
-                                                <!-- <option>Hello!</option> -->
-                                                <option disabled selected>Please select attachment...</option>
-                                                @foreach($inventory->customer->attachments as $key => $value)
-                                                    <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}">{{ $value->type }}</option>
-                                                @endforeach
-                                            </select>
-                                            </li>
-                                            <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">ID Number</label> : <input type="text" class="form-control" style="margin-left:20px;width:200px" id="attachment_number" readonly name="attachment_number"></li>
-                                            <!-- <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Image</label> : <span class="font-weight-normal col-xl-5">Renew</span></li> -->
+                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Authorized Representative</label> : <input type="checkbox" style="width:50px;box-shadow:none" name="authorized_representative" value="1" {{ isset($tickets_current) && $tickets_current->pawnTickets->authorized_representative == 1 ? 'checked' : '' }}></li>
+                                            <div class="form-group input attachment_id_error" style="margin-bottom:-15px">
+                                                <li class="form-inline"  style="height:40px">
+                                                    <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">ID Presented</label> : 
+                                                    <select name="attachment_id" id="attachment_id" class="form-control attachment_select" style="width:200px;margin-left:20px" onChange="getAttachmentNumber(this.options[this.selectedIndex])" name="attachment_id">
+                                                        <!-- <option>Hello!</option> -->
+                                                        <option disabled selected>Please select attachment...</option>
+                                                        @foreach($inventory->customer->attachments as $key => $value)
+                                                            @if(isset($tickets_current) && $value->id == $tickets_current->pawnTickets->attachment_id)
+                                                                <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}" selected>{{ $value->type }}</option>
+                                                            @else
+                                                                <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}">{{ $value->type }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </li>
+                                            </div>
+                                            <div class="form-group input attachment_number_error" style="margin-bottom:-15px">
+                                                 <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">ID Number</label> : 
+                                                 <input type="text" class="form-control" style="margin-left:20px;width:200px" id="attachment_number" readonly name="attachment_number" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->attachment_number : '' }}"></li>
+                                            </div>
+                                             <!-- <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Image</label> : <span class="font-weight-normal col-xl-5">Renew</span></li> -->
                                         </ul>
                                         <!-- <div class="form-inline">
 
@@ -194,17 +226,41 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="other_charges_body">
-                                                <td>
-                                                    <select name="other_charges_id[]" class="form-control select2 other_charges_select">
-                                                        <option></option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                     <input type="text" name="other_charges_amount[]" id="other_charges_amount" class="form-control other_charges_amount">
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
-                                                </td>
+                                                @if(isset($tickets_current))
+                                                    @foreach($tickets_current->pawnTickets->other_charges as $key => $value)
+                                                        @if($value->inventory_other_charges->charge_type == 'charges')
+                                                        <tr>
+                                                            <td>
+                                                                <select name="other_charges_id[]" class="form-control select2 other_charges_select">
+                                                                    <option value="{{ $value->inventory_other_charges->id }}">{{ $value->inventory_other_charges->charge_name }}</option>
+                                                                    <option></option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" name="other_charges_amount[]" id="other_charges_amount" class="form-control other_charges_amount" value="{{ $value->amount }}">
+                                                            </td>
+                                                            <td>
+                                                                 <button type="button" class="btn btn-danger btn-sm remove" id="{{ $value->id }}" data-name="/pawn_auction/inventory_other_charges"><i class="material-icons">close</i></button>
+                                                            </td>
+                                                    </tr>
+                                                        @endif
+                                                     @endforeach
+                                                    @else
+                                                        <tr>
+                                                            <td>
+                                                                <select name="other_charges_id[]" class="form-control select2 other_charges_select">
+                                                                    <option></option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" name="other_charges_amount[]" id="other_charges_amount" class="form-control other_charges_amount">
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
+                                                            </td>
+                                                        </tr>
+                                                     @endif
+
                                             </tbody>
                                             <tfoot>
                                         <tr>
@@ -215,19 +271,75 @@
                                     </tfoot>
                                        </table>
 
+                                       <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                <th style="width:50%">Discount</th>
+                                                <th style="width:30%">Amount</th>
+                                                <th style="width:10%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="discount_body">
+                                                @if(isset($tickets_current))
+                                                    @foreach($tickets_current->pawnTickets->other_charges as $key => $value)
+                                                        @if($value->inventory_other_charges->charge_type == 'discount')
+                                                        <tr>
+                                                            <td>
+                                                                <select name="other_charges_id[]" class="form-control select2 discount_select">
+                                                                    <option value="{{ $value->inventory_other_charges->id }}">{{ $value->inventory_other_charges->charge_name }}</option>
+                                                                    <option></option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" name="other_charges_amount[]" id="discount_amount" class="form-control discount_amount" value="{{ $value->amount }}">
+                                                                <input type="hidden" name="inventory_other_charges_id[]" id="inventory_other_charges_id" class="form-control" value="{{ $value->id }}">
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-sm remove" id="{{ $value->id }}" data-name="/pawn_auction/inventory_other_charges"><i class="material-icons">close</i></button>
+                                                            </td>
+                                                    </tr>
+                                                        @endif
+                                                     @endforeach
+                                                    @else
+                                                        <tr>
+                                                            <td>
+                                                                 <select name="other_charges_id[]" class="form-control select2 discount_select">
+                                                                    <option></option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" name="other_charges_amount[]" id="discount_amount" class="form-control discount_amount">
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
+                                                            </td>
+                                                        </tr>
+                                                     @endif
+
+                                            </tbody>
+                                            <tfoot>
+                                        <tr>
+                                            <td colspan="3">
+                                                 <button type="button" class="btn btn-info btn-sm float-right" onClick="add_other_charges(this, 'discount')" style="margin:1px">Add</button>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                       </table>
+
+
                                        <ul style="list-style-type:none;padding-left: 5px;">
-                                            <li class="form-inline" style="height:40px;">
+                                            <!-- <li class="form-inline" style="height:40px;">
                                                 <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Discounts <i>(if any)</i> </label> : 
                                                 <input type="text" name="remarks" class="form-control" style="margin-left:20px;width:180px" id="remarks" placeholder="Remarks" onChange="enableDiscount(this)">
                                                 <input type="number" name="discount" class="form-control" style="margin-left:20px;width:100px" id="discount" value="0" readonly step=".01" onChange="setNetProceeds()">
-                                            </li>
+                                            </li> -->
                                             <li class="form-inline" style="height:40px;">
                                                 <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interest</label> : 
-                                                <input type="number" name="interest_text" class="form-control" style="margin-left:20px;width:100px" id="interest_text" value="0" step=".01" onChange="setNetProceeds()">
+                                                <input type="number" name="interest_text" class="form-control" style="margin-left:20px;width:100px" id="interest_text" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->interest_text : 0 }}" step=".01" onChange="setNetProceeds()">
                                             </li>
                                             <li class="form-inline" style="height:40px;">
                                                 <label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Penalty</label> : 
-                                                <input type="number" name="penalty_text" class="form-control" style="margin-left:20px;width:100px" id="penalty_text" value="0" step=".01" onChange="setNetProceeds()">
+                                                <input type="number" name="penalty_text" class="form-control" style="margin-left:20px;width:100px" id="penalty_text" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->penalty_text : 0 }}" step=".01" onChange="setNetProceeds()">
                                             </li>
                                         </ul>
 
@@ -238,11 +350,12 @@
 
                                     <ul style="list-style-type:none;padding-left: 5px;">
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Principal </label> : <span class="font-weight-normal col-xl-5">{{ number_format($inventory->principal,2) }}</span></li>
-                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interest</label> : <input type="text" name="interest" class="form-control" style="margin-left:20px;width:200px" id="interest" value="{{ round(($inventory->principal * 0.03) * $tickets->count(),2) }}" readonly></li>
-                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Advance Interest</label> : <input type="text" name="advance_interest" class="form-control" style="margin-left:20px;width:200px" id="advance_interest" value="{{ isset($inventory->advance_interest) ? $inventory->advance_interest : '0'}}" readonly></li>
-                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Penalty</label> : <input type="text" class="form-control" name="penalty" style="margin-left:20px;width:200px" id="penalty" value="{{ isset($inventory->penalty) ? $inventory->penalty : '0'}}" readonly ></li>
-                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Other Charges</label> : <input type="text" class="form-control" name="other_charges" style="margin-left:20px;width:200px" id="other_charges" value="0" readonly></li>
-                                            <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Net Proceeds</label> : <input type="text" name="net" class="form-control" style="margin-left:20px;width:200px" id="net_proceeds" readonly></li>
+                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interest</label> : <input type="text" name="interest" class="form-control" style="margin-left:20px;width:200px" id="interest" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->interest ?? 0 : round(($inventory->principal * 0.03) * $tickets->count(),2) }}" readonly></li>
+                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Advance Interest</label> : <input type="text" name="advance_interest" class="form-control" style="margin-left:20px;width:200px" id="advance_interest" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->advance_interest ?? $inventory->advance_interest ?? 0 : 0}}" readonly></li>
+                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Penalty</label> : <input type="text" class="form-control" name="penalty" style="margin-left:20px;width:200px" id="penalty" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->penalty ?? $inventory->penalty ?? 0 : 0  }}" readonly ></li>
+                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Other Charges</label> : <input type="text" class="form-control" name="other_charges" style="margin-left:20px;width:200px" id="other_charges" value="{{ isset($tickets_current) && $tickets_current->pawnTickets->charges ? $tickets_current->pawnTickets->charges : 0 }}" readonly></li>
+                                            <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Discount</label> : <input type="text" class="form-control" name="discount" style="margin-left:20px;width:200px" id="discount" value="{{ isset($tickets_current) && $tickets_current->pawnTickets->discount ? $tickets_current->pawnTickets->discount : 0 }}" readonly></li>
+                                            <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Net Proceeds</label> : <input type="text" name="net" class="form-control" style="margin-left:20px;width:200px" id="net_proceeds" readonly value="{{ isset($tickets_current) ? ($tickets_current->pawnTickets->advance_interest + $tickets_current->pawnTickets->interest + $tickets_current->pawnTickets->penalty + $tickets_current->pawnTickets->interest_text + $tickets_current->pawnTickets->penalty_text + $tickets_current->pawnTickets->charges) - ($tickets_current->pawnTickets->discount + $tickets_current->pawnTickets->discount_text) : 0  }}"></li>
                                         </ul>
                                     <div class="jumbotron" style="padding:0">
                                     <ul style="list-style-type:none;">
@@ -262,7 +375,7 @@
                 <!-- end content-->
                 <div class="text-center">
                         <input type="hidden" name="inventory_id" value="{{ $id }}">
-                        <input type="hidden" name="ticket_number" value="{{ $ticket_number }}">
+                        <input type="hidden" name="ticket_number" value="{{ isset($tickets_current) ? '' :  $ticket_number }}">
                         <input type="hidden" name="processed_by"  value="{{ Auth::user()->id }}">
                         <input type="hidden" name="transaction_type"  value="renew">
                         <input type="submit" value="Submit" class="btn btn-success">
@@ -282,13 +395,29 @@
 setNetProceeds();
     const other_charges = '.other_charges_select';
     const other_charges_route =  '{{ route("other_charges.search") }}' 
-    const table_other_charges = 'other_charges';
+    const table_other_charges = 'charges';
     select2Initialized(other_charges,other_charges_route, table_other_charges);
 
-    $(document).on('select2:select', '.other_charges_select', function (e) {
+    const discount = '.discount_select';
+    const discount_route =  '{{ route("other_charges.search") }}' 
+    const table_discount = 'discount';
+
+    select2Initialized(discount,discount_route,table_discount);
+
+    $(document).on('select2:select', '.other_charges_select, .discount_select', function (e) {
         const data = e.params.data;
-        $(this).closest('tr').find('.other_charges_amount').val(data['data-amount']);
-        setOtherCharges();
+        // console.log(data.action);
+        switch(data.action){
+            case 'discount':
+                $(this).closest('tr').find('.discount_amount').val(data['data-amount']);
+                setDiscount();
+            break;
+            case 'amount':
+                $(this).closest('tr').find('.other_charges_amount').val(data['data-amount']);
+                setOtherCharges();
+            break;
+
+        }
         // console.log(data.id);
         if(data.id == 'link'){
             window.open(data.link);
@@ -318,7 +447,6 @@ setNetProceeds();
         const interest_text = document.getElementById('interest_text').value;
         const advance_interest = document.getElementById('advance_interest').value;
         const discount = document.getElementById('discount').value;
-
         const net_proceeds = document.getElementById('net_proceeds');
         net_proceeds.value = ((parseFloat(other_charges) + parseFloat(penalty) + parseFloat(interest) + parseFloat(advance_interest) + parseFloat(interest_text) + parseFloat(penalty_text)) - parseFloat(discount)).toFixed(2);
 

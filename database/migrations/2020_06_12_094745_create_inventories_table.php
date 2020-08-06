@@ -30,7 +30,8 @@ class CreateInventoriesTable extends Migration
             $table->double('penalty', 10, 4)->nullable();
             $table->smallInteger('interest_percentage')->default(3);
             $table->smallInteger('penalty_percentage')->default(2);
-            $table->smallInteger('discount')->nullable();
+            $table->double('discount', 10, 4)->nullable();
+            $table->double('charges', 10, 4)->nullable();
             $table->double('appraised_value', 10, 4)->nullable();
             $table->double('principal', 10, 4)->nullable();
             $table->double('net', 10, 4)->nullable();

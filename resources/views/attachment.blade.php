@@ -51,8 +51,8 @@
                   <div class="card-icon" style="background: linear-gradient(60deg,#702230,#702230)">
                     <i class="material-icons">list</i>
                   </div>
-                    <a href="{{ route('other_charges.create') }}" class="btn float-right btn-responsive">Add Charges</a>
-                    <h4 class="card-title">Charges</h4>
+                    <a href="{{ route('attachment.create') }}" class="btn float-right btn-responsive">Add Attachment</a>
+                    <h4 class="card-title">Attachment</h4>
 
                 </div>
     
@@ -60,13 +60,11 @@
                         @include('alert')
                     <div class="alert_message"></div>
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
-                      <table class="table table-hover other_charges_table">
+                      <table class="table table-hover attachment_table">
                             <thead>
                                 <tr>
                                   <th>#</th>
-                                  <th>Type</th>
-                                  <th>Name</th>
-                                  <th>Amount</th>
+                                  <th>Attachment</th>
                                   <th>Status</th>
                                   <th style="width:15%">Actions</th>
                                 </tr>
@@ -93,17 +91,15 @@
     <script type="text/javascript">
   $(tableFunction = () => {
     
-    let table = $('.other_charges_table').DataTable({
+    let table = $('.attachment_table').DataTable({
         processing: true,
         serverSide: true,
         stateSave: true, // statesaving of datatable
         bDestroy: true, // for re-initialized 
-        ajax: "{{ route('other_charges.index') }}",
+        ajax: "{{ route('attachment.index') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-            {data: 'charge_type', name: 'type'},
-            {data: 'charge_name', name: 'name'},
-            {data: 'amount', name: 'amount'},
+            {data: 'type', name: 'attachment'},
             {data: 'status', name: 'status'},
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]

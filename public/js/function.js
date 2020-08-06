@@ -10,17 +10,10 @@ $(document).ready(function(){
     // inline : true,
     // minDate: new Date() // Now can select only dates, which goes after today
   });
-  $(document).on('click', '#addTable', function() {
-    const category_jewelry = document.getElementById('category_jewelry');
-    if(category_jewelry.checked){
-      const count = document.querySelectorAll('.count');
-      const length = count.length;
-      // console.log(length);
-      let jewelry_counter = length == 0 ? 0 : parseInt(count[length - 1].value) + 1;
-      jewelryTable(jewelry_counter);
-    }
-    
-  });
+  // $(document).on('click', '#addTable', function() {
+
+
+  // });
 
   $('#itemTable').on('click','.remove_table',function() {
     $(this).closest('table').remove();
@@ -28,12 +21,14 @@ $(document).ready(function(){
   });
 
   
+
   
 
   
 });
 
 // let jewelry_counter = 0;
+
 function togglePassword(element){
     const state = element.getAttribute('data-id');
     const password = document.getElementById('password');
@@ -151,11 +146,12 @@ function getSuki(radio){
   // console.log(document.getElementById("category_jewelry").checked);
   const suki_check = document.getElementById('suki_check');
   const suki = document.getElementById("suki");
-  suki_check.checked = false;
+
   if(document.getElementById("category_jewelry").checked){
       suki.style.display = "block";
       suki_check.disabled = false;
   }else {
+      suki_check.checked = false;
       suki.style.display = "none";
       suki_check.disabled = true;
   }
@@ -189,22 +185,30 @@ function jewelryTable(jewelry_counter = 0){
       '<tbody>'+
       '<tr>'+
         '<td>'+
+          '<div class="form-group input item_type_id_'+jewelry_counter+'_error">'+
           '<select name="item_type_id['+jewelry_counter+']" class="form-control item_type" onChange="setAppraisedValue(this);getKarat(this.value, this)">'+
             '<option selected disabled></option>'+
           '</select>'+
+          '</div>'+
         '</td>'+
         '<td>'+
+        '<div class="form-group input item_type_weight_'+jewelry_counter+'_error ">'+
           '<input class="form-control item_type_weight" type="number" name="item_type_weight['+jewelry_counter+']" value="0.00" onKeyup="setKaratWeight(this);setAppraisedValue(this)">'+
-        '</td>'+
+        '</div>'+
+          '</td>'+
         '<td>'+
+        '<div class="form-group input item_type_appraised_value_'+jewelry_counter+'_error">'+
           '<input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value['+jewelry_counter+']" value="0" readonly >'+
+        '</div>'+
         '</td>'+
         '<td rowspan=3 class="text-center">'+
+          '<div class="form-group input description_'+jewelry_counter+'_error">'+
           '<textarea class="form-control" rows="5" name="description['+jewelry_counter+']" id="description"></textarea> <br>'+
+          '</div>'+
           '<button id="addDiamond" class="btn btn-warning btn-sm" type="button">ADD DIAMOND</button>'+
         '</td>'+
         '<td rowspan=3 class="text-center">'+
-          '<div class="form-group">'+
+          '<div class="form-group input image_'+jewelry_counter+'_error">'+
             '<input type="file" name="image['+jewelry_counter+']" class="image" onChange="checkUpload(this)">'+
             '<button type="button" class="btn btn-success btn-sm uploadButton">Upload Image</button>'+
             '<div class="input-group">'+
@@ -222,8 +226,9 @@ function jewelryTable(jewelry_counter = 0){
       
       '<tr>'+
         '<td>'+
+        '<div class="form-group input item_name_'+jewelry_counter+'_error">'+
           '<input type="text" name="item_name['+jewelry_counter+']" class="form-control">'+
-
+        '</div>'+
         '</td>'+
         '<td>'+
           '<input class="form-control" type="number" name="item_name_weight['+jewelry_counter+']" value="0.00">'+
@@ -235,9 +240,11 @@ function jewelryTable(jewelry_counter = 0){
       
       '<tr>'+
         '<td>'+
+        '<div class="form-group input item_karat_'+jewelry_counter+'_error">'+
           '<select name="item_karat['+jewelry_counter+']" class="form-control item_karat" onChange="setAppraisedValue(this)">'+
               '<option></option>'+
             '</select>'+
+          '</div>'+
         '</td>'+
         '<td>'+
           '<input class="form-control karat_weight" type="number" name="item_karat_weight['+jewelry_counter+']" value="0.00" readonly>'+
@@ -257,7 +264,7 @@ function jewelryTable(jewelry_counter = 0){
       url: '/settings/rates.getItemType/1',
       success: (data) => {
         const item_type_element = document.querySelectorAll('.item_type');
-        let item_type_value = '<option selected disabled></option>';
+        let item_type_value = '<option selected></option>';
         data.forEach(element => {
           item_type_value += '<option value="'+element.id+'">'+element.item_type+'</option>';
         })
@@ -407,8 +414,8 @@ function removeImage(element){
 }
 function inventoryForm(event, element){
   event.preventDefault();
-  // $('.error_message').css('display', 'none');
-  // $('.input').removeClass('has-error is-focused');
+  $('.error_message').css('display', 'none');
+  $('.input').removeClass('has-error is-focused');
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
@@ -425,12 +432,13 @@ function inventoryForm(event, element){
       processData : false,
       success: (data) => {
         // console.log(data.success);
+        // console.log(data);
         if(data.success === true){
           // alert_message('Success', data.status);
+          location.reload();
         if(data.create === true){
           window.location.href = data.link;
         }
-         location.reload();
 
         }else{
           alert_message('Danger', 'Error occured. Pleasse contact administrator');
@@ -441,34 +449,44 @@ function inventoryForm(event, element){
         const error = data.responseJSON.errors;
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
-             $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
+          // console.log(error[errorValue][0].replace(/\.|[0-9]/g, ''));
+
+             if(/\.|[0-9]/g.test(errorValue)){
+              $('.'+errorValue.replace(/\./g, '_')+'_error').addClass('has-error is-focused');
+             }else{
+              $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
               $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
+
+             }
+
+            //  console.log($('.'+errorValue.replace(/\./g, '_')+'_error'));
 
         }
       }
     });
 };
 
-function add_other_charges(element){
+function add_other_charges(element, table){
   // console.log(element);
-  const tbody = document.querySelector('#other_charges_body');
+  const tbody = document.querySelector('#'+table+'_body');
   const tr = tbody.insertRow(tbody.rows.length);
   const other_charges_select = tr.insertCell(0);
   const other_charges_amount = tr.insertCell(1);
   const remove = tr.insertCell(2);
-  other_charges_select.innerHTML = '<select class="form-control other_charges_select" name="other_charges_id[]"></select>';
-  other_charges_amount.innerHTML = '<input type="text" class="form-control other_charges_amount" name="other_charges_amount[]">';
+  other_charges_select.innerHTML = '<select class="form-control '+table+'_select" name="other_charges_id[]"></select>';
+  other_charges_amount.innerHTML = '<input type="text" class="form-control '+table+'_amount" name="other_charges_amount[]">';
   remove.innerHTML = '<button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>';
 
-  const other_charges = '.other_charges_select';
+  const other_charges = '.'+table+'_select';
   const other_charges_route =  '/settings/other_charges/search' ;
-  const table_other_charges = 'other_charges';
+  const table_other_charges = table == 'other_charges' ? 'charges' : 'discount';
       select2Initialized(other_charges,other_charges_route, table_other_charges);
 
 }
 
 function removeTr(element){
   $(element).closest('tr').remove();
+  setDiscount();
   setOtherCharges();
 }
 
@@ -477,17 +495,29 @@ function setOtherCharges(){
   const other_charges = document.getElementById('other_charges');
   let total = 0;
   for(let i = 0; i < other_charges_amount.length; i++){
-      total += parseFloat(other_charges_amount[i].value);
+    // console.log(other_charges_amount[i]);
+      total += other_charges_amount[i].value != '' ? parseFloat(other_charges_amount[i].value) : 0;
   }
   other_charges.value = total.toFixed(2);
   setNetProceeds();
 }
 
+function setDiscount(){
+  const discount_amount = document.querySelectorAll('.discount_amount');
+  const discount = document.getElementById('discount');
+  let total = 0;
+  for(let i = 0; i < discount_amount.length; i++){
+    // console.log(other_charges_amount[i]);
+      total += discount_amount[i].value != '' ? parseFloat(discount_amount[i].value) : 0;
+  }
+  discount.value = total.toFixed(2);
+  setNetProceeds();
+}
 
 function renewForm(event, element){
   event.preventDefault();
   // $('.error_message').css('display', 'none');
-  // $('.input').removeClass('has-error is-focused');
+  $('.input').removeClass('has-error is-focused');
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
@@ -520,9 +550,7 @@ function renewForm(event, element){
         const error = data.responseJSON.errors;
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
-             $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
-              $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
-
+              $('.'+errorValue+'_error').addClass('has-error is-focused');
         }
       }
     });

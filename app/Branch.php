@@ -10,7 +10,7 @@ class Branch extends Model
     //
     use SoftDeletes;
     
-    protected $fillable = ['branch'];
+    protected $fillable = ['branch','address','tin','contact_number'];
 
     public function user(){
         return $this->hasOne('App\User');

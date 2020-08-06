@@ -1,7 +1,6 @@
 @php
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
-
 @extends('layout')
 @section('content')
 <style>
@@ -23,7 +22,7 @@
                     <i class="material-icons">list</i>
                   </div>
                     <a href="{{ route('other_charges.index') }}" class="btn float-right btn-responsive">View All</a>
-                    <h4 class="card-title"> {{ ucwords($routeName) }} Other Charges</h4>
+                    <h4 class="card-title"> {{ ucwords($routeName) }} Charges</h4>
 
                 </div>
     
@@ -37,13 +36,41 @@
                     <div class="col-xl-12 mt-5 d-flex justify-content-center">
                         <div class="col-xl-6">
                             <div class="row d-flex justify-content-center">
-                                <label for="charge_type" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Charge Type: </label>
+                                <label for="charge_type" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Type: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('charge_type') has-error is-focused @enderror">
-		                                <input type="text" id="charge_type" name="charge_type" class="form-control" value="{{ isset($data->charge_type) && $errors->isEmpty() ? $data->charge_type : old('amount') }}"/>
+                                        <select class="form-control" name="charge_type" id="charge_type">
+                                            <option></option>
+                                            <option value="discount"
+                                                @if((isset($data->charge_type) && $data->charge_type == 'discount'))
+                                                    selected 
+                                                @elseif(!isset($data->charge_type) && old('charge_type') == 'discount')
+                                                    selected
+                                                @endif
+                                            >Discount</option>
+                                            <option value="charges" 
+                                            @if((isset($data->charge_type) && $data->charge_type == 'charges'))
+                                                    selected 
+                                                @elseif(!isset($data->charge_type) && old('charge_type') == 'charges')
+                                                    selected
+                                                @endif
+                                            >Charges</option>
+                                        </select>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('charge_type')
+                                     <label class="text-danger">{{ $message }}</label>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row d-flex justify-content-center">
+                                <label for="charge_name" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Name: </label>
+                                <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
+                                    <div class="form-group @error('charge_name') has-error is-focused @enderror">
+		                                <input type="text" id="charge_name" name="charge_name" class="form-control" value="{{ isset($data->charge_name) && $errors->isEmpty() ? $data->charge_name : old('charge_name') }}"/>
+                                        <span class="material-icons form-control-feedback">clear</span>
+                                    </div>
+                                    @error('charge_name')
                                      <label class="text-danger">{{ $message }}</label>
                                     @enderror
                                 </div>

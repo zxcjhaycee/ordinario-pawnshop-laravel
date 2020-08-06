@@ -22,7 +22,7 @@
                   <div class="card-icon" style="background: linear-gradient(60deg,#702230,#702230)">
                     <i class="material-icons">list</i>
                   </div>
-                    <a href="" class="btn float-right btn-responsive">View All</a>
+                    <a href="{{ route('attachment.index') }}" class="btn float-right btn-responsive">View All</a>
                     <h4 class="card-title"> {{ ucwords($routeName) }} Attachment</h4>
 
                 </div>

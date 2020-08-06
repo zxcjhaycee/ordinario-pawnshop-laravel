@@ -10,6 +10,7 @@ class Other_charges extends Model
     //
     use SoftDeletes;
     
-    protected $fillable = ['charge_type', 'amount'];
+    protected $fillable = ['charge_type', 'charge_name', 'amount'];
+
 
 }
