@@ -39,8 +39,8 @@
     
                  <div class="card-body">
                     @include('alert')
-                 <form enctype="multipart/form-data" id="inventoryForm" onSubmit="inventoryForm(event, this)" method="POST">
-                        @if(isset($data->id))
+                 <form enctype="multipart/form-data" id="repawnForm" onSubmit="repawnForm(event, this)" method="POST">
+                        @if(isset($tickets_current))
                             @method('PUT')
                         @endif
                         @csrf
@@ -59,7 +59,7 @@
                                     <div class="col-xl-5 col-lg-6 col-md-5 col-sm-7 inventory_number_error" style="top:-20px;">
                                         <div class="form-group input @error('inventory_number') has-error is-focused @enderror">
                                         <!-- <input type="number" readonly id="inventory_number" name="inventory_number" class="form-control" value="{{ isset($data->inventory_number) && $errors->isEmpty() ? $data->inventory_number : old('inventory_number') }}"/> -->
-                                            <input type="text" id="inventory_number" name="inventory_number" class="form-control" value="{{ isset($data->inventory_number) && $errors->isEmpty() ? $data->inventory_number : '' }}"/>
+                                            <input type="text" id="inventory_number" name="inventory_number" class="form-control" value="{{ $inventory->inventory_number }}" readonly/>
                                             <span class="material-icons form-control-feedback">clear</span>
                                         </div>
                                         @error('inventory_number')
@@ -85,7 +85,7 @@
                                         <label for="ticket_number" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">PT #: </label>
                                         <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 ticket_number_error" style="top:-17px;">
                                             <div class="form-group input @error('ticket_number') has-error is-focused @enderror">
-                                                <input type="number" readonly id="ticket_number" name="ticket_number" class="form-control" value="{{ isset($data->ticket_number) && $errors->isEmpty() ? $data->ticket_number : $ticket_number }}"/>
+                                                <input type="number" readonly id="ticket_number" name="ticket_number" class="form-control" value="{{ isset($tickets_current->ticket_number) && $errors->isEmpty() ? $tickets_current->ticket_number : $ticket_number }}"/>
                                                 <span class="material-icons form-control-feedback">clear</span>
                                             </div>
                                             @error('ticket_number')
@@ -99,8 +99,7 @@
                                         <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 transaction_status_error" style="top:-17px;">
                                             <div class="form-group input @error('transaction_status') has-error is-focused @enderror">
                                             <select name="transaction_status" id="transaction_status" class="form-control">
-                                                <option {{ isset($data) && $data->transaction_status == 'New' ? 'selected' : '' }}>New</option>
-                                                <option {{ isset($data) && $data->transaction_status == 'Old' ? 'selected' : '' }}>Old</option>
+                                                <option selected>Old</option>
                                             </select>                                                
                                            <span class="material-icons form-control-feedback">clear</span>
                                             </div>
@@ -128,7 +127,7 @@
                                             <label for="transaction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Transaction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 transaction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('transaction_date') has-error is-focused @enderror">
-                                                    <input type="text" name="transaction_date"  class="form-control air_date_picker" onblur="transaction_dates(this)" value="{{ isset($data->pawnTickets->transaction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->pawnTickets->transaction_date)) : '' }}" autocomplete="off">
+                                                    <input type="text" name="transaction_date"  class="form-control transaction_picker" onblur="transaction_dates(this)" value="{{ isset($tickets_current) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->transaction_date)) : '' }}" autocomplete="off">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('transaction_date')
@@ -141,7 +140,7 @@
                                             <label for="maturity_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Maturity Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 maturity_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('maturity_date') has-error is-focused @enderror">
-                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($data->pawnTickets->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->pawnTickets->maturity_date)) : '' }}">
+                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($tickets_current->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->maturity_date)) : '' }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('maturity_date')
@@ -154,7 +153,7 @@
                                             <label for="expiration_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Expiration Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 expiration_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('expiration_date') has-error is-focused @enderror">
-                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($data->pawnTickets->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->pawnTickets->expiration_date)) : '' }}">
+                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($tickets_current->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->expiration_date)) : '' }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('expiration_date')
@@ -167,7 +166,7 @@
                                             <label for="auction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Auction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 auction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('auction_date') has-error is-focused @enderror">
-                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($data->pawnTickets->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->pawnTickets->auction_date)) : '' }}">
+                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($tickets_current->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->auction_date)) : '' }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('auction_date')
@@ -193,9 +192,9 @@
                                     <label for="customer_id" class="col-xl-2 col-lg-2 col-md-2 col-sm-4 ">Customer: </label>
                                     <div class="col-xl-5 col-lg-6 col-md-5 col-sm-7 customer_id customer_id_error" style="top:-10px;">
                                         <div class="form-group input @error('customer_id') has-error is-focused @enderror">
-                                            <select name="customer_id" id="customer_id" class="form-control customer_id select2">
+                                            <select name="customer_id" id="customer_id" class="form-control customer_id select2" disabled>
                                                 <!-- <option></option> -->
-                                                <option value="{{ isset($data) ? $data->customer_id : '' }}" selected="selected">{{ isset($data) ? $data->customer->first_name." ".$data->customer->last_name." ".$data->customer->suffix : '' }}</option>
+                                                <option value="{{ $inventory->customer_id }}" selected="selected">{{  $inventory->customer->first_name." ".$inventory->customer->last_name." ".$inventory->customer->suffix }}</option>
 
                                             </select>     
                                         </div>
@@ -209,12 +208,18 @@
                                     <div class="col-xl-5 col-lg-6 col-md-5 col-sm-7 attachment_id_error" style="top:-10px;">
                                         <div class="form-group input @error('attachment_id') has-error is-focused @enderror">
                                             <select name="attachment_id" id="attachment_id" class="form-control attachment_id" readonly onChange="getAttachmentNumber(this.options[this.selectedIndex])">
-                                                @isset($data->customer->attachments)
-                                                    @foreach($data->customer->attachments as $key => $value)
-                                                            <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}" 
-                                                            {{ $data->pawnTickets->attachment_id == $value->id ? 'selected' : '' }}>
+                                                <option></option>
+                                                @isset($inventory->customer->attachments)
+                                                    @foreach($inventory->customer->attachments as $key => $value)
+                                                            @if($value->id == $tickets_current->attachment_id)
+                                                            <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}" selected>
                                                              {{ $value->type }}
                                                             </option>
+                                                            @else
+                                                            <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}">
+                                                             {{ $value->type }}
+                                                            </option>
+                                                            @endif
                                                     @endforeach
                                                 @endisset
                                                 <!-- <option value = {{ isset($data->pawnTickets->attachment_id) ? $data->pawnTickets->attachment_id : '' }}>{{ isset($data->pawnTickets->attachment->type) ?  $data->pawnTickets->attachment->type : '' }}</option> -->
@@ -229,7 +234,7 @@
                                     <label for="attachment_number" class="col-xl-2 col-lg-2 col-md-2 col-sm-4 ">Attachment Number: </label>
                                     <div class="col-xl-5 col-lg-6 col-md-5 col-sm-7 attachment_number_error" style="top:-20px;">
                                         <div class="form-group input @error('attachment_number') has-error is-focused @enderror">
-                                            <input type="number" readonly id="attachment_number" name="attachment_number" class="form-control" value="{{ isset($data->pawnTickets->attachment_number) && $errors->isEmpty() ? $data->pawnTickets->attachment_number : old('attachment_number') }}"/>
+                                            <input type="number" readonly id="attachment_number" name="attachment_number" class="form-control" value="{{ isset($tickets_current->attachment_number) && $errors->isEmpty() ? $tickets_current->attachment_number : old('attachment_number') }}"/>
                                             <span class="material-icons form-control-feedback">clear</span>
                                         </div>
                                         @error('attachment_number')
@@ -240,7 +245,7 @@
                             </div>
                          </div>
                         <!-- Items -->
-                         <div class="card" id="items">
+                        <div class="card" id="items">
                             <div class="card-header card-header-text card-header-primary">
                                 <div class="card-text">
                                 <h4 class="card-title">Items</h4>
@@ -252,7 +257,7 @@
                                         <div class="form-group input @error('item_category_id') has-error is-focused @enderror">
                                             <div class="form-check">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="radio" id="category_jewelry" name="item_category_id" value="1" onclick="getSuki(this);addItem('checkbox')" {{ isset($data->item_category_id) && $data->item_category_id == 1 ? 'checked' : ''  }}> Jewelry
+                                                <input class="form-check-input" type="radio" id="category_jewelry" name="item_category_id" value="1" onclick="getSuki(this);addItem('checkbox')" {{ isset($inventory->item_category_id) && $inventory->item_category_id == 1 ? 'checked' : ''  }}> Jewelry
                                                 <span class="circle">
                                                 <span class="check"></span>
                                                 </span>
@@ -260,7 +265,7 @@
                                             </div>
                                             <div class="form-check">
                                             <label class="form-check-label">
-                                                <input class="form-check-input" type="radio" id="category_non-jewelry" name="item_category_id" value="2" onclick="getSuki(this)" {{ isset($data->item_category_id) && $data->item_category_id == 2 ? 'checked' : ''  }}> Non-Jewelry
+                                                <input class="form-check-input" type="radio" id="category_non-jewelry" name="item_category_id" value="2" onclick="getSuki(this)" {{ isset($inventory->item_category_id) && $inventory->item_category_id == 2 ? 'checked' : ''  }}> Non-Jewelry
                                                 <span class="circle">
                                                 <span class="check"></span>
                                                 </span>
@@ -271,7 +276,7 @@
                                     <div class="col-xl-6">
                                         <div id="suki" class="form-check" {{ isset($data->item_category_id) && $data->item_category_id == 1 ? '' : 'style="display:none;"'  }}>
                                         <label class="form-check-label">
-                                            <input id="suki_check" class="form-check-input" type="checkbox" value="1" name="is_special_rate" onClick="checkRate(this)" {{ isset($data->pawnTickets->is_special_rate) && $data->pawnTickets->is_special_rate == 1 ? 'checked' : ''  }}> Suki Rate? (For Jewelry Items)
+                                            <input id="suki_check" class="form-check-input" type="checkbox" value="1" name="is_special_rate" onClick="checkRate(this)" {{ isset($tickets_current->is_special_rate) && $tickets_current->is_special_rate == 1 ? 'checked' : ''  }}> Suki Rate? (For Jewelry Items)
                                             <span class="form-check-sign">
                                             <span class="check"></span>
                                             </span>
@@ -279,8 +284,10 @@
                                         </div>
                                     </div>
                                     <div class="col-xl-12 col-sm-12 container table-responsive" id="itemTable">
-                            @isset($data->inventoryItems)
-                                @foreach($data->inventoryItems as $key => $value)
+
+                                    @isset($inventory->inventoryItems)
+                                    @foreach($inventory->inventoryItems as $key => $value)
+
                                     <table class="table table-bordered mt-3 jewelry_table" width="100%">
                                         <thead>
                                             <tr>
@@ -296,34 +303,31 @@
                                             <tr>
                                                 <td>
                                                     <div class="form-group input item_type_id_{{ $key }}_error">
-                                                        <select name="item_type_id[{{ $key }}]" class="form-control item_type" onChange="setAppraisedValue(this);getKarat(this.value, this)">
-                                                            <option selected disabled></option>
-                                                            @foreach($item_type_data as $item_type)
-                                                                <option value="{{ $item_type->id }}" {{ $item_type->id == $value->item_type_id ? 'selected' : '' }}>{{ $item_type->item_type}}</option>
-                                                            @endforeach
+                                                        <select name="item_type_id[{{ $key }}]" class="form-control item_type" onChange="setAppraisedValue(this);getKarat(this.value, this)" disabled>
+                                                                <option value="{{ $item_type[$key]->id }}" selected >{{ $item_type[$key]->item_type}}</option>
                                                         </select>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="form-group input item_type_weight_{{ $key }}_error ">
-                                                        <input class="form-control item_type_weight" type="number" name="item_type_weight[{{ $key }}]" value="{{ $value->item_type_weight }}" onKeyup="setKaratWeight(this);setAppraisedValue(this)">
+                                                        <input class="form-control item_type_weight" type="number" name="item_type_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_type_weight : $value->item_type_weight }}" onKeyup="setKaratWeight(this);setAppraisedValue(this)" disabled>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="form-group input item_type_appraised_value_{{ $key }}_error">
-                                                        <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ $value->ticket_item->item_type_appraised_value }}" readonly >
+                                                        <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_type_appraised_value :  $price[$key] }}" readonly >
                                                     </div>
                                                 </td>
                                                 <td rowspan=3 class="text-center">
                                                     <div class="form-group input description_{{ $key }}_error">
-                                                     <textarea class="form-control" rows="5" name="description[{{ $key }}]" id="description">{{ $value->description }}</textarea> <br>
+                                                     <textarea class="form-control" rows="5" name="description[{{ $key }}]" id="description" disabled>{{ isset($tickets_current) ? $value->inventory_items->description :  $value->description }}</textarea> <br>
                                                     </div>
                                                     <button id="addDiamond" class="btn btn-warning btn-sm" type="button">ADD DIAMOND</button>
                                                 </td>
                                                 <td rowspan=3 class="text-center">
                                                     <div class="form-group input image_{{ $key }}_error">
-                                                        <input type="file" name="image[{{ $key }}]" class="image" onChange="checkUpload(this)">
-                                                        <button type="button" class="btn btn-success btn-sm uploadButton">Change Image</button>
+                                                        <input type="file" name="image[{{ $key }}]" class="image" onChange="checkUpload(this)" disabled>
+                                                        <button type="button" class="btn btn-success btn-sm uploadButton" disabled>Change Image</button>
                                                         <div class="input-group">
                                                             <input type="text" name="image[{{ $key }}]" readonly="" class="form-control imageText">
                                                         </div>
@@ -331,7 +335,6 @@
                                                     <button type="button" class="btn btn-danger btn-sm removeImage" style="display:none" onClick="removeImage(this)">Remove Image</button>
                                                 </td>
                                                 <td rowspan=3>
-                                                    <!-- <i class="material-icons remove" style="cursor: pointer;" data-id="{{ $value->ticket_item->id }}" id="{{ $value->id }}" data-name="/pawn_auction/inventory_item">cancel</i> -->
                                                     <i class="material-icons remove_table" style="cursor: pointer;">cancel</i>
 
                                                 </td>
@@ -340,34 +343,40 @@
                                                 <tr>
                                                     <td>
                                                         <div class="form-group input item_name_{{ $key }}_error">
-                                                            <input type="text" name="item_name[{{ $key }}]" class="form-control" value="{{ $value->item_name }}">
+                                                            <input type="text" name="item_name[{{ $key }}]" class="form-control" value="{{ isset($tickets_current) ? $value->inventory_items->item_name : $value->item_name }}" disabled>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_weight[{{ $key }}]" value="{{ $value->item_name_weight }}">
+                                                        <input class="form-control" type="number" name="item_name_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_name_weight : $value->item_name_weight }}" disabled>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ $value->ticket_item->item_name_appraised_value }}"  readonly>
+                                                        <input class="form-control" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_name_appraised_value : 0 }}"  readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>
                                                         <div class="form-group input item_karat_{{ $key }}_error">
-                                                            <select name="item_karat[{{ $key }}]" class="form-control item_karat" onChange="setAppraisedValue(this)">
-                                                                <option></option>
-                                                                @foreach($rate_data[$key] as $rate)
-                                                                    <option value="{{ $rate->karat }}" data-gram="{{ $rate->gram }}" data-regular_rate="{{ $rate->regular_rate }}" data-special_rate="{{ $rate->special_rate }}" {{ $rate->karat == $value->item_karat ? 'selected' : '' }} >
-                                                                        {{ $rate->karat }}
+                                                            <select name="item_karat[{{ $key }}]" class="form-control item_karat" onChange="setAppraisedValue(this)" disabled>
+                                                                    @if(isset($tickets_current))
+                                                                    <option value="{{ $value->inventory_items->item_karat }}" selected data-gram="{{ $karat_rate['gram'][$key] }}" data-regular_rate="{{ $karat_rate['regular_rate'][$key] }}" data-special_rate="{{ $karat_rate['special_rate'][$key] }}">
+                                                                        {{ $value->inventory_items->item_karat }}
                                                                     </option>
-                                                                @endforeach
+                                                                    @else
+                                                                    <option value="{{ $value->item_karat }}" selected data-gram="{{ $karat_rate['gram'][$key] }}" data-regular_rate="{{ $karat_rate['regular_rate'][$key] }}" data-special_rate="{{ $karat_rate['special_rate'][$key] }}">
+                                                                        {{ $value->item_karat }}
+                                                                    </option>
+                                                                    @endif
                                                             </select>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ $value->item_karat_weight }}" readonly>
+                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_karat_weight :  $value->item_karat_weight }}" disabled>
                                                           <input type="hidden" class="count" value="{{ $key }}">
-                                                          <input type="hidden" name="inventory_item_id[{{ $key }}]" id="inventory_item_id" value="{{ $value->id }}"  class="inventory_item_id">
-                                                          <input type="hidden" name="ticket_item_id[{{ $key }}]" id="ticket_item_id" value="{{ $value->ticket_item->id }}"  class="ticket_item_id">
+                                                          <input type="hidden" name="inventory_item_id[{{ $key }}]" id="inventory_item_id" value="{{ isset($tickets_current) ? $value->inventory_item_id :  $value->id }}" class="inventory_item_id">
+                                                          @isset($tickets_current)
+                                                          <input type="hidden" name="ticket_item_id[{{ $key }}]" id="ticket_item_id" value="{{ $value->id  }}"  class="ticket_item_id">
+                                                          @endisset
+
 
                                                     </td>
                                                     <td>
@@ -378,7 +387,7 @@
                               @endforeach
                             @endisset
                                     </div>
-                                      <button id="item_button" class="btn btn-warning btn-sm" type="button" onClick="addItem();"  {{ isset($data->inventoryItems) ? '' :  'style=display:none' }}>ADD</button>
+                                      <button id="item_button" class="btn btn-warning btn-sm" type="button" onClick="addItem();">ADD</button>
                                 </div>
                             
                             </div>
@@ -396,7 +405,7 @@
                                             <label for="appraised_value" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Appraised Value </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 appraised_value_error" style="top:-17px;">
                                                 <div class="form-group input @error('appraised_value') has-error is-focused @enderror">
-                                                    <input type="number" id="appraised_value" name="appraised_value" class="form-control" value="{{ isset($data->pawnTickets->appraised_value) && $errors->isEmpty() ? $data->pawnTickets->appraised_value : 0 }}" readonly/>
+                                                    <input type="number" id="appraised_value" name="appraised_value" class="form-control" value="{{ isset($tickets_current->appraised_value) && $errors->isEmpty() ? $tickets_current->appraised_value : 0 }}" readonly/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('appraised_value')
@@ -408,7 +417,7 @@
                                             <label for="principal" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Principal: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 principal_error" style="top:-17px;">
                                                 <div class="form-group input @error('principal') has-error is-focused @enderror">
-                                                    <input type="number"  id="principal" name="principal" class="form-control" value="{{ isset($data->pawnTickets->principal) && $errors->isEmpty() ? $data->pawnTickets->principal : 0 }}" readonly/>
+                                                    <input type="number"  id="principal" name="principal" class="form-control" value="{{ isset($tickets_current->principal) && $errors->isEmpty() ? $tickets_current->principal : 0 }}" readonly/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('principal')
@@ -420,7 +429,7 @@
                                             <label for="other_charges" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Other Charges: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 other_charges_error" style="top:-17px;">
                                                 <div class="form-group input @error('other_charges') has-error is-focused @enderror">
-                                                    <input type="number"  id="other_charges" name="other_charges" class="form-control" value="{{ isset($other_charges['charges']) && $errors->isEmpty() ? $other_charges['charges'] : 0 }}" readonly/>
+                                                    <input type="number"  id="other_charges" name="other_charges" class="form-control" value="{{ isset($tickets_current->charges) && $errors->isEmpty() ? $tickets_current->charges : 0 }}" readonly/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('other_charges')
@@ -432,7 +441,7 @@
                                             <label for="discount" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Discount: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 discount_error" style="top:-17px;">
                                                 <div class="form-group input @error('discount') has-error is-focused @enderror">
-                                                    <input type="number"  id="discount" name="discount" class="form-control" value="{{ isset($other_charges['discount']) && $errors->isEmpty() ? $other_charges['discount'] : 0 }}" readonly/>
+                                                    <input type="number"  id="discount" name="discount" class="form-control" value="{{ isset($tickets_current->discount) && $errors->isEmpty() ? $tickets_current->discount : 0 }}" readonly/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('discount')
@@ -444,7 +453,7 @@
                                             <label for="net_proceeds" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Net Proceeds: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 net_proceeds_error" style="top:-17px;">
                                                 <div class="form-group input @error('net_proceeds') has-error is-focused @enderror">
-                                                    <input type="number"  id="net_proceeds" name="net_proceeds" class="form-control" value="{{ isset($data->pawnTickets->net) && $errors->isEmpty() ? $data->pawnTickets->net : 0 }}" readonly/>
+                                                    <input type="number"  id="net_proceeds" name="net_proceeds" class="form-control" value="{{ isset($tickets_current->net) && $errors->isEmpty() ? $tickets_current->net : 0 }}" readonly/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('net_proceeds')
@@ -463,8 +472,8 @@
                                         </tr>
                                     </thead>
                                     <tbody id="other_charges_body">
-                                    @if(isset($data->pawnTickets->other_charges))
-                                        @foreach($data->pawnTickets->other_charges as $key => $value)
+                                    @if(isset($tickets_current->other_charges))
+                                        @foreach($tickets_current->other_charges as $key => $value)
                                             @if($value->inventory_other_charges->charge_type == 'charges')
                                                 <tr>
                                                     <td>
@@ -479,9 +488,7 @@
                                                     <input type="hidden" name="inventory_other_charges_id[]" id="inventory_other_charges_id" class="form-control inventory_other_charges_id" value="{{ $value->id }}">
                                                     </td>
                                                     <td>
-                                                        <!-- <button type="button" class="btn btn-danger btn-sm remove" id="{{ $value->id }}" data-name="/pawn_auction/inventory_other_charges"><i class="material-icons">close</i></button> -->
-                                                        <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
-
+                                                    <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
                                                     </td>
                                                 </tr>
                                             @endif
@@ -507,7 +514,6 @@
                                         <tr>
                                             <td colspan="3">
                                                 <button type="button" class="btn btn-info btn-sm float-right" onClick="add_other_charges(this, 'other_charges')" style="margin:1px">Add</button>
-
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -522,8 +528,8 @@
                                         </tr>
                                     </thead>
                                     <tbody id="discount_body">
-                                    @if(isset($data->pawnTickets->other_charges))
-                                        @foreach($data->pawnTickets->other_charges as $key => $value)
+                                    @if(isset($tickets_current->other_charges))
+                                        @foreach($tickets_current->other_charges as $key => $value)
                                             @if($value->inventory_other_charges->charge_type == 'discount')
                                                 <tr>
                                                     <td>
@@ -535,12 +541,10 @@
                                                     </td>
                                                     <td>
                                                     <input type="text" name="other_charges_amount[]" id="discount_amount" class="form-control discount_amount" value="{{ $value->amount }}">
-                                                    <input type="hidden" name="inventory_other_charges_id[]" id="discount_id" class="form-control discount_id" value="{{ $value->id }}">
+                                                    <input type="hidden" name="inventory_other_charges_id[]" id="inventory_other_charges_id" class="form-control discount_id" value="{{ $value->id }}">
                                                     </td>
                                                     <td>
-                                                        <!-- <button type="button" class="btn btn-danger btn-sm remove" id="{{ $value->id }}" data-name="/pawn_auction/inventory_other_charges"><i class="material-icons">close</i></button> -->
-                                                        <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
-
+                                                    <button type="button" class="btn btn-danger btn-sm" onClick="removeTr(this)"><i class="material-icons">close</i></button>
                                                     </td>
                                                 </tr>
                                                 @endif
@@ -579,10 +583,10 @@
                          </div>
                          <input type="hidden" name="branch_id" id="branch_id" class="form-control" value="{{ Auth::user()->branch_id }}">
                          <input type="hidden" name="processed_by" id="processed_by" class="form-control" value="{{ Auth::user()->id }}">
-                         <input type="hidden" name="transaction_type" id="transaction_type" class="form-control" value="pawn">
-                        @isset($data->id)
-                            <input type="hidden" name="id" id="id" class="form-control" value="{{ $data->id }}">
-                            <input type="hidden" name="ticket_id" id="ticket_id" class="form-control" value="{{ $data->pawnTickets->id }}">
+                         <input type="hidden" name="transaction_type" id="transaction_type" class="form-control" value="repawn">
+                         <input type="hidden" name="inventory_id" id="inventory_id" class="form-control" value="{{ $inventory->id }}">
+                        @isset($tickets_current)
+                            <input type="hidden" name="id" id="id" class="form-control" value="{{ $tickets_current->id }}">
                         @endisset
                         <div class="d-flex justify-content-center">
                             <button type="submit" class="btn btn-success">Submit</button>
@@ -605,7 +609,7 @@
 @push('scripts')
 
 <script>
-    
+    setAppraisedComputation();
     /*
     window.onbeforeunload = function(){  // back to top when the page reloads	
         window.scrollTo(0,0); 
@@ -655,6 +659,16 @@
         //  }
 
     });
+
+    $('.transaction_picker').datepicker({
+    language: 'en',
+    todayButton: new Date(),
+    autoClose : true,
+    position: "bottom center",
+    minDate: new Date('{{ date("m-d-Y", strtotime($tickets_latest->transaction_date. "+1 day")) }}')
+    // inline : true,
+    // minDate: new Date() // Now can select only dates, which goes after today
+  });
 
     function customer_attachment(customer_id){
         $.ajax({

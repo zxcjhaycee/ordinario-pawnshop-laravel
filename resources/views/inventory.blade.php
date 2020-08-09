@@ -112,7 +112,7 @@
             {data: 'ticket_date', name: 'ticket_date'},
             {data: 'transaction_status', name: 'transaction_status'},
             {data: 'customer', name: 'customer'},
-            {data: 'principal', name: 'principal'},
+            {data: 'gross', name: 'gross'},
             {data: 'principal', name: 'principal'},
             {data: 'net', name: 'net'},
             {data: 'action', name: 'action', orderable: false, searchable: false},

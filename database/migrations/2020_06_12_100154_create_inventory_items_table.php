@@ -18,8 +18,6 @@ class CreateInventoryItemsTable extends Migration
             $table->unsignedBigInteger('inventory_id');
             $table->unsignedBigInteger('item_type_id');
             $table->string('item_name', 100); // this is temporary to be changed to id
-            $table->double('item_type_appraised_value', 10, 4);
-            $table->double('item_name_appraised_value', 10, 4);
             $table->double('item_type_weight', 10, 4);
             $table->double('item_name_weight', 10, 4);
             $table->smallInteger('item_karat');

@@ -16,4 +16,7 @@ class Inventory_item extends Model
     public function item_type(){
         return $this->belongsTo('App\Item_type');
     }
+    public function ticket_item(){
+        return $this->hasOne('App\Ticket_item');
+    }
 }

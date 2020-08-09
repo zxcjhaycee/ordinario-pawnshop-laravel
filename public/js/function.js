@@ -16,6 +16,10 @@ $(document).ready(function(){
   // });
 
   $('#itemTable').on('click','.remove_table',function() {
+    const inventory_item = $(this).closest('tbody').find('.inventory_item_id').val();
+    const ticket_item = $(this).closest('tbody').find('.ticket_item_id').val();
+    typeof inventory_item !='undefined' ? $('#items').append('<input type="hidden" name="inventory_deleted_item[]" value="'+inventory_item+'" id="deleted_item" />') : "";
+    typeof ticket_item !='undefined' ? $('#items').append('<input type="hidden" name="ticket_deleted_item[]" value="'+ticket_item+'" id="deleted_item" />') : "";
     $(this).closest('table').remove();
     setAppraisedComputation();
   });
@@ -36,7 +40,7 @@ function togglePassword(element){
     if(state == 'off'){
         element.setAttribute('data-id', 'on');
         password.setAttribute('type', 'text');    
-        element.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        element.innerHTML = '<i class="fas fa-eye-slash"></input>';
         return;
     }
 
@@ -372,7 +376,7 @@ function setAppraisedValue(element){
 }
 
 function checkRate(element){
-
+    // console.log("Hello!");
     $('.item_type_appraised_value').each(function(index){
       if($(this).val() != 0){
         const item_type_weight = $(this).closest('table').find('.item_type_weight');
@@ -485,7 +489,13 @@ function add_other_charges(element, table){
 }
 
 function removeTr(element){
+  const other_charges = $(element).closest('tr').find('.inventory_other_charges_id').val();
+  const discount = $(element).closest('tr').find('.discount_id').val();
+  // console.log(discount);
+  typeof other_charges != 'undefined' ? $('#other_charges_body').append('<input type="hidden" name="deleted_other_charges[]" value="'+other_charges+'" />') : "";
+  typeof discount != 'undefined' ? $('#discount_body').append('<input type="hidden" name="deleted_other_charges[]" value="'+discount+'" />') : "";
   $(element).closest('tr').remove();
+
   setDiscount();
   setOtherCharges();
 }
@@ -539,7 +549,8 @@ function renewForm(event, element){
         if(data.create === true){
           window.location.href = data.link;
         }
-         location.reload();
+        //  location.reload();
+        window.location.href = data.link;
 
         }else{
           alert_message('Danger', 'Error occured. Pleasse contact administrator');
@@ -564,7 +575,7 @@ function redeemForm(event, element){
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
-  const url = id == null ? '/pawn_auction/inventory/redeem' : '/pawn_auction/inventory/renew/'+id; 
+  const url = id == null ? '/pawn_auction/inventory/redeem' : '/pawn_auction/inventory/redeem/'+id; 
     $.ajax({
       headers: {
           'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -582,7 +593,7 @@ function redeemForm(event, element){
         if(data.create === true){
           window.location.href = data.link;
         }
-         location.reload();
+        window.location.href = data.link;
 
         }else{
           alert_message('Danger', 'Error occured. Pleasse contact administrator');
@@ -601,3 +612,57 @@ function redeemForm(event, element){
     });
 };
 
+
+function repawnForm(event, element){
+  event.preventDefault();
+  $('.error_message').css('display', 'none');
+  $('.input').removeClass('has-error is-focused');
+  const form_data = new FormData(element);
+  const id = form_data.get('id');
+  // console.log(id);
+  const url = id == null ? '/pawn_auction/inventory/repawn' : '/pawn_auction/inventory/repawn/'+id; 
+    $.ajax({
+      headers: {
+          'X-CSRF-TOKEN': "{{ csrf_token() }}"
+      },
+      url : url,
+      type : "POST",
+      data : form_data,
+      cache: false,
+      contentType : false,
+      processData : false,
+      success: (data) => {
+        // console.log(data.success);
+        // console.log(data);
+        if(data.success === true){
+          // alert_message('Success', data.status);
+          location.reload();
+        if(data.create === true){
+          window.location.href = data.link;
+        }
+
+        }else{
+          alert_message('Danger', 'Error occured. Pleasse contact administrator');
+        }
+
+      },
+      error: (data) => {
+        const error = data.responseJSON.errors;
+        for(let errorValue in error){
+          if (!error.hasOwnProperty(errorValue)) continue;
+          // console.log(error[errorValue][0].replace(/\.|[0-9]/g, ''));
+
+             if(/\.|[0-9]/g.test(errorValue)){
+              $('.'+errorValue.replace(/\./g, '_')+'_error').addClass('has-error is-focused');
+             }else{
+              $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
+              $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
+
+             }
+
+            //  console.log($('.'+errorValue.replace(/\./g, '_')+'_error'));
+
+        }
+      }
+    });
+};

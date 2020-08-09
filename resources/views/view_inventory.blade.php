@@ -37,14 +37,16 @@
                       <div><span class="badge badge-danger float-right" style="font-size:30px!important">Auctioned</span></div>
                   @endif
 
-                  @if($inventory->status == 0)
-                  <a href="{{ route('inventory.renew', $id) }}" class="btn btn-success float-right btn-responsive">Renew</a>
-                  <a href="{{ route('inventory.redeem', $id) }}" class="btn btn-success float-right btn-responsive">Redeem</a>
+                  @if(isset($current_pawn))
+                  <a href="{{ route('inventory.renew', ['id' => $id, 'pawn_id' => $current_pawn->id]) }}" class="btn btn-success float-right btn-responsive">Renew</a>
+                  <a href="{{ route('inventory.redeem', ['id' => $id, 'pawn_id' => $current_pawn->id]) }}" class="btn btn-success float-right btn-responsive">Redeem</a>
                     <form action="{{ route('inventory.auction') }}" method="post">
                       @csrf
                         <input type="hidden" name="inventory_id" value="{{ $id }}">
                       <input type="submit" value="Auction" class="btn btn-success float-right btn-responsive">
                     </form>
+                  @else
+                     <a href="{{ route('inventory.repawn', ['id' => $id]) }}" class="btn btn-success float-right btn-responsive">Repawn</a>
                   @endif
 
                     <h4 class="card-title"> {{ ucwords($routeName) }} Inventory</h4>
@@ -63,6 +65,7 @@
                                   <th>Transaction Date<br/>Maturity Date<br/>Expiration Date<br/>Auction Date</th>
                                   <th>Transaction Type</th>
                                   <th>Net Proceeds</th>
+                                  <th>Payment</th>
                                   <th>Attachment</th>
                                   <th>Processed By</th>
                                   <th style="width:15%">Actions</th>
@@ -74,24 +77,38 @@
                                     $count = 1;
                                   @endphp
                                   @foreach($ticket as $key => $value)
+                                    @php
+                                      $transaction_date = isset($value->transaction_date) ?  date('m-d-Y', strtotime($value->transaction_date)) : ""; 
+                                      $maturity_date = isset($value->maturity_date) ?  date('m-d-Y', strtotime($value->maturity_date)) : ""; 
+                                      $expiration_date = isset($value->expiration_date) ?  date('m-d-Y', strtotime($value->expiration_date)) : ""; 
+                                      $auction_date = isset($value->auction_date) ?  date('m-d-Y', strtotime($value->auction_date)) : ""; 
+                                    @endphp
                                     <tr>
                                       <td>{{ $count++ }}</td>
                                       <td>{{ $value->ticket_number }}</td>
-                                      <td>{{ date('m-d-Y', strtotime($value->transaction_date)) }} <br/>
-                                          {{ date('m-d-Y', strtotime($value->maturity_date))  }} <br/>
-                                          {{ date('m-d-Y', strtotime($value->expiration_date )) }} <br/>
-                                          {{ date('m-d-Y', strtotime($value->auction_date)) }}
+                                      <td>{{ $transaction_date }} <br/>
+                                          {{ $maturity_date  }} <br/>
+                                          {{ $expiration_date}} <br/>
+                                          {{ $auction_date }}
                                       </td>
                                       <td>{{ strtoupper($value->transaction_type) }}</td>
                                       <td>{{ number_format($value->net, 2) }}</td>
+                                      <td>{{ isset($value->pawn_tickets->payment) ?  number_format($value->pawn_tickets->payment['amount'],2) : "" }}</td>
                                       <td>{{ $value->attachment->type }}<br/>{{ $value->attachment_number }}</td>
 
                                       <td>{{ ucwords($value->encoder->first_name)." ".ucwords($value->encoder->last_name) }}</td>
                                       <td>
                                           <a href="{{ route('pawn_print', ['id' => $id, 'ticket_id' => $value->id ]) }}" target="_blank" class="btn ordinario-button btn-sm btn-responsive">Print</a>
-                                          @if($value->transaction_type == 'renew')
+                                          @if($value->transaction_type == 'renew' && $ticket_update->id == $value->id)
                                              <a href="{{ route('renew_update', ['ticket_id' => $value->id, 'id' => $id ]) }}" target="_blank" class="btn btn-success btn-sm btn-responsive"><span class="material-icons">edit</span></a>
-                                          @endif                                      
+                                          @endif   
+                                          @if($value->transaction_type == 'redeem' && $ticket_update->id == $value->id)
+                                             <a href="{{ route('redeem_update', ['ticket_id' => $value->id, 'id' => $id ]) }}" target="_blank" class="btn btn-success btn-sm btn-responsive"><span class="material-icons">edit</span></a>
+                                          @endif       
+                                          @if($value->transaction_type == 'repawn' && $ticket_update->id == $value->id)
+                                             <a href="{{ route('repawn_update', ['ticket_id' => $value->id, 'id' => $id ]) }}" target="_blank" class="btn btn-success btn-sm btn-responsive"><span class="material-icons">edit</span></a>
+                                          @endif                                        
+                                 
                                       </td>
                                     </tr>
                                   @endforeach

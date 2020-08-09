@@ -9,7 +9,7 @@ class Inventory extends Model
 {
     //
     use SoftDeletes;
-    protected $fillable = ['transaction_type', 'inventory_number', 'customer_id', 'branch_id', 'item_category_id', 'is_special_rate','ticket_number','net','transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'processed_by', 'principal', 'appraised_value', 'status', 'discount', 'charges', 'interest', 'penalty'];
+    protected $fillable = ['transaction_type', 'inventory_number', 'customer_id', 'branch_id', 'item_category_id', 'is_special_rate','ticket_number','net','transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'processed_by', 'principal', 'appraised_value', 'status', 'discount', 'charges', 'interest', 'penalty', 'transaction_status'];
 
     public function customer(){
         return $this->belongsTo('App\Customer');
@@ -34,6 +34,10 @@ class Inventory extends Model
 
     public function item(){
         return $this->hasMany('App\Inventory_item');
+    }
+
+    public function inventory_payment(){
+        return $this->hasOne('App\Payment');
     }
 
 }

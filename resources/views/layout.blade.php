@@ -129,9 +129,10 @@
 
   $(document).on('click', '.remove', function(){
     const id = $(this).attr('id');
+    const data_id = typeof $(this).attr('data-id') != 'undefined' ? $(this).attr('data-id') : "";
     const name = $(this).data('name');
     let url = name+'/'+id;
-    // console.log("hello!");
+    // console.log(data_id);
     const r = confirm("Do you want to continue?");
       if(r == true){
         $.ajax({
@@ -141,7 +142,8 @@
           type: "POST",
           url : url,
           data: {
-            "_method": 'DELETE'
+            "_method": 'DELETE',
+            'data_id' : data_id
           },
           success: (data) => {
             console.log(data);
