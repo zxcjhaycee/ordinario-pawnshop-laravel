@@ -211,7 +211,7 @@
                                                 <option></option>
                                                 @isset($inventory->customer->attachments)
                                                     @foreach($inventory->customer->attachments as $key => $value)
-                                                            @if($value->id == $tickets_current->attachment_id)
+                                                            @if(isset($tickets_current) && $value->id == $tickets_current->attachment_id)
                                                             <option value="{{ $value->id }}" data-number="{{ $value->pivot->number }}" selected>
                                                              {{ $value->type }}
                                                             </option>

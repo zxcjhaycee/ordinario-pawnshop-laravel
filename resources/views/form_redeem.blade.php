@@ -41,7 +41,7 @@
                     @include('alert')
                     <form enctype="multipart/form-data" id="redeemForm" onSubmit="redeemForm(event, this)" method="POST">
                     @csrf
-                    @isset($id)
+                    @isset($ticket_id)
                         @method('PUT')
                     @endisset
                     <div class="card">
@@ -386,7 +386,7 @@
                             <input type="hidden" name="pawn_id"  value="{{ $pawn_id }}">
                             <input type="hidden" name="or_number"  value="{{ isset($tickets_current) ? $payment_display->pawn_ticket_payment->or_number : $or_number }}">
                         @endisset
-                        @isset($id)
+                        @isset($ticket_id)
                             <input type="hidden" name="id"  value="{{ $ticket_id }}">
                             <input type="hidden" name="payment_id"  value="{{ $payment_display->pawn_ticket_payment->id }}">
                         @endisset

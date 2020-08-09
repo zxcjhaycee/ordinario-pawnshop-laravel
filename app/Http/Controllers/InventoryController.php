@@ -1001,8 +1001,8 @@ class InventoryController extends Controller
         $net = $inventory->pawnTickets()->whereNotIn('transaction_type', ['pawn', 'repawn'])->whereNotIn('id', [$request['ticket_id']])->sum('net');
         // dd($net);   
         $payment_balance = $inventory->inventory_payment->where('inventory_id', $request->id)->sum('amount') - $payment_display->payment->amount;
-        $prev_balance =  $net - $payment_balance;
-        // dd($payment_balance); 
+        $prev_balance =  round($net,2) - round($payment_balance,2);
+        // dd($net); 
 
             return view('form_redeem', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id', 'payment_display', 'prev_balance', 'pawn_id', 'ticket_id', 'ticket_original'));
 
