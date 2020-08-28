@@ -24,7 +24,7 @@ $factory->define(User::class, function (Faker $faker) {
         'username' => 'admin',
         'password' => '$2y$10$F5Iu0fbep2q92g./Q52b7uQukmjbpdnM/2iop6GbjLTO6S5sZd/VO',
         'branch_id' => rand(1, 3),
-        'access' => 'admin',
+        'access' => 'Administrator',
         'auth_code' => '1234'
     ];
 });

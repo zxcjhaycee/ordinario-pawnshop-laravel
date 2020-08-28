@@ -21,7 +21,7 @@ class AddColumnUserTable extends Migration
             $table->string('last_name', 50)->after('name');
             $table->renameColumn('name', 'first_name');
             $table->unsignedBigInteger('branch_id')->after('password');
-            $table->enum('access', ['user', 'admin'])->after('branch_id');
+            $table->enum('access', ['Administrator', 'Manager', 'Staff'])->after('branch_id');
             $table->integer('auth_code')->after('access');
             $table->string('username', 50)->unique()->after('last_name');
 

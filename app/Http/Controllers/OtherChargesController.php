@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Other_charges;
 use DataTables;
+use Illuminate\Validation\ValidationException;
+use App\User;
 
 class OtherChargesController extends Controller
 {
@@ -55,6 +57,12 @@ class OtherChargesController extends Controller
             'amount' => 'required|numeric'
         ]);
 
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        // dd($check);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
+
         $other_charges = Other_charges::create($data);
 
         return back()->with('status', 'The other_charges was successfully created');
@@ -73,6 +81,12 @@ class OtherChargesController extends Controller
             'charge_name' => 'required',
             'amount' => 'required|numeric'
         ]);
+
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        // dd($check);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
 
         $other_charges = Other_charges::withTrashed()->findOrFail($request->id)->update($data);
 

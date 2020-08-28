@@ -39,6 +39,7 @@
     
                  <div class="card-body">
                     @include('alert')
+                    <div class="alert_message"></div>
                     <form enctype="multipart/form-data" id="redeemForm" onSubmit="redeemForm(event, this)" method="POST">
                     @csrf
                     @isset($ticket_id)
@@ -59,7 +60,7 @@
                                       <div class="col-xl-12 mt-4">
                                         <ul style="list-style-type:none;padding-left: 5px;">
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Inventory #</label> : <span class="font-weight-normal col-xl-5">{{ $inventory->inventory_number }}</span></li>
-                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">OR #</label> : <span class="font-weight-normal col-xl-5">{{ isset($tickets_current) ? $payment_display->pawn_ticket_payment->or_number : $or_number }}</span></li>
+                                            <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">OR #</label> : <span class="font-weight-normal col-xl-5">{{ isset($tickets_current) ? $tickets_current->pawnTickets->payment->or_number : $or_number }}</span></li>
                                             <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Transaction Date </label> : <input type="text" class="form-control transaction_picker" style="margin-left:20px"  name="transaction_date" autocomplete="off" value="{{ isset($tickets_current) ? date('m/d/Y' ,strtotime($tickets_current->pawnTickets->transaction_date)) : '' }}"></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Transaction Type </label> : <span class="font-weight-normal col-xl-5">Redeem</span></li>
                                             <li><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Interbranch Transaction </label> : <input type="checkbox" style="width:50px;box-shadow:none" value="1" name="interbranch" {{ isset($tickets_current) && $tickets_current->pawnTickets->interbranch == 1 ? 'checked' : ''  }}></li>
@@ -139,19 +140,34 @@
                                             </thead>
                                             <tbody>
                                                 @foreach($inventory->pawnTickets->item_tickets as $key => $value)
+                                                    @if($inventory->item_category_id == 1)
                                                     <tr>
-                                                    <!-- <td><input type="checkbox" class="item" name="item[]" id="item" value='{{ $value->id }}' onClick="toggleState()"></td> -->
-                                                    <td><img src="https://i.pinimg.com/originals/81/b8/ec/81b8ec9c3450c00ef1d9dbfc1d6de9d6.png" alt="" class="rounded" style="width:130px"></td>
-                                                    <td>{{ $value->inventory_items->item_type->item_type." (".$value->inventory_items->item_karat."K P ".number_format($value->item_type_appraised_value, 2).")" }}<br/>
-                                                    {{ number_format($value->inventory_items->item_type_weight,2)."g / ".number_format($value->inventory_items->item_name_weight,2)."g / ". number_format($value->inventory_items->item_karat_weight,2)."g" }}
-                                                    <br/>
+                                                        <!-- <td><input type="checkbox" class="item" name="item[]" id="item" value='{{ $value->id }}' onClick="toggleState()"></td> -->
+                                                        <td><img src="https://i.pinimg.com/originals/81/b8/ec/81b8ec9c3450c00ef1d9dbfc1d6de9d6.png" alt="" class="rounded" style="width:130px"></td>
+                                                        <td>{{ $value->inventory_items->item_type->item_type." (".$value->inventory_items->item_karat."K P ".number_format($value->item_type_appraised_value, 2).")" }}<br/>
+                                                        {{ number_format($value->inventory_items->item_type_weight,2)."g / ".number_format($value->inventory_items->item_name_weight,2)."g / ". number_format($value->inventory_items->item_karat_weight,2)."g" }}
+                                                        <br/>
 
-                                                    {{-- 'P '. number_format($value->item_type_appraised_value ,2) --}} 
-                                                    <!-- <br/> -->
-                                                    <!-- babaguhin pa -->
-                                                    </td>
-                                                    <td> {{ $value->inventory_items->description }}</td>
+                                                        {{-- 'P '. number_format($value->item_type_appraised_value ,2) --}} 
+                                                        <!-- <br/> -->
+                                                        <!-- babaguhin pa -->
+                                                        </td>
+                                                        <td> {{ $value->inventory_items->description }}</td>
                                                     </tr>
+                                                    @else
+                                                    <tr>
+                                                        <td><img src="https://i.pinimg.com/originals/81/b8/ec/81b8ec9c3450c00ef1d9dbfc1d6de9d6.png" alt="" class="rounded" style="width:130px"></td>
+                                                        <td>{{ $value->inventory_items->item_type->item_type }}<br/>
+                                                        {{ $value->inventory_items->item_name }}
+                                                        <br/>
+                                                        {{ 'P '. number_format($value->item_type_appraised_value,2) }} 
+
+                                                        <!-- babaguhin pa -->
+                                                        </td>
+                                                        <td> {{ $value->inventory_items->description }}</td>
+
+                                                    </tr>
+                                                    @endif
                                                 @endforeach
                                             </tbody>
                                        </table>
@@ -192,15 +208,15 @@
                                                         <td>{{ number_format($value->ticket_child->interest, 2)  }}</td>
                                                         <td>{{ number_format($value->ticket_child->penalty, 2)  }}</td>
                                                         <td>{{ number_format($value->ticket_child->net,2) }}</td>
-                                                        <td>{{ isset($value->ticket_child) ? number_format($value->payment->amount, 2) : 0  }}</td>
-                                                        <td>{{ isset($value->ticket_child) ? number_format($value->ticket_child->net - $value->payment->amount, 2) : 0  }}</td>
+                                                        <td>{{ isset($value->ticket_child) ? number_format($value->ticket_child->payment->amount, 2) : 0  }}</td>
+                                                        <td>{{ isset($value->ticket_child) ? number_format($value->ticket_child->net - $value->ticket_child->payment->amount, 2) : 0  }}</td>
                                                     </tr>
                                                         @php
                                                             $interest_total += $value->ticket_child->interest;
                                                             $penalty_total += $value->ticket_child->penalty;
                                                             $net_total += $value->ticket_child->net;
-                                                            $payment_total += $value->payment->amount;
-                                                            $balance_total += $value->ticket_child->net - $value->payment->amount;
+                                                            $payment_total += $value->ticket_child->payment->amount;
+                                                            $balance_total += $value->ticket_child->net - $value->ticket_child->payment->amount;
                                                         @endphp
                                                     @endisset
                                                     @endforeach
@@ -357,7 +373,7 @@
                                                 @endisset
 
                                                 <li class="form-inline" style="height:40px;"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Balance</label> : <input type="text" name="balance" class="form-control" style="margin-left:20px;width:200px" id="balance" value="{{ isset($tickets_current) ?  '' : 0  }}" readonly></li>
-                                                <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Payment</label> : <input type="number" name="payment" class="form-control" style="margin-left:20px;width:200px" id="payment" value="{{ isset($tickets_current) ?  $payment_display->pawn_ticket_payment->amount : 0  }}"  step="0.01"></li>
+                                                <li class="form-inline"><label class="font-weight-bold" style="display:inline-block;width:120px;text-align:right">Payment</label> : <input type="number" name="payment" class="form-control" style="margin-left:20px;width:200px" id="payment" value="{{ isset($tickets_current) ?  $tickets_current->pawnTickets->payment->amount : 0  }}"  step="0.01"></li>
 
                                         </ul>
                                         <div class="jumbotron" style="padding:0">
@@ -381,18 +397,19 @@
                         <input type="hidden" name="ticket_number" value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->ticket_number : $ticket_number }}">
                         <input type="hidden" name="processed_by"  value="{{ Auth::user()->id }}">
                         <input type="hidden" name="transaction_type"  value="redeem">
-                        <input type="hidden" name="or_number"  value="{{ isset($tickets_current) ? $payment_display->pawn_ticket_payment->or_number : $or_number }}">
+                        <input type="hidden" name="or_number"  value="{{ isset($tickets_current) ? $tickets_current->pawnTickets->payment->or_number : $or_number }}">
                         @isset($pawn_id)
                             <input type="hidden" name="pawn_id"  value="{{ $pawn_id }}">
-                            <input type="hidden" name="or_number"  value="{{ isset($tickets_current) ? $payment_display->pawn_ticket_payment->or_number : $or_number }}">
                         @endisset
                         @isset($ticket_id)
                             <input type="hidden" name="id"  value="{{ $ticket_id }}">
-                            <input type="hidden" name="payment_id"  value="{{ $payment_display->pawn_ticket_payment->id }}">
+                            <input type="hidden" name="payment_id"  value="{{ $tickets_current->pawnTickets->payment->id }}">
                         @endisset
 
-                        <input type="submit" value="Submit" class="btn btn-success">
-
+                        <div class="d-flex justify-content-center">
+                                 <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                        </div>
                 </div>
                 </form>
               </div>

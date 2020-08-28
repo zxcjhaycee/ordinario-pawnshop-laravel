@@ -6,7 +6,9 @@ use App\Rate;
 use App\Branch;
 use App\Item_category;
 use App\Item_type;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class RatesController extends Controller
 {
@@ -18,6 +20,7 @@ class RatesController extends Controller
 
     public function index($branch_id = null, $item_category_id = null)
     {
+        // dd("Hello");
         $rates = new Rate;
         $item_category = Item_category::all();
         $branch = Branch::all();
@@ -43,8 +46,13 @@ class RatesController extends Controller
      */
     public function store(Request $request, Rate $rate)
     {
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        // dd($check);
+        if(!$check){
+            throw ValidationException::withMessages(['rate_auth_code_error' => 'The auth code is incorrect !']);
+        }
         $rate->create($request->only('branch_id', 'item_type_id', 'karat', 'gram', 'regular_rate', 'special_rate', 'description'));
-        return back()->with('success', 'Rate has been created');
+        return back()->with('rate_status', 'Rate has been created !');
     }
 
     /**
@@ -107,14 +115,15 @@ class RatesController extends Controller
 
     public function getItemType(Request $request){
          $item_type = Item_type::where('item_category_id', $request->id)->get();
-
         return response()->json($item_type);
     }
 
     public function getKarat(Request $request){
-        $item_karat = Rate::where('item_type_id', $request->id)->where('branch_id', \Auth::user()->branch_id)->orderBy('id')->get();
+        $item_karat = Rate::where('item_type_id', $request->id)->where('branch_id', $request->branch_id)->orderBy('id')->get();
         // dd($request->id);
         return response()->json($item_karat);
 
     }
+
+
 }

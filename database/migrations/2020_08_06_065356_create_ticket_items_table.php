@@ -19,6 +19,7 @@ class CreateTicketItemsTable extends Migration
             $table->unsignedBigInteger('inventory_item_id');
             $table->double('item_type_appraised_value', 10, 4);
             $table->double('item_name_appraised_value', 10, 4);
+            $table->enum('item_status', ['old', 'new'])->default('new');
             $table->softDeletes();
             $table->timestamps();
         });

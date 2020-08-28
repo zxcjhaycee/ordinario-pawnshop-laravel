@@ -40,7 +40,7 @@
                                 <label for="type" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Attachment Type: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('type') has-error is-focused @enderror">
-		                                <input type="text" id="type" name="type" class="form-control" value="{{ isset($data->type) && $errors->isEmpty() ? $data->type : '' }}"/>
+		                                <input type="text" id="type" name="type" class="form-control" value="{{ isset($data->type) && $errors->isEmpty() ? $data->type : old('type') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('type')
@@ -48,9 +48,10 @@
                                     @enderror
                                 </div>
                             </div>
-                                <div class="text-center">
-                                         <button type="submit" class="btn btn-success">Submit</button>
-                                </div>
+                            <div class="d-flex justify-content-center">
+                                 <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                            </div>
                         </div>
 
 

@@ -44,6 +44,7 @@
 <script src="/js/datepicker.js"></script>
 <script src="/js/datepicker.en.js"></script>
 <script src="/js/select2.min.js"></script>
+<!-- <script src="/js/material/plugins/jquery.datatables.js"></script> -->
 <!-- <script src="/js/material/plugins/dataTables.material.min.js"></script> -->
 <script src="/js/material/plugins/jquery.dataTables-2.min.js"></script>
 <script src="/js/function.js"></script>

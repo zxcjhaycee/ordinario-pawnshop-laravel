@@ -9,7 +9,7 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="card">
                     <div class="card-header card-header-success">
                         <h4 class="card-title">Branch & Item Category</h4>
@@ -52,8 +52,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-7">
+                @isset($item_category_id)
                 @include('settings.rates._create')
+                @endisset
             </div>
         </div>
         <div class="row">

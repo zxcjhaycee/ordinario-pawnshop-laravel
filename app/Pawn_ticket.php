@@ -16,12 +16,12 @@ class Pawn_ticket extends Model
     //     ->selectRaw('ticket_id, SUM(net) as balance')
     // }
 
-    public function payment(){
-        // dd($payment);
-        return $this->hasOne('App\Payment')
-        ->selectRaw('pawn_ticket_id,SUM(amount) as amount')
-        ->groupBy('pawn_ticket_id');
-    }
+    // public function payment(){
+    //     // dd($payment);
+    //     return $this->hasOne('App\Payment')
+    //     ->selectRaw('pawn_ticket_id,SUM(amount) as amount')
+    //     ->groupBy('pawn_ticket_id');
+    // }
 
     public function ticket_child(){
         return $this->belongsTo('App\Ticket', 'ticket_id');
@@ -34,14 +34,14 @@ class Pawn_ticket extends Model
         // ->groupBy(['transaction_type']);
     }
 
-    public function payment_all(){
-        // dd($payment);
-        return $this->hasMany('App\Payment');
-    }
+    // public function payment_all(){
+    //     // dd($payment);
+    //     return $this->hasMany('App\Payment');
+    // }
 
-    public function pawn_ticket_payment(){
-        // dd($payment);
-        return $this->hasOne('App\Payment');
-    }
+    // public function pawn_ticket_payment(){
+    //     // dd($payment);
+    //     return $this->hasOne('App\Payment');
+    // }
 
 }

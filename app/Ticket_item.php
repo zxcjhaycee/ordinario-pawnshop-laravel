@@ -9,7 +9,7 @@ class Ticket_item extends Model
 {
     //
     use SoftDeletes;
-    protected $fillable = ['ticket_id', 'inventory_item_id', 'item_type_appraised_value', 'item_name_appraised_value'];
+    protected $fillable = ['ticket_id', 'inventory_item_id', 'item_type_appraised_value', 'item_name_appraised_value', 'item_status'];
 
     public function inventory_items(){
         return $this->belongsTo('App\Inventory_item', 'inventory_item_id');

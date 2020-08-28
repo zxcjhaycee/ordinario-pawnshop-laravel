@@ -18,7 +18,7 @@ class CreateTicketsTable extends Migration
             $table->unsignedBigInteger('inventory_id');
             $table->unsignedBigInteger('attachment_id');
             $table->string('ticket_number', 20);
-            $table->enum('transaction_type', ['pawn', 'renew', 'redeem', 'repawn']);
+            $table->enum('transaction_type', ['pawn', 'renew', 'redeem', 'repawn', 'auction']);
             $table->date('transaction_date');	
             $table->date('maturity_date')->nullable();
             $table->date('expiration_date')->nullable();	
@@ -26,8 +26,6 @@ class CreateTicketsTable extends Migration
             $table->double('advance_interest', 10, 4)->nullable();
             $table->double('interest', 10, 4)->nullable();
             $table->double('penalty', 10, 4)->nullable();
-            $table->double('interest_text', 10, 4)->nullable();
-            $table->double('penalty_text', 10, 4)->nullable();
             $table->double('discount', 10, 4)->nullable();
             $table->double('charges', 10, 4)->nullable();
             $table->integer('attachment_number');
@@ -43,6 +41,11 @@ class CreateTicketsTable extends Migration
             $table->unsignedBigInteger('processed_by');
             $table->softDeletes();
             $table->smallInteger('status')->default(0); // 0 - open , 1 - redeem, 2 - cancelled
+            $table->smallInteger('repawn')->default(0); // to identify if the tickets is repawned
+            $table->date('foreclosed_date')->nullable();
+            // $table->string('notice_yr', 5)->nullable();
+            // $table->string('notice_ctrl', 20)->nullable();
+            // $table->date('notice_date')->nullable(); 
             $table->timestamps();
         });
     }

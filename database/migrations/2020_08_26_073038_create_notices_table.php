@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePaymentsTable extends Migration
+class CreateNoticesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreatePaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('notices', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->enum('transaction_type', ['renew', 'redeem']); // renew = interest / penalty, redeem = principal
             $table->unsignedBigInteger('inventory_id');
             $table->unsignedBigInteger('ticket_id');
-            $table->string('or_number', 20);
-            $table->double('amount', 10, 4)->nullable();
-            $table->softDeletes();
+            $table->string('notice_yr', 5);
+            $table->string('notice_ctrl', 20);
+            $table->date('notice_date');
+            $table->smallInteger('status')->default(0); // 1 - renew
+            $table->softDeletes(); 
             $table->timestamps();
         });
     }
@@ -32,6 +33,6 @@ class CreatePaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('notices');
     }
 }

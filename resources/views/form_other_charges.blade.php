@@ -87,9 +87,10 @@
                                     @enderror
                                 </div>
                             </div>
-                                <div class="text-center">
-                                         <button type="submit" class="btn btn-success">Submit</button>
-                                </div>
+                            <div class="d-flex justify-content-center">
+                                 <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                            </div>
                         </div>
 
 

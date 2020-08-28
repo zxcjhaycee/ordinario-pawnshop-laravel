@@ -13,6 +13,10 @@
     .alert .close{
         line-height : 1.5;
     }
+    /* #user_auth_code{
+        bottom: 120px;
+    } */
+
 
 </style>
 <div class="content">
@@ -116,10 +120,12 @@
                                     <div class="form-group @error('access') has-error is-focused @enderror">
                                         <select name="access" id="access" class="form-control">
                                                 <option></option>
-                                                <option value="admin" {{ old('access') == 'admin' || (isset($data) && $data->access == 'admin')  ? 'selected' : '' }}>
-                                                Admin</option>
-                                                <option value="user" {{ old('access') == 'user' || (isset($data) && $data->access == 'user') ? 'selected' : '' }}>
-                                                End-User</option>
+                                                <option value="Administrator" {{ old('access') == 'Administrator' || (isset($data) && $data->access == 'Administrator')  ? 'selected' : '' }}>
+                                                Administrator</option>
+                                                <option value="Manager" {{ old('access') == 'Manager' || (isset($data) && $data->access == 'Manager') ? 'selected' : '' }}>
+                                                Manager</option>
+                                                <option value="Staff" {{ old('access') == 'Staff' || (isset($data) && $data->access == 'Staff') ? 'selected' : '' }}>
+                                                Staff</option>
                                         </select>                                        
                                             <span class="material-icons form-control-feedback">clear</span>
                                     </div>
@@ -140,14 +146,19 @@
                                     @enderror
                                 </div>
                             </div>
-                                <div class="text-center">
-                                         <button type="submit" class="btn btn-success">Submit</button>
-                                </div>
+
                         </div>
 
-
                     </div>
+                    <div class="col-xl-12">
 
+                                <div class="d-flex justify-content-center">
+                                        <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                         &nbsp;
+                                         <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                                </div>
+
+                                </div>
                   </form>
                  
 

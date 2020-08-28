@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 use App\User;
 use App\Branch;
@@ -53,16 +54,21 @@ class UserController extends Controller
     }
 
     public function store(Request $request, User $user){
-
         $data = $request->validate([
             'first_name' => 'required|alpha',
             'last_name' => 'required|alpha',
             'username' => 'required|unique:users,username',
             'password' => 'required|min:5',
             'branch_id' => 'required|exists:App\Branch,id',
-            'access' => 'required|in:admin,user',
+            'access' => 'required|in:Administrator,Manager,Staff',
             'auth_code' => 'required|min:3|alpha_num',
         ]);
+        $check = $user->where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        // dd($check);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
+
 
         $data['password'] = Hash::make($data['password']);
         $user->create($data);
@@ -78,13 +84,18 @@ class UserController extends Controller
     }
 
     public function update(Request $request){
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        // dd($check);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
         $data = $request->validate([
             'first_name' => 'required|alpha',
             'last_name' => 'required|alpha',
             'password' => 'required|min:5',
             'username' => 'required|unique:users,username,'.$request->id,
             'branch_id' => 'required|exists:App\Branch,id',
-            'access' => 'required|in:admin,user',
+            'access' => 'required|in:Administrator,Manager,Staff',
             'auth_code' => 'required|min:3|alpha_num',
         ]);
         $data['password'] = Hash::make($data['password']);
@@ -108,4 +119,5 @@ class UserController extends Controller
         // return back()->with($message);
         return response()->json($message);
     }
+
 }

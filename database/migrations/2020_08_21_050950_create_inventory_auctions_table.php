@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePawnTicketsTable extends Migration
+class CreateInventoryAuctionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreatePawnTicketsTable extends Migration
      */
     public function up()
     {
-        Schema::create('pawn_tickets', function (Blueprint $table) {
+        Schema::create('inventory_auctions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('pawn_id'); // pawn and repawn
-            $table->unsignedBigInteger('ticket_id')->nullable(); // renew / redeem / auction
+            $table->unsignedBigInteger('inventory_id');
+            $table->unsignedBigInteger('ticket_id');
+            $table->string('inventory_auction_number', 20);
+            $table->double('price', 10, 4);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -29,6 +31,6 @@ class CreatePawnTicketsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pawn_tickets');
+        Schema::dropIfExists('inventory_auctions');
     }
 }

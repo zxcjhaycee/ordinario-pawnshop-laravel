@@ -18,6 +18,10 @@ class Inventory extends Model
     public function pawnTickets(){
         return $this->hasOne('App\Ticket');
     }
+    public function pawnTicketsLatest(){
+        return $this->hasOne('App\Ticket')->latest();
+    }
+
 
     public function inventoryItems(){
         return $this->hasMany('App\Inventory_item');

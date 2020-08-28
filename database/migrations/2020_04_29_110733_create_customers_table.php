@@ -18,7 +18,7 @@ class CreateCustomersTable extends Migration
             $table->string('first_name', 50);
             $table->string('middle_name', 50)->nullable();
             $table->string('last_name', 50);
-            $table->string('suffix', 10);
+            $table->string('suffix', 10)->nullable();
             $table->date('birthdate');
             $table->enum('sex', ['male', 'female']);
             $table->enum('civil_status', ['single', 'married','seperated', 'divorced', 'widowed']);

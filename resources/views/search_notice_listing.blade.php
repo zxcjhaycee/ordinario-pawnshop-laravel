@@ -10,6 +10,7 @@
         padding: 12px 20px;
         font-size: 12px;
       }
+
     }
 
     @media(min-width: 576px){
@@ -28,8 +29,8 @@
 }
 @media (max-width: 576px) {
   .btn-responsive {
-    font-size:10px;
-    padding:4px 4px;
+    font-size:11px;
+    padding:6px 18px;
   }
 }
 
@@ -70,31 +71,30 @@
                   <div class="card-icon" style="background: linear-gradient(60deg,#702230,#702230)">
                     <i class="material-icons">assignment</i>
                   </div>
-                  <h4 class="card-title">Notice Listing</h4>
+                  @isset($notice_yr)
+                  <a href="{{ route('notice_listing_print', ['notice_yr' => $notice_yr, 'notice_ctrl' => $notice_ctrl]) }}" target="_blank" class="btn btn-success float-right btn-responsive">Print</a>
+                  @endisset
+                  <h4 class="card-title">Search Notice</h4>
+
                 </div>
                 <div class="card-body">
                 <div class="row">
                     <div class="col-xl-7 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
-                      <form action="{{ route('notice_listing.create.search.submit') }}" method="post" class="row">
-                        @csrf
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
-                            <input type="text" name="notice_month_year" data-id=""  data-min-view="months" data-view="months" data-date-format="MM yyyy" class="form-control air_date_picker" placeholder="Month / Year" value="{{ isset($date) ? $date : '' }}">
+                        <form action="{{ route('notice_listing.search.submit') }}" method="post" class="row">
+                            @csrf
+                          <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4 col-12">
+                            <input type="text" name="notice_year" placeholder="Year" class="form-control" value="{{ isset($notice_yr) ? $notice_yr : '' }}" >
                           </div>
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
-                            <div class="dropdown bootstrap-select show-tick">
-                              <select class="selectpicker" data-size="7" data-style="select-with-transition" title="Branch" tabindex="-98" name="branch">
-                                  @foreach($branch as $branches)
-                                    <option value="{{ $branches->id }}" {{ isset($branch_value) && $branch_value == $branches->id ? 'selected' : '' }}>{{ $branches->branch }}</option>
-                                  @endforeach
-                            </select>
-                            </div>
+                          <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4 col-12">
+                            <input type="text" name="notice_ctrl" placeholder="Ctrl Number" class="form-control" value="{{ isset($notice_ctrl) ? $notice_ctrl : '' }}" >
                           </div>
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12 mt-2 text-center-jc">
+
+                          <div class="col-xl-2 col-lg-4 col-md-4 col-sm-4 col-12 mt-2 text-center-jc pl-1">
                             <button type="submit" class="btn btn-default btn-sm-jc"><i class="material-icons">search</i></button>
                           </div>
                           </form>
-                      </div>
-
+                    </div>
+                        {{--
                       <div class="col-xl-5 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
                         <form  method="POST" class="row" onSubmit="noticeListingForm(event, this)">
                           @csrf
@@ -110,21 +110,19 @@
                                 <!-- change to button if finalized -->
                             </div>
                           </form>
-
-
                       </div>
+                        --}}
                 </div>
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
-                      <table class="table table-hover notice_listing_table">
+                      <table class="table table-hover search_notice_listing_table">
                             <thead>
                                 <tr>
-                                  <th style="width:45px">
-                                      <input id="checkbox_all" type="checkbox" value="1" name="checkbox_all" onClick="toggle(this)" >
-                                  </th>
+                                  <th>#</th>
                                   <th>Pawn Ticket</th>
                                   <th>Customer</th>
                                   <th>Last Transaction</th>
                                   <th>Address</th>
+                                  <th style="width:15%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -148,18 +146,19 @@
     <script type="text/javascript">
   $(tableFunction = () => {
     
-    let table = $('.notice_listing_table').DataTable({
+    let table = $('.search_notice_listing_table').DataTable({
         processing: true,
         serverSide: true,
         stateSave: true, // statesaving of datatable
         bDestroy: true, // for re-initialized 
-        ajax: "{{ route('notice_listing.index', ['date' => $date, 'branch' => $branch_value]) }}",
+        ajax: "{{ route('notice_listing.search', ['notice_yr' => $notice_yr, 'notice_ctrl' => $notice_ctrl]) }}",
         columns: [
-            {data: 'checkbox', name: 'checkbox', orderable: false, targets: 0, searchable: false},
+            {data: 'DT_RowIndex', name: 'DT_RowIndex'},
             {data: 'ticket_number', name: 'ticket_number'},
             {data: 'customer', name: 'customer'},
             {data: 'transaction_date', name: 'transaction_date'},
             {data: 'present_address', name: 'present_address'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
         ],
         order: [[1, 'asc']] 
 
@@ -167,26 +166,6 @@
 
 
   });
-  function toggle(source) {
-        checkboxes = document.querySelectorAll('.item');
-        for(var i=0, n=checkboxes.length;i<n;i++) {
-            checkboxes[i].checked = source.checked;
-        }
-    }
-    function toggleState(){
-        checkbox = document.getElementById('checkbox_all');
-        checkbox.checked = false;
-        if(AreAnyCheckboxesChecked()){
-            checkbox.checked = true;
-        }
-    }
-
-    function AreAnyCheckboxesChecked () {
-        if($('.item').not(':checked').length > 0){
-            return false;
-        }
-        return true;
-    }
 
 </script>
 @endpush

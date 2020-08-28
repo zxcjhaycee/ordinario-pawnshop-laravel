@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Attachment;
 use DataTables;
+use Illuminate\Validation\ValidationException;
+use App\User;
 
 class AttachmentController extends Controller
 {
@@ -67,6 +69,11 @@ class AttachmentController extends Controller
             'type' => 'required'
         ]);
 
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
+
         $attachment = Attachment::create($data);
 
         return back()->with(['status' => 'The attachment was succesfully created!']);
@@ -83,6 +90,11 @@ class AttachmentController extends Controller
         $data = $request->validate([
             'type' => 'required'
         ]);
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
+        
 
         $attachment = Attachment::withTrashed()->findOrFail($request->id)->update($data);
 

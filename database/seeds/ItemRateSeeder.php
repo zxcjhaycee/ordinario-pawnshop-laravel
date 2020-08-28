@@ -56,6 +56,20 @@ class ItemRateSeeder extends Seeder
                             'karat' => $karat
                         ]);
                     }
+                }else{
+                    $test_item = ['Test Item', 'Test Item 2', 'Test Item 3'];
+                    foreach($test_item as $test_items){
+                        factory(App\Rate::class)->create([
+                            'branch_id' => $branch->id,
+                            'item_type_id' => $it->id,
+                            'description' => $test_items,
+                            'karat' => NULL,
+                            'gram' => NULL,
+                            'regular_rate' => rand(300, 1700),
+                            'special_rate' => NULL
+                        ]);
+                    }
+
                 }
             }
         });

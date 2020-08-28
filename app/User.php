@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -41,4 +42,18 @@ class User extends Authenticatable
     public function branch(){
         return $this->belongsTo('App\Branch');
     }
+
+    public function isAdmin(){
+        return Auth::user()->access == 'Administrator';
+
+    }
+    
+    public function isManager(){
+        return Auth::user()->access == 'Manager';
+    }
+
+    public function isStaff(){
+        return Auth::user()->access == 'Staff';
+    }
+
 }

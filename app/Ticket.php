@@ -9,7 +9,7 @@ class Ticket extends Model
 {
     //
     use SoftDeletes;
-    protected $fillable = ['inventory_id', 'ticket_number', 'transaction_type', 'transaction_status', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'attachment_id', 'processed_by', 'net', 'attachment_number','discount', 'discount_remarks', 'authorized_representative', 'interbranch', 'interbranch_renewal', 'interest', 'penalty', 'advance_interest', 'interest_text', 'penalty_text', 'charges', 'is_special_rate', 'appraised_value', 'principal', 'status'];
+    protected $fillable = ['inventory_id', 'ticket_number', 'transaction_type', 'transaction_status', 'transaction_date', 'maturity_date', 'expiration_date', 'auction_date', 'attachment_id', 'processed_by', 'net', 'attachment_number','discount', 'discount_remarks', 'authorized_representative', 'interbranch', 'interbranch_renewal', 'interest', 'penalty', 'advance_interest', 'interest_text', 'penalty_text', 'charges', 'is_special_rate', 'appraised_value', 'principal', 'status', 'foreclosed_date'];
 
     public function other_charges(){
         return $this->hasMany('App\Inventory_other_charges');
@@ -40,5 +40,15 @@ class Ticket extends Model
 
     public function item_tickets(){
         return $this->hasMany('App\Ticket_item');
+    }
+
+    public function payment(){
+        return $this->hasOne('App\Payment');
+    }
+    public function payment_test(){
+        return $this->hasOne('App\Payment', 'ticket_id');
+    }
+    public function notice(){
+        return $this->hasOne('App\Notice');
     }
 }

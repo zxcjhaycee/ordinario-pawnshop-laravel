@@ -41,7 +41,7 @@
                 </div>
     
                  <div class="card-body">
-                    <!-- @include('alert') -->
+                    @include('alert')
                     <div class="alert_message"></div>
                     
                  <form method="POST" enctype="multipart/form-data" id="customerForm" onSubmit="customerForm(event, this)">
@@ -427,11 +427,12 @@
                            
                             <button type="button" class="btn btn-warning btn-sm add_section" onClick="addAttachment()"> Add Another Attachment </button>
                         </div>
-                            <div class="text-center mx-auto">
-                                            <button type="submit" class="btn btn-success">Submit</button>
-                            </div>
-                    </div>
 
+                    </div>
+                            <div class="d-flex justify-content-center">
+                                 <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                            </div>
                   </form>
                  
 

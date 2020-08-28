@@ -51,8 +51,8 @@
                   <div class="card-icon" style="background: linear-gradient(60deg,#702230,#702230)">
                     <i class="material-icons">star</i>
                   </div>
-                    <!-- <a href="{{ route('pawn.create') }}" class="btn float-right btn-responsive">Add Pawn</a> -->
-                    <h4 class="card-title">Inventory</h4>
+                    <a href="{{ route('pawn.create') }}" class="btn float-right btn-responsive">Add Pawn</a>
+                    <h4 class="card-title">Pawn</h4>
 
                 </div>
     
@@ -60,16 +60,18 @@
                         @include('alert')
                     <div class="alert_message"></div>
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
-                      <table class="table table-hover inventory_table">
+                      <table class="table table-hover pawn_table">
                             <thead>
                                 <tr>
                                   <th>#</th>
-                                  <th>Inventory #</th>
+                                  <th>PT #</th>
+                                  <th>Transaction Date</th>
+                                  <th>Maturity<br/>Expiry<br/>Auction</th>
                                   <th>Customer</th>
                                   <th>Gross Proceeds</th>
                                   <th>Principal</th>
                                   <th>Net Proceeds</th>
-                                  <th>Type<br/>Status</th>
+                                  <th>Status</th>
                                   <th style="width:15%">Actions</th>
                                 </tr>
                             </thead>
@@ -95,15 +97,17 @@
     <script type="text/javascript">
   $(tableFunction = () => {
     
-    let table = $('.inventory_table').DataTable({
+    let table = $('.pawn_table').DataTable({
         processing: true,
         serverSide: true,
         stateSave: true, // statesaving of datatable
         bDestroy: true, // for re-initialized 
-        ajax: "{{ route('inventory.index') }}",
+        ajax: "{{ route('pawn.index') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-            {data: 'inventory_number', name: 'inventory_number'},
+            {data: 'ticket_number', name: 'ticket_number'},
+            {data: 'transaction_date', name: 'transaction_date'},
+            {data: 'ticket_date', name: 'ticket_date'},
             {data: 'customer', name: 'customer'},
             {data: 'gross', name: 'gross'},
             {data: 'principal', name: 'principal'},

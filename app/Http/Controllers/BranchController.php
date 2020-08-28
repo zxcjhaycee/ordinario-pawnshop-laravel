@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Branch;
 use DataTables;
+use Illuminate\Validation\ValidationException;
+use App\User;
+
 class BranchController extends Controller
 {
     //
@@ -41,7 +44,10 @@ class BranchController extends Controller
             'tin' => 'required',
             'contact_number' => 'required'
         ]);
-
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
         $branch = Branch::create($data);
 
         return back()->with('status', 'The branch was successfully created');
@@ -65,7 +71,10 @@ class BranchController extends Controller
             'tin' => 'required',
             'contact_number' => 'required'
         ]);
-        
+        $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
+        if(!$check){
+            throw ValidationException::withMessages(['auth_code_error' => 'The auth code is incorrect !']);
+        }
         $branch = Branch::withTrashed()->findOrfail($request->id)->update($data);
 
         return back()->with('status', 'The branch was successfully updated');
@@ -86,5 +95,13 @@ class BranchController extends Controller
 
         // return back()->with($message);
         return response()->json($message);
+    }
+
+    public function updateUserBranch(Request $request){
+        // dd($request);
+        $updateUserBranch = User::find(\Auth::user()->id)->update(array('branch_id' => $request->id));
+        
+        return response()->json(array('status' => 'success'));
+
     }
 }

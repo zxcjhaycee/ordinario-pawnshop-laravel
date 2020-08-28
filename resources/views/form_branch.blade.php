@@ -40,7 +40,7 @@
                                 <label for="branch" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Branch: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('branch') has-error is-focused @enderror">
-		                                <input type="text" id="branch" name="branch" class="form-control" value="{{ isset($data->branch) && $errors->isEmpty() ? $data->branch : '' }}"/>
+		                                <input type="text" id="branch" name="branch" class="form-control" value="{{ isset($data->branch) && $errors->isEmpty() ? $data->branch : old('branch') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('branch')
@@ -52,7 +52,7 @@
                                 <label for="address" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Address: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('address') has-error is-focused @enderror">
-		                                <input type="text" id="address" name="address" class="form-control" value="{{ isset($data->address) && $errors->isEmpty() ? $data->address : '' }}"/>
+		                                <input type="text" id="address" name="address" class="form-control" value="{{ isset($data->address) && $errors->isEmpty() ? $data->address : old('address') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('address')
@@ -64,7 +64,7 @@
                                 <label for="contact_number" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Contact Number: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('contact_number') has-error is-focused @enderror">
-		                                <input type="text" id="contact_number" name="contact_number" class="form-control" value="{{ isset($data->contact_number) && $errors->isEmpty() ? $data->contact_number : '' }}"/>
+		                                <input type="text" id="contact_number" name="contact_number" class="form-control" value="{{ isset($data->contact_number) && $errors->isEmpty() ? $data->contact_number : old('contact_number') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('contact_number')
@@ -76,7 +76,7 @@
                                 <label for="tin" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">TIN: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('tin') has-error is-focused @enderror">
-		                                <input type="text" id="tin" name="tin" class="form-control" value="{{ isset($data->tin) && $errors->isEmpty() ? $data->tin : '' }}"/>
+		                                <input type="text" id="tin" name="tin" class="form-control" value="{{ isset($data->tin) && $errors->isEmpty() ? $data->tin : old('tin') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('tin')
@@ -84,9 +84,10 @@
                                     @enderror
                                 </div>
                             </div>
-                                <div class="text-center">
-                                         <button type="submit" class="btn btn-success">Submit</button>
-                                </div>
+                            <div class="d-flex justify-content-center">
+                                 <input type="text" id="user_auth_code" class="form-control" style="margin-top:16px;width:130px" name="user_auth_code"  placeholder="Auth Code"/>
+                                <button type="submit" class="btn btn-success" style="height:100%">Submit</button>
+                            </div>
                         </div>
 
 
