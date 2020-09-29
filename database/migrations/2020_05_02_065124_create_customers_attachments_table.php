@@ -17,8 +17,8 @@ class CreateCustomersAttachmentsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('attachment_id');
-            $table->integer('number');
-            $table->string('path');
+            $table->string('number', 50);
+            $table->string('path')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

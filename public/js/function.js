@@ -24,9 +24,16 @@ $(document).ready(function(){
     setAppraisedComputation();
   });
 
+  $('.edit_pt').click(function(){
+      const id = $(this).attr('id');
+      // console.log(id);
+      const input = '<input type="text" class="form-control input_date" name="ticket_number" value="'+id+'">';
+      $(this).parent().html(input);
+      $('#ticket_text').remove();
+      $(this).hide();
+  })
   
-
-  
+  $('#transaction_date').mask("00/00/0000", {placeholder: "mm/dd/yyyy"});
 
   
 });
@@ -54,9 +61,12 @@ function transaction_dates(element){
     // var date = document.getElementById("transaction_date").value;
     // console.log(moment);
     var date = element.value;
-    const maturity = moment(date, 'MM/DD/YYYY').add(30, 'days');
-    const expiration = moment(date, 'MM/DD/YYYY').add(120, 'days');
-    const auction = moment(date, 'MM/DD/YYYY').add(180, 'days');
+    // const maturity = moment(date, 'MM/DD/YYYY').add(30, 'days');
+    // const expiration = moment(date, 'MM/DD/YYYY').add(122, 'days');
+    // const auction = moment(date, 'MM/DD/YYYY').add(182, 'days');
+    const maturity = moment(date, 'MM/DD/YYYY').add(1, 'months');
+    const expiration = moment(maturity, 'MM/DD/YYYY').add(3, 'months');
+    const auction = moment(expiration, 'MM/DD/YYYY').add(2, 'months');
 
     if(maturity.isValid()){
       document.getElementById("maturity_date").value =  maturity.format('MM/DD/YYYY');
@@ -123,13 +133,14 @@ function transaction_dates(element){
         }
       });
   };
-function select2Initialized(element, route, table = null){
+function select2Initialized(element, route, table = null, placeholder = null){
   // console.log(table);
   if(table != null){
     table = table;
   }
   $(element).select2({
     width: '100%',
+    placeholder : placeholder,
     ajax: {
       url: route,
     data: function (params) {
@@ -182,7 +193,7 @@ function alert_message(status, message){
 
 function jewelryTable(jewelry_counter = 0){
 
-  $("#itemTable").append('<table class="table table-bordered mt-3 jewelry_table" width="100%">'+
+  $("#itemTable").append('<table class="table table-bordered mt-3 jewelry_table table_'+jewelry_counter+'_error" width="100%">'+
       '<thead>'+
         '<tr>'+
           '<td style="width:10%">Material <br> Item Type <br> Karat</td>'+
@@ -197,14 +208,15 @@ function jewelryTable(jewelry_counter = 0){
       '<tr>'+
         '<td>'+
           '<div class="form-group input item_type_id_'+jewelry_counter+'_error">'+
-          '<select name="item_type_id['+jewelry_counter+']" class="form-control item_type" onChange="setAppraisedValue(this);getKarat(this.value, this)">'+
+          '<select name="item_type_id['+jewelry_counter+']" class="form-control item_type" onChange="setAppraisedValue(this);getKarat(this.value, this)" title="This field is required" data-toggle="tooltip">'+
             '<option selected disabled></option>'+
           '</select>'+
+
           '</div>'+
         '</td>'+
         '<td>'+
         '<div class="form-group input item_type_weight_'+jewelry_counter+'_error ">'+
-          '<input class="form-control item_type_weight" type="number" name="item_type_weight['+jewelry_counter+']" value="0.00" onKeyup="setKaratWeight(this);setAppraisedValue(this)">'+
+          '<input class="form-control item_type_weight" type="number" name="item_type_weight['+jewelry_counter+']" value="0.00" step=".01" onKeyup="setKaratWeight(this);setAppraisedValue(this)">'+
         '</div>'+
           '</td>'+
         '<td>'+
@@ -214,7 +226,7 @@ function jewelryTable(jewelry_counter = 0){
         '</td>'+
         '<td rowspan=3 class="text-center">'+
           '<div class="form-group input description_'+jewelry_counter+'_error">'+
-          '<textarea class="form-control" rows="5" name="description['+jewelry_counter+']" id="description"></textarea> <br>'+
+          '<textarea class="form-control" rows="5" name="description['+jewelry_counter+']" id="description" title="This field is required" data-toggle="tooltip"></textarea> <br>'+
           '</div>'+
           '<button id="addDiamond" class="btn btn-warning btn-sm" type="button">ADD DIAMOND</button>'+
         '</td>'+
@@ -238,27 +250,27 @@ function jewelryTable(jewelry_counter = 0){
       '<tr>'+
         '<td>'+
         '<div class="form-group input item_name_'+jewelry_counter+'_error">'+
-          '<input type="text" name="item_name['+jewelry_counter+']" class="form-control">'+
+          '<input type="text" name="item_name['+jewelry_counter+']" class="form-control item_name" title="This field is required" data-toggle="tooltip">'+
         '</div>'+
         '</td>'+
         '<td>'+
-          '<input class="form-control" type="number" name="item_name_weight['+jewelry_counter+']" value="0.00">'+
+          '<input class="form-control item_name_weight" type="number" name="item_name_weight['+jewelry_counter+']" value="0.00" onKeyup="setKaratWeight(this);setAppraisedValue(this)" step=".01">'+
         '</td>'+
         '<td>'+
-          '<input class="form-control" type="number" name="item_name_appraised_value['+jewelry_counter+']" value="0" readonly>'+
+          '<input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value['+jewelry_counter+']" value="0" readonly>'+
         '</td>'+
       '</tr>'+
       
       '<tr>'+
         '<td>'+
         '<div class="form-group input item_karat_'+jewelry_counter+'_error">'+
-          '<select name="item_karat['+jewelry_counter+']" class="form-control item_karat" onChange="setAppraisedValue(this)">'+
+          '<select name="item_karat['+jewelry_counter+']" class="form-control item_karat" onChange="setAppraisedValue(this)" title="This field is required" data-toggle="tooltip">'+
               '<option></option>'+
             '</select>'+
           '</div>'+
         '</td>'+
         '<td>'+
-          '<input class="form-control karat_weight" type="number" name="item_karat_weight['+jewelry_counter+']" value="0.00" readonly>'+
+          '<input class="form-control karat_weight" type="number" name="item_karat_weight['+jewelry_counter+']" value="0.00" step=".01" readonly>'+
           '<input type="hidden" value="'+jewelry_counter+'" class="count">'+
         '</td>'+
         '<td>'+
@@ -295,7 +307,7 @@ function jewelryTable(jewelry_counter = 0){
 }
 
 function nonJewelryTable(non_jewelry_counter = 0){
-  $("#itemTable").append('<table class="table table-bordered mt-3 non_jewelry_table" width="100%">'+
+  $("#itemTable").append('<table class="table table-bordered mt-3 non_jewelry_table table_'+non_jewelry_counter+'_error" width="100%">'+
       '<thead>'+
         '<tr>'+
           '<td style="width:20%">Item Type <br/> Item Name</td>'+
@@ -310,13 +322,13 @@ function nonJewelryTable(non_jewelry_counter = 0){
       '<td>'+
           '<div class="form-group input item_type_id_'+non_jewelry_counter+'_error">'+
           '<select name="item_type_id['+non_jewelry_counter+']" class="form-control item_type" onChange="setNonJewelryAppraisedValue(this);getItemName(this.value, this)">'+
-            '<option selected disabled></option>'+
+            '<option selected></option>'+
           '</select>'+
           '</div>'+
       '</td>'+
       '<td rowspan="2">'+
-        '<div class="form-group input item_type_appraised_value_'+non_jewelry_counter+'_error">'+
-          '<input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value['+non_jewelry_counter+']" value="0" readonly >'+
+        '<div class="form-group input item_name_appraised_value'+non_jewelry_counter+'_error">'+
+          '<input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value['+non_jewelry_counter+']" value="0" readonly >'+
         '</div>'+
       '</td>'+
       '<td rowspan=2 class="text-center">'+
@@ -343,7 +355,7 @@ function nonJewelryTable(non_jewelry_counter = 0){
             '<td>'+
               '<div class="form-group input item_name_'+non_jewelry_counter+'_error">'+
                 '<select name="item_name['+non_jewelry_counter+']" class="form-control item_name" onChange="setNonJewelryAppraisedValue(this)">'+
-                  '<option selected disabled></option>'+
+                  '<option selected></option>'+
                 '</select>'+
                 '<input type="hidden" value="'+non_jewelry_counter+'" class="count">'+
               '</div>'+
@@ -418,9 +430,9 @@ function getKarat(item_type, element){
       const item_karat = $(element).closest('table').find('.item_karat');
       // const suki_check = document.getElementById('suki_check');
       // item_karat[0].innerHTML = '';
-      let item_karat_element = '<option selected disabled></option>';
+      let item_karat_element = '<option selected></option>';
       data.forEach(element => {
-        item_karat_element += '<option value="'+element.karat+'" data-gram="'+element.gram+'" data-regular_rate="'+element.regular_rate+'" data-special_rate="'+element.special_rate+'">'+element.karat+'</option>';
+        item_karat_element += '<option value="'+element.karat+'" data-regular_rate="'+element.regular_rate+'" data-special_rate="'+element.special_rate+'">'+element.karat+'</option>';
       })
       item_karat[0].innerHTML = item_karat_element;
       $(element).closest('table').find('.item_type_appraised_value').val(0);
@@ -496,9 +508,14 @@ function setItemBranch(){
 
 }
 function setKaratWeight(element){
-  const item_type_weight = $(element).val();
+  const item_type_weight = $(element).closest('table').find('.item_type_weight')
   const karat_weight = $(element).closest('table').find('.karat_weight');
-  karat_weight[0].value = item_type_weight
+  const item_name_weight = $(element).closest('table').find('.item_name_weight');
+  // console.log(item_type_weight.val());
+  if(item_name_weight.val() > item_type_weight.val()){
+    item_name_weight.val(0);
+  }
+  karat_weight[0].value = (item_type_weight.val() - item_name_weight.val()).toFixed(2);
 }
 
 function setAppraisedValue(element){
@@ -506,25 +523,32 @@ function setAppraisedValue(element){
   const item_type = $(element).closest('table').find('.item_type');
   const item_type_weight = $(element).closest('table').find('.item_type_weight');
   const item_karat = $(element).closest('table').find('.item_karat');
+  const item_karat_weight = $(element).closest('table').find('.karat_weight');
+  const item_name_weight = $(element).closest('table').find('.item_name_weight');
   const item_type_appraised_value = $(element).closest('table').find('.item_type_appraised_value');
+  const item_name_appraised_value = $(element).closest('table').find('.item_name_appraised_value');
   if($(item_type).val() != '' && ($(item_type_weight).val() != '' && $(item_type_weight).val() != '0.00') && $(item_karat).val() != null && $(item_karat).val() != ''){
     // console.log($(item_type_weight).val());
 
-    const gram = $(item_karat).find(':selected').attr('data-gram');
+    // const gram = $(item_karat).find(':selected').attr('data-gram');
     const regular_rate = $(item_karat).find(':selected').attr('data-regular_rate');
     const special_rate = $(item_karat).find(':selected').attr('data-special_rate');
     const suki_check = document.getElementById('suki_check');
     let rate_appraised_value = 0;
+    let rate = 0;
     if(suki_check.checked){
-      rate_appraised_value = ($(item_type_weight).val() * gram) * special_rate;
+      rate_appraised_value = $(item_karat_weight).val() * special_rate;
+      rate = parseFloat(special_rate);
       // rate_appraised_value = special_rate * gram;
     }else{
-      rate_appraised_value = ($(item_type_weight).val() * gram) * regular_rate;
+      rate_appraised_value = $(item_karat_weight).val() * regular_rate;
+      rate = parseFloat(regular_rate);
       // rate_appraised_value = regular_rate * gram;
       // console.log(item_type_weight);
     }
-
-    $(item_type_appraised_value).val(rate_appraised_value.toFixed(2));
+    // console.log(rate);
+    $(item_type_appraised_value).val(rate.toFixed(2));
+    $(item_name_appraised_value).val(rate_appraised_value.toFixed(2));
 
   }
   setAppraisedComputation();
@@ -534,26 +558,30 @@ function setNonJewelryAppraisedValue(element){
   const item_name = $(element).closest('table').find('.item_name');
   const item_type = $(element).closest('table').find('.item_type');
   const item_type_appraised_value = $(element).closest('table').find('.item_type_appraised_value');
+  const item_name_appraised_value = $(element).closest('table').find('.item_name_appraised_value');
   if($(item_type).val() != '' && $(item_name).val() != null){
     const regular_rate = $(item_name).find(':selected').attr('data-regular_rate');
-    $(item_type_appraised_value).val(parseFloat(regular_rate).toFixed(2));
+    $(item_name_appraised_value).val(parseFloat(regular_rate).toFixed(2));
   }
   setAppraisedComputation();
 }
 function checkRate(element){
     // console.log("Hello!");
-    $('.item_type_appraised_value').each(function(index){
+    $('.item_name_appraised_value').each(function(index){
       if($(this).val() != 0){
         const item_type_weight = $(this).closest('table').find('.item_type_weight');
         const item_karat = $(this).closest('table').find('.item_karat');
         const gram = $(item_karat).find(':selected').attr('data-gram');
         const regular_rate = $(item_karat).find(':selected').attr('data-regular_rate');
         const special_rate = $(item_karat).find(':selected').attr('data-special_rate');
+        const item_type_appraised_value = $(this).closest('table').find('.item_type_appraised_value');
         let rate_appraised_value = 0;
         if(element.checked){
-          rate_appraised_value = ($(item_type_weight).val() * gram) * special_rate;
+          $(item_type_appraised_value).val(parseFloat(special_rate).toFixed(2));
+          rate_appraised_value = special_rate * $(item_type_weight).val();
         }else{
-          rate_appraised_value = ($(item_type_weight).val() * gram) * regular_rate;
+          $(item_type_appraised_value).val(parseFloat(regular_rate).toFixed(2));
+          rate_appraised_value = regular_rate * $(item_type_weight).val();
         }
         $(this).val(rate_appraised_value.toFixed(2));
         setAppraisedComputation();
@@ -585,6 +613,7 @@ function inventoryForm(event, element){
   event.preventDefault();
   $('.error_message').css('display', 'none');
   $('.input').removeClass('has-error is-focused');
+  $('.alert_error').remove();
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
@@ -602,30 +631,30 @@ function inventoryForm(event, element){
       success: (data) => {
         // console.log(data.success);
         // console.log(data);
-        if(data.success === true){
-          // alert_message('Success', data.status);
-          window.scrollTo(0, 0);
-          location.reload();
-        if(data.create === true){
+        if(data.success){
           window.location.href = data.link;
+          return;
         }
-
-        }else{
-          window.scrollTo(0, 0);
-          alert_message('Danger', 'Error occured. Pleasse contact administrator');
-        }
-
-        if(data.auth_code_error === false){
+        if(!data.auth_code_error){
           window.scrollTo(0, 0);
           alert_message('Danger', data.status);
+          return;
         }
+        window.scrollTo(0, 0);
+        alert_message('Danger', 'Error occured. Pleasse contact administrator');
+
+
       },
       error: (data) => {
         const error = data.responseJSON.errors;
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
+        let first = true;
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
-          // console.log(error[errorValue][0].replace(/\.|[0-9]/g, ''));
+            if(first){
+              $('.'+errorValue.replace(/\./g, '_')+'_error').find(':input').focus();
+              first = false;
+            }
 
              if(/\.|[0-9]/g.test(errorValue)){
               $('.'+errorValue.replace(/\./g, '_')+'_error').addClass('has-error is-focused');
@@ -635,8 +664,19 @@ function inventoryForm(event, element){
 
              }
 
-            //  console.log($('.'+errorValue.replace(/\./g, '_')+'_error'));
 
+             const alert_error = '<div class="col-xl-8 col-lg-12 col-md-12 mx-auto alert_error">'+
+             '<div class="alert alert-danger alert-dismissible fade show text-center" style="font-size:15px" role="alert">'+
+                 '<strong>Error!</strong> '+error[errorValue][0].replace(/\.|[0-9]/g, '')+
+                     '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+                         '<span aria-hidden="true">&times;</span>'+
+                     '</button>'+
+             '</div>'+
+          '</div>';
+            const count = errorValue.match(/\d+/g);
+            if(count !== null){
+              $( alert_error ).insertBefore('.table_'+count[0]+'_error');
+            }
         }
       }
     });
@@ -698,8 +738,8 @@ function setDiscount(){
 
 function renewForm(event, element){
   event.preventDefault();
-  // $('.error_message').css('display', 'none');
-  $('.input').removeClass('has-error is-focused');
+  $('.error_message').css('display', 'none');
+  $('.form-group').removeClass('has-error is-focused');
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
@@ -716,31 +756,35 @@ function renewForm(event, element){
       processData : false,
       success: (data) => {
         // console.log(data.success);
-        if(data.success === true){
-          // alert_message('Success', data.status);
-        if(data.create === true){
-          window.location.href = data.link;
+        if(data.success){
+           window.location.href = data.link;
+          return;
         }
-        //  location.reload();
-        window.location.href = data.link;
-
-        }else{
-          window.scrollTo(0, 0);
-          alert_message('Danger', 'Error occured. Pleasse contact administrator');
-        }
-
-        if(data.auth_code_error === false){
+        if(!data.auth_code_error){
           window.scrollTo(0, 0);
           alert_message('Danger', data.status);
+          return;
         }
+
+        window.scrollTo(0, 0);
+        alert_message('Danger', 'Error occured. Pleasse contact administrator');
 
       },
       error: (data) => {
         const error = data.responseJSON.errors;
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
+        let first = true; // to get the first loop index
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
+              // $('.transaction_date_error').find(':input').focus();
+              if(first){
+                $('.'+errorValue+'_error').find(':input').focus();
+                first = false;
+              }
               $('.'+errorValue+'_error').addClass('has-error is-focused');
+              $('.'+errorValue+'_error').append('<label class="text-danger error_message">'+error[errorValue][0]+'</label>');
+
+
         }
       }
     });
@@ -749,8 +793,8 @@ function renewForm(event, element){
 
 function redeemForm(event, element){
   event.preventDefault();
-  // $('.error_message').css('display', 'none');
-  // $('.input').removeClass('has-error is-focused');
+  $('.error_message').css('display', 'none');
+  $('.form-group').removeClass('has-error is-focused');
   const form_data = new FormData(element);
   const id = form_data.get('id');
   // console.log(id);
@@ -767,31 +811,31 @@ function redeemForm(event, element){
       processData : false,
       success: (data) => {
         // console.log(data.success);
-        if(data.success === true){
-          // alert_message('Success', data.status);
-        if(data.create === true){
+        if(data.success){
           window.location.href = data.link;
+          return;
         }
-        window.location.href = data.link;
-
-        }else{
-          window.scrollTo(0, 0);
-          alert_message('Danger', 'Error occured. Pleasse contact administrator');
-        }
-
-        if(data.auth_code_error === false){
+        if(!data.auth_code_error){
           window.scrollTo(0, 0);
           alert_message('Danger', data.status);
+          return;
         }
-
+        window.scrollTo(0, 0);
+        alert_message('Danger', 'Error occured. Pleasse contact administrator');
       },
       error: (data) => {
         const error = data.responseJSON.errors;
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
+        let first = true;
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
-             $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
-              $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
+
+            if(first){
+              $('.'+errorValue+'_error').find(':input').focus();
+              first = false;
+            }
+            $('.'+errorValue+'_error').addClass('has-error is-focused');
+            $('.'+errorValue+'_error').append('<label class="text-danger error_message">'+error[errorValue][0]+'</label>');
 
         }
       }
@@ -805,6 +849,7 @@ function repawnForm(event, element){
   $('.input').removeClass('has-error is-focused');
   const form_data = new FormData(element);
   const id = form_data.get('id');
+  $('.alert_error').remove();
   // console.log(id);
   const url = id == null ? '/pawn_auction/pawn/repawn' : '/pawn_auction/pawn/repawn/'+id; 
     $.ajax({
@@ -820,40 +865,50 @@ function repawnForm(event, element){
       success: (data) => {
         // console.log(data.success);
         // console.log(data);
-        if(data.success === true){
-          // alert_message('Success', data.status);
-          location.reload();
-        if(data.create === true){
+        if(data.success){
           window.location.href = data.link;
+          return;
         }
-
-        }else{
-          window.scrollTo(0, 0);
-          alert_message('Danger', 'Error occured. Pleasse contact administrator');
-        }
-        if(data.auth_code_error === false){
+        if(!data.auth_code_error){
           window.scrollTo(0, 0);
           alert_message('Danger', data.status);
+          return;
         }
+        window.scrollTo(0, 0);
+        alert_message('Danger', 'Error occured. Pleasse contact administrator');
 
       },
       error: (data) => {
         const error = data.responseJSON.errors;
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
+        let first = true;
         for(let errorValue in error){
           if (!error.hasOwnProperty(errorValue)) continue;
-          // console.log(error[errorValue][0].replace(/\.|[0-9]/g, ''));
 
+            if(first){
+              $('.'+errorValue.replace(/\./g, '_')+'_error').find(':input').focus();
+              first = false;
+            }
              if(/\.|[0-9]/g.test(errorValue)){
               $('.'+errorValue.replace(/\./g, '_')+'_error').addClass('has-error is-focused');
              }else{
               $('.'+errorValue.replace(/\./g, '_')+'_error').append('<label class="text-danger error_message">'+error[errorValue][0].replace(/\.|[0-9]/g, '')+'</label>');
               $('.'+errorValue.replace(/\./g, '_')+'_error').find('.input').addClass('has-error is-focused');
-
              }
 
-            //  console.log($('.'+errorValue.replace(/\./g, '_')+'_error'));
+             const alert_error = '<div class="col-xl-8 col-lg-12 col-md-12 mx-auto alert_error">'+
+             '<div class="alert alert-danger alert-dismissible fade show text-center" style="font-size:15px" role="alert">'+
+                 '<strong>Error!</strong> '+error[errorValue][0].replace(/\.|[0-9]/g, '')+
+                     '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+                         '<span aria-hidden="true">&times;</span>'+
+                     '</button>'+
+             '</div>'+
+          '</div>';
+             const count = errorValue.match(/\d+/g);
+            if(count !== null){
+              $( alert_error ).insertBefore('.table_'+count[0]+'_error');
 
+            }
         }
       }
     });
@@ -890,9 +945,14 @@ function noticeListingForm(event, element){
 
 function auctionForm(event, element){
   event.preventDefault();
+    let checkbox = $("input:checkbox[name=auction]:checked").map(function(){return $(this).val()}).get();
+    // console.log(checkbox.length);
+    if(checkbox.length == 0){
+      return false;
+    }
     const form_data = new FormData(element);
-    const url = '/pawn_auction/pawn/auction';
-
+    form_data.append('id', JSON.stringify(checkbox));
+    const url = '/pawn_auction/auction';
     $.ajax({
       headers: {
           'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -907,14 +967,39 @@ function auctionForm(event, element){
         // console.log(data.success);
         // location.reload();
         if(data.success){
-          // location.reload();
-          $('.auction').popover('hide');
-          tableFunction();
+          location.reload();
+
 
         }
       },
       error: (data) => {
 
+      }
+    });
+};
+
+function singleNoticeForm(event, element){
+  event.preventDefault();
+    const form_data = new FormData(element);
+    const url = '/reports/notice_listing/single_store';
+
+    $.ajax({
+      headers: {
+          'X-CSRF-TOKEN': "{{ csrf_token() }}"
+      },
+      url : url,
+      type : "POST",
+      data : form_data,
+      cache: false,
+      contentType : false,
+      processData : false,
+      success: (data) => {
+        // console.log(data.success);
+        // location.reload();
+        $('.notice').popover('hide');
+        tableFunction();
+      },
+      error: (data) => {
       }
     });
 };

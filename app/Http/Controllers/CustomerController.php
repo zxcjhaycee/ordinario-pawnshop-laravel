@@ -68,9 +68,9 @@ class CustomerController extends Controller
             'birthdate' => 'required|date',
             'sex' => 'required|in:male,female',
             'civil_status' => 'required|in:single,married,seperated,divorced,widowed',
-            'email' => 'required|email',
+            'email' => 'email',
             'contact_number' => 'required',
-            'alternate_number' => 'required',
+            // 'alternate_number' => 'required',
             'present_address' => 'required',
             'present_area' => 'required',
             'present_city' => 'required',
@@ -79,7 +79,7 @@ class CustomerController extends Controller
             'permanent_area' => 'required',
             'permanent_city' => 'required',
             'permanent_zip_code' => 'required|numeric',
-            'attachment.*' => 'required|mimes:jpeg,bmp,jpeg,jpg,png',
+            // 'attachment.*' => 'required|mimes:jpeg,bmp,jpeg,jpg,png',
             'attachment_number.*' => 'required',
             // 'attachment_type' => 'required||exists:App\Attachment,id'
             'attachment_type.*' => 'required'
@@ -97,10 +97,15 @@ class CustomerController extends Controller
                 $request['attachment_id'] = $request['attachment_type'];
                 $request['number'] = $request['attachment_number'];
                 $attachment_data = array();
-                $customer = Customer::create($request->all());
+                $customer = Customer::create($request->only('first_name', 'middle_name', 'last_name', 'suffix', 'birthdate', 'sex', 'civil_status', 'email',
+                                            'contact_number', 'alternate_number', 'present_address', 'present_address_two', 'present_area', 'present_city', 'present_zip_code',
+                                                'permanent_address', 'permanent_address_two', 'permanent_area', 'permanent_city', 'permanent_zip_code'));
+                $attachment_path = '';
                 foreach($request['attachment_id'] as $key => $value){
-                    $attachment_path = $key.'_'.time().'.'.$request->attachment[$key]->extension(); 
-                    $request->attachment[$key]->move(public_path('attachment'), $attachment_path);
+                    if(isset($request['attachment'][$key])){
+                        $attachment_path = $key.'_'.time().'.'.$request->attachment[$key]->extension(); 
+                        $request->attachment[$key]->move(public_path('attachment'), $attachment_path);
+                    }
         
                     $attachment_data[] = array(
                         'customer_id' => $customer->id,
@@ -232,7 +237,7 @@ class CustomerController extends Controller
     public function search(Request $request){
         $data = array();
         if(isset($request->search)){
-            $customer = Customer::where(\DB::raw('concat(first_name," ",last_name," ", suffix)'), 'like', '%'.$request->search.'%')->take(10)->get();
+            $customer = Customer::where(\DB::raw('concat(first_name," ",last_name)'), 'like', '%'.$request->search.'%')->take(10)->get();
             // dd($attachments[0]);
             if($customer->count() > 0){
                 foreach($customer as $key => $value){

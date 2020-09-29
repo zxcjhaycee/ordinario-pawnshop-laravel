@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Inventory')
 @section('content')
 <style>
 

@@ -2,6 +2,15 @@
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
 @extends('layout')
+@if(isset($data))
+    @if($data->charge_type == 'discount')
+        @section('title', 'Update Discount : '. $data->charge_name)
+    @else
+         @section('title', 'Update Charges : '. $data->charge_name)
+    @endif
+@else
+        @section('title', 'Create Charges')
+@endif
 @section('content')
 <style>
 

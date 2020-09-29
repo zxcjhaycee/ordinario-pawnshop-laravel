@@ -3,6 +3,7 @@
 @endphp
 
 @extends('layout')
+@section('title', 'Inventory # : '. $inventory->inventory_number) 
 @section('content')
 <style>
 
@@ -23,7 +24,13 @@
     .has-error .select2-selection {
          border-color: rgb(185, 74, 72) !important;
     }
-
+    tr td:first-child{
+      width:1%;
+      white-space:nowrap;
+    }
+    .table-borderless td, .table-borderless th {
+       border: none;
+    }
 </style>
 <div class="content">
     <div class="col-xl-12">
@@ -66,27 +73,79 @@
                                 <div class="card-body">
                                 <div class="row">
                                 
-                                  <div class="col-xl-6">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                       <h3 class="display-4">Details</h3>
-                                        <div class="col-xl-12 mt-4">
-
+                                        <div class="mt-4">
+                                        <div class="table-responsive material-datatables" style="overflow-y: hidden;">
+                                          <table class="table table-borderless" style="margin:0 auto">
+                                              <tr>
+                                                <td style="text-align:right;font-weight:bold">Inventory # :</td>
+                                                <td>{{ $inventory->inventory_number }}</td>
+                                              </tr>
+                                              <tr>
+                                                <td style="text-align:right;font-weight:bold">Category :</td>
+                                                <td>{{ $inventory->item_category->item_category }}</td>
+                                              </tr>
+                                              <tr>
+                                                <td style="text-align:right;font-weight:bold">Loan Status :</td>
+                                                <td>{{ 'Outstanding' }}</td>
+                                              </tr>
+                                              <tr>
+                                                <td style="text-align:right;font-weight:bold">Branch :</td>
+                                                <td>{{ $inventory->branch->branch }}</td>
+                                              </tr>
+                                          </table>
+                                        </div>
+                                          <!-- 
                                           <ul style="list-style-type:none;padding-left: 5px;">
                                             <li class="font-weight-bold" style="text-indent:11px">Inventory # : <span class="font-weight-normal">{{ $inventory->inventory_number }}</span></li>
                                             <li class="font-weight-bold mt-2" style="text-indent:8px">Item Category : <span class="font-weight-normal">{{ $inventory->item_category->item_category }}</span> </li>
                                             <li class="font-weight-bold mt-2" style="text-indent:8px">Loan Status : <span class="font-weight-normal">Outstanding</span> </li>
                                             <li class="font-weight-bold mt-2" style="text-indent:40px">Branch : <span class="font-weight-normal">{{ $inventory->branch->branch }}</span> </li>
-                                          </ul>
+                                          </ul> -->
 
                                         </div>
                                   </div>
-                                    <div class="col-xl-6">
+                                  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                       <h3 class="display-4">Customer</h3>
                                       <div class="row">
                                         <div class="col-xl-4">
                                           <img src="http://getdrawings.com/free-icon-bw/facebook-avatar-icon-25.png" class="rounded float-left" alt="..." style="width:150px">
                                         </div>
                                         <div class="col-xl-8">
-                                          <ul style="padding-left:5px;list-style-type:none">
+                                        <div class="table-responsive material-datatables" style="overflow-y: hidden;">
+                                            <table class="table table-borderless" style="margin:0 auto">
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Full Name :</td>
+                                                  <td>{{ $inventory->customer->first_name." ".$inventory->customer->middle_name." ".$inventory->customer->last_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Address :</td>
+                                                  <td>{{ $inventory->customer->present_address }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Birthday :</td>
+                                                  <td>{{ date('F d, Y', strtotime($inventory->customer->birthdate)) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Sex :</td>
+                                                  <td>{{ ucwords($inventory->customer->sex) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Civil Status :</td>
+                                                  <td>{{ ucwords($inventory->customer->civil_status) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Contact # :</td>
+                                                  <td>{{ $inventory->customer->contact_number }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Email :</td>
+                                                  <td>{{ $inventory->customer->email }}</td>
+                                                </tr>
+                                            </table>
+                                          </div>
+                                          <!-- <ul style="padding-left:5px;list-style-type:none">
                                             <li class="font-weight-bold">Full Name : <span class="font-weight-normal"> {{ $inventory->customer->first_name." ".$inventory->customer->middle_name." ".$inventory->customer->last_name }} </span> </li>
                                             <li class="font-weight-bold">Address : <span class="font-weight-normal"> {{ $inventory->customer->present_address }}</span>  </li>
                                             <li class="font-weight-bold">Birthday : <span class="font-weight-normal"> {{ date('F d, Y', strtotime($inventory->customer->birthdate)) }}</span>  </li>
@@ -94,8 +153,8 @@
                                             <li class="font-weight-bold">Civil Status : <span class="font-weight-normal"> {{ ucwords($inventory->customer->civil_status) }}</span>  </li>
                                             <li class="font-weight-bold">Contact # : <span class="font-weight-normal"> {{ $inventory->customer->contact_number }}</span>  </li>
                                             <li class="font-weight-bold">Email : <span class="font-weight-normal"> {{ $inventory->customer->email }}</span>  </li>
+                                          </ul> -->
 
-                                          </ul>
                                         </div>
                                         <!-- <div class="col-xl-6">Birthday:</div> -->
                                         <!-- <div class="col-xl-6">Sex:</div> -->
@@ -143,10 +202,10 @@
                                                       <td>{{ $value->item_karat }}</td>
                                                       <td>{{ $value->item_karat_weight }}</td>
                                                       <td>{{ $value->description }}</td>
-                                                      <td>{{ number_format($value->ticket_item->item_type_appraised_value,2) }}</td>
+                                                      <td>{{ number_format($value->ticket_item->item_name_appraised_value,2) }}</td>
                                                     </tr>
                                                     @php
-                                                      $appraised_value += $value->ticket_item->item_type_appraised_value;
+                                                      $appraised_value += $value->ticket_item->item_name_appraised_value;
                                                     @endphp
                                                   @endforeach
                                                     <tr class="table-success">

@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Create Notice Listing')
 
 @section('content')
 <style>
@@ -94,7 +95,7 @@
                           </div>
                           </form>
                       </div>
-
+                    {{--
                       <div class="col-xl-5 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
                         <form  method="POST" class="row" onSubmit="noticeListingForm(event, this)">
                           @csrf
@@ -113,6 +114,7 @@
 
 
                       </div>
+                      --}}
                 </div>
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                       <table class="table table-hover notice_listing_table">

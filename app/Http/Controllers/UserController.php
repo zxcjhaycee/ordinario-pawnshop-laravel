@@ -54,6 +54,7 @@ class UserController extends Controller
     }
 
     public function store(Request $request, User $user){
+        // dd($request);
         $data = $request->validate([
             'first_name' => 'required|alpha',
             'last_name' => 'required|alpha',
@@ -71,6 +72,9 @@ class UserController extends Controller
 
 
         $data['password'] = Hash::make($data['password']);
+        $branches = isset($request['branches']) ? $request['branches'] : array();
+        array_push($branches, $data['branch_id']);
+        $data['branches'] = implode(',', array_unique($branches));
         $user->create($data);
         
         return back()->with('status', 'The user was successfully created');
@@ -79,8 +83,11 @@ class UserController extends Controller
     public function edit(Request $request){
         $data = User::where('id', $request->id)->first();
         $branch = Branch::all();
-
-        return view('form_user', compact('data', 'branch'));        
+        $branches_array = explode(',', $data->branches);
+        // dd($branches_array);
+        $branches = Branch::whereIn('id', $branches_array)->get();
+        // dd($branches);
+        return view('form_user', compact('data', 'branch', 'branches'));        
     }
 
     public function update(Request $request){
@@ -99,7 +106,9 @@ class UserController extends Controller
             'auth_code' => 'required|min:3|alpha_num',
         ]);
         $data['password'] = Hash::make($data['password']);
-
+        $branches = isset($request['branches']) ? $request['branches'] : array();
+        array_push($branches, $data['branch_id']);
+        $data['branches'] = implode(',', array_unique($branches));
         $user = User::findOrfail($request->id)->update($data);
 
         return back()->with('status', 'The user was successfully updated');

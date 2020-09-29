@@ -18,7 +18,7 @@
 
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"> -->
     
-    <title>Ordinario Pawnshop</title>
+    <title>Ordinario Pawnshop :: @yield('title')</title>
 </head>
 <body>
 <!-- sidebar -->
@@ -44,6 +44,7 @@
 <script src="/js/datepicker.js"></script>
 <script src="/js/datepicker.en.js"></script>
 <script src="/js/select2.min.js"></script>
+<script src="/js/jquery.mask.min.js"></script>
 <!-- <script src="/js/material/plugins/jquery.datatables.js"></script> -->
 <!-- <script src="/js/material/plugins/dataTables.material.min.js"></script> -->
 <script src="/js/material/plugins/jquery.dataTables-2.min.js"></script>

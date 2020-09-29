@@ -46,6 +46,17 @@ class RatesController extends Controller
      */
     public function store(Request $request, Rate $rate)
     {
+        // dd($request);
+        $data = $request->validate([
+            'item_type_id' => 'required',
+            'karat' => 'required',
+            'gram' => 'required',
+            'regular_rate' => 'required',
+            'special_rate' => 'required'
+            // 'description' => 'required'
+            
+        ]);
+
         $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
         // dd($check);
         if(!$check){

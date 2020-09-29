@@ -214,7 +214,7 @@ class PawnController extends Controller
             'item_type_weight.*' => 'required',
             'description.*' => 'required',
             'item_type_appraised_value.*' => 'required',
-            'image.*' => 'required',
+            'image.*' => '',
             'item_name.*' => 'required',
             'item_name_weight.*' => 'required',
             'item_name_appraised_value.*' => 'required',
@@ -251,8 +251,12 @@ class PawnController extends Controller
         $pawn_ticket = Pawn_ticket::create(array('pawn_id' => $request['pawn_id'], 'ticket_id' => $request['pawn_id']));
 
             foreach($data['item_type_id'] as $key => $value){
-                $image_path = $key.'_'.time().'.'.$request->image[$key]->extension(); 
-                $request->image[$key]->move(public_path('item_image'), $image_path);
+                $image_path = '';
+                if(isset($request['image'][$key]) && $request['image'][$key] != ''){
+                    $image_path = $key.'_'.time().'.'.$request->image[$key]->extension(); 
+                    $request->image[$key]->move(public_path('item_image'), $image_path);
+                }
+
                 if($request['item_category_id'] == 1){
                     $inventory_item_data = array(
                         'inventory_id' => $data['inventory_id'],
@@ -284,11 +288,11 @@ class PawnController extends Controller
                 $ticket_item_array = array(
                     'ticket_id' => $data['ticket_id'],
                     'inventory_item_id' => $inventory_item,
-                    'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                    'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
                     'created_at'=>date('Y-m-d H:i:s'),
                     'updated_at'=> date('Y-m-d H:i:s')
                 );
-                $ticket_item_array['item_name_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_name_appraised_value'][$key] : 0;
+                $ticket_item_array['item_type_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_type_appraised_value'][$key] : 0;
                 $ticket_item = Ticket_item::insert($ticket_item_array);
             }
     
@@ -311,7 +315,7 @@ class PawnController extends Controller
             \DB::commit();
             $request->session()->flash('status', 'The pawn was successfully created!');
         //  return response()->json(['success' => true, 'link' => route('pawn_print', $request['inventory_id']), 'create' => true]);
-            return response()->json(['success' => true, 'create' => true, 'link' => route('pawn.show', $data['ticket_id'])]);
+            return response()->json(['success' => true, 'link' => route('pawn.show', $data['ticket_id'])]);
         
         }catch(\PDOException $e){
             \DB::rollBack();
@@ -531,6 +535,26 @@ class PawnController extends Controller
         ]);
     }
 
+    public function pawnPrint_test(Request $request){
+    $ticket_id = $request['ticket_id'];
+    // dd($ticket_id);
+    $data = Inventory::with(['pawnTickets' => function($query) use ($ticket_id){
+        $query->where('id', '=', $ticket_id);
+    }, 'pawnTickets.encoder', 'pawnTickets.other_charges', 'pawnTickets.item_tickets','pawnTickets.attachment',
+     'pawnTickets.pawn_tickets', 'pawnTickets.pawn_tickets.ticket_items', 'pawnTickets.pawn_tickets.ticket_items.inventory_items',
+     'pawnTickets.pawn_tickets.ticket_items.inventory_items.item_type', 'pawnTickets.pawn_tickets.ticket_parent', 'pawnTickets.payment'])
+    ->with(['customer', 'branch'])
+    ->where('id', $request->id)
+    ->first();
+    $formatter = new NumberFormatter("en", \NumberFormatter::SPELLOUT);
+
+    // dd($data);
+    // dd($data->pawnTickets->item_tickets->sum('item_name_appraised_value'));
+    $pdf = \PDF::loadView('pdf.pawn', array('data' => $data, 'formatter' => $formatter));
+    return $pdf->inline();
+
+
+    }
 
     public function show(Request $request)
     {
@@ -540,6 +564,7 @@ class PawnController extends Controller
         // dd($ticket);
         // $inventory = Inventory::with('customer', 'branch', 'item_category', 'inventoryItems', 'item.item_type')->findOrFail($request->id);
         $ticket = Ticket::with('item_tickets', 'item_tickets.inventory_items')->find($request->id);
+        // dd($ticket);
         // dd($ticket);
         // dd($ticket->pawn_parent->ticket_child);
         // $current_pawn = Ticket::whereIn('transaction_type', array('pawn', 'repawn'))->where([['status', '=', 0], ['inventory_id', $request->id]])->first();
@@ -676,7 +701,9 @@ class PawnController extends Controller
                             'updated_at'=> date('Y-m-d H:i:s')
                          );
                          $ticket_item_data = array(
-                            'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                            'item_type_appraised_value' => 0,
+                            'item_name_appraised_value' => $data['item_name_appraised_value'][$key]
+
                          );
                     }
 
@@ -733,8 +760,8 @@ class PawnController extends Controller
                             $ticket_item_data = array(
                                 'ticket_id' => $request['id'],
                                 'inventory_item_id' => $inventory_item,
-                                'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
-                                'item_name_appraised_value' => 0,
+                                'item_type_appraised_value' => 0,
+                                'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
                                 'created_at'=>date('Y-m-d H:i:s'),
                                 'updated_at'=> date('Y-m-d H:i:s')
                             );
@@ -789,7 +816,8 @@ class PawnController extends Controller
 
              \DB::commit();
              $request->session()->flash('status', 'The pawn was successfully updated!');
-             return response()->json(['success' => true]);
+             return response()->json(['success' => true, 'link' => route('pawn.show', $data['ticket_id'])]);
+            //  return response()->json(['success' => true]);
          }catch(\PDOException $e){
              \DB::rollBack();
              //  dd($e->getMessage());
@@ -867,7 +895,10 @@ class PawnController extends Controller
         $tickets_current = Inventory::with(['pawnTickets' => function($query) use ($ticket_id){
             $query->where('id', $ticket_id);
         }, 'pawnTickets.other_charges', 'pawnTickets.other_charges.inventory_other_charges', 'pawnTickets.pawn_tickets', 'pawnTickets.payment'])->find($request->id);
-        // dd($tickets_current);
+        // dd(Inventory::find($request->id)->pawnTickets->where('id', '<', $ticket_id)->get(); // get the prev record
+        // dd($ticket_id);
+        $tickets_prev = Ticket::where('inventory_id', $request->id)->where('id', '<', $ticket_id)->orderBy('id', 'desc')->first(); // get the prev record
+        // dd($tickets_prev);
         $pawn_id = $tickets_current->pawnTickets->pawn_tickets->pawn_id;
         $request['pawn_id'] = $tickets_current->pawnTickets->pawn_tickets->pawn_id;
         $inventory = Inventory::with(['pawnTickets' => function($query) use ($pawn_id){
@@ -890,7 +921,7 @@ class PawnController extends Controller
         $prev_balance =  round($net,2) - round($payment_balance,2);
         // dd($net); 
 
-            return view('form_renew', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id', 'prev_balance', 'pawn_id', 'ticket_id', 'ticket_original'));
+            return view('form_renew', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id', 'prev_balance', 'pawn_id', 'ticket_id', 'ticket_original', 'tickets_prev'));
 
     }
 
@@ -1110,6 +1141,12 @@ class PawnController extends Controller
 
     public function submitRedeem(Request $request){
         // dd($request);
+        $data = $request->validate([
+            'transaction_date' => 'required',
+            'attachment_number' => 'required',
+            'attachment_id' => 'required',
+            'payment' => 'required'
+        ]);
         $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
         // dd($check);
         if(!$check){
@@ -1201,6 +1238,7 @@ class PawnController extends Controller
         $tickets_current = Inventory::with(['pawnTickets' => function($query) use ($ticket_id){
             $query->where('id', $ticket_id);
         }, 'pawnTickets.other_charges', 'pawnTickets.other_charges.inventory_other_charges', 'pawnTickets.pawn_tickets'])->find($request->id);
+        $tickets_prev = Ticket::where('inventory_id', $request->id)->where('id', '<', $ticket_id)->orderBy('id', 'desc')->first(); // get the prev record
         $pawn_id = $tickets_current->pawnTickets->pawn_tickets->pawn_id;
         $request['pawn_id'] = $pawn_id;
         $ticket_original = Ticket::find($request['pawn_id']);
@@ -1223,7 +1261,7 @@ class PawnController extends Controller
         $prev_balance =  round($net,2) - round($payment_balance,2);
         // dd($net); 
 
-            return view('form_redeem', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id', 'prev_balance', 'pawn_id', 'ticket_id', 'ticket_original'));
+            return view('form_redeem', compact('inventory', 'tickets', 'tickets_latest', 'tickets_current', 'id', 'prev_balance', 'pawn_id', 'ticket_id', 'ticket_original', 'tickets_prev'));
 
     }
 
@@ -1345,6 +1383,7 @@ class PawnController extends Controller
     }
 
     public function submitRepawn(Request $request){
+        // dd($request);
         try{
             // dd(($request['item_type_id']));
             \DB::beginTransaction();
@@ -1363,7 +1402,15 @@ class PawnController extends Controller
                 'attachment_id' => 'required',
                 'attachment_number' => 'required',
                 'item_type_appraised_value.*' => 'required',
-                'item_name_appraised_value.*' => 'required'
+                'item_name_appraised_value.*' => 'required',
+                'image.*' => 'required',
+                'item_name.*' => 'required',
+                'item_name_weight.*' => 'required',
+                'item_karat.*' => 'required',
+                'item_karat_weight.*' => 'required',                        
+                'item_type_weight.*' => 'required',
+                'description.*' => 'required',
+                'item_type_id.*' => 'required',
             ]);
             $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
             // dd($check);
@@ -1391,7 +1438,7 @@ class PawnController extends Controller
             $ticket = Ticket::create($ticket_data->only('transaction_type','inventory_id', 'attachment_id','ticket_number','transaction_date','maturity_date','expiration_date','auction_date','processed_by','appraised_value', 'principal', 'net', 'attachment_number', 'discount', 'charges', 'is_special_rate')->toArray());
             $data['ticket_id'] = $ticket->id;
             $pawn_ticket = Pawn_ticket::create(array('pawn_id' => $data['ticket_id'], 'ticket_id' => $data['ticket_id']));
-             foreach($data['item_type_appraised_value'] as $key => $value){
+             foreach($data['item_name_appraised_value'] as $key => $value){
                  if(!isset($request['inventory_item_id'][$key])){
 
                     if($request['item_category_id'] == 1){ // jewelry
@@ -1453,8 +1500,8 @@ class PawnController extends Controller
                         $ticket_item_data = array(
                             'ticket_id' => $data['ticket_id'],
                             'inventory_item_id' => $inventory_item,
-                            'item_name_appraised_value' => 0,
-                            'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                            'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
+                            'item_type_appraised_value' => 0,
                             'item_status' => 'new',
                             'created_at'=>date('Y-m-d H:i:s'),
                             'updated_at'=> date('Y-m-d H:i:s')
@@ -1466,12 +1513,12 @@ class PawnController extends Controller
                      $ticket_item_data = array(
                         'ticket_id' => $data['ticket_id'],
                         'inventory_item_id' => $request['inventory_item_id'][$key],
-                        'item_type_appraised_value' => $data['item_type_appraised_value'][$key],
+                        'item_name_appraised_value' => $data['item_name_appraised_value'][$key],
                         'item_status' => 'old',
                         'created_at'=>date('Y-m-d H:i:s'),
                         'updated_at'=> date('Y-m-d H:i:s')
                      );
-                     $ticket_item_data['item_name_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_name_appraised_value'][$key] : 0;
+                     $ticket_item_data['item_type_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_type_appraised_value'][$key] : 0;
                     $ticket_item = Ticket_item::insert($ticket_item_data);
                  }
 
@@ -1498,7 +1545,7 @@ class PawnController extends Controller
              \DB::commit();
              $request->session()->flash('status', 'The repawn was successfully created!');
             //  return response()->json(['success' => true, 'link' => route('pawn_print', $request['inventory_id']), 'create' => true]);
-             return response()->json(['success' => true, 'create' => true, 'link' => route('pawn.show', $ticket->id)]);
+             return response()->json(['success' => true, 'link' => route('pawn.show', $ticket->id)]);
             
          }catch(\PDOException $e){
              \DB::rollBack();
@@ -1557,7 +1604,15 @@ class PawnController extends Controller
             'attachment_id' => 'required',
             'attachment_number' => 'required',
             'item_type_appraised_value.*' => 'required',
-            'item_name_appraised_value.*' => 'required'
+            'item_name_appraised_value.*' => 'required',
+            'image.*' => 'required',
+            'item_name.*' => 'required',
+            'item_name_weight.*' => 'required',
+            'item_karat.*' => 'required',
+            'item_karat_weight.*' => 'required',                        
+            'item_type_weight.*' => 'required',
+            'description.*' => 'required',
+            'item_type_id.*' => 'required',
         ]);
         $check = User::where('auth_code', $request->user_auth_code)->find(\Auth::user()->id);
         // dd($check);
@@ -1578,7 +1633,7 @@ class PawnController extends Controller
             $inventory = Inventory::findOrfail($request->inventory_id)->update($inventory_data->only('transaction_date', 'maturity_date', 'expiration_date', 'auction_date')->toArray());
             $ticket = Ticket::findOrfail($request->id)->update($inventory_data->only('attachment_id','transaction_date','maturity_date','expiration_date','auction_date', 'net', 'attachment_number', 'is_special_rate', 'appraised_value', 'principal', 'charges', 'discount')->toArray());
             //  $request['ticket_id'] = $ticket->id;
-            foreach($data['item_type_appraised_value'] as $key => $value){
+            foreach($data['item_name_appraised_value'] as $key => $value){
                 if(!isset($request['inventory_item_id'][$key])){
                     if($request['item_category_id'] == 1){
                         $item_data = $request->validate([
@@ -1699,9 +1754,9 @@ class PawnController extends Controller
                         }
                     }
                     $ticket_item_array = array(
-                        'item_type_appraised_value' => $data['item_type_appraised_value'][$key]
+                        'item_name_appraised_value' => $data['item_name_appraised_value'][$key]
                     );
-                    $ticket_item_array['item_name_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_name_appraised_value'][$key] : 0;
+                    $ticket_item_array['item_type_appraised_value'] = $request['item_category_id'] == 1 ? $data['item_type_appraised_value'][$key] : 0;
                    $ticket_item = Ticket_item::findOrFail($request['ticket_item_id'][$key])->update($ticket_item_array);
                 }
 
@@ -1753,7 +1808,9 @@ class PawnController extends Controller
 
              \DB::commit();
              $request->session()->flash('status', 'The pawn was successfully updated!');
-             return response()->json(['success' => true]);
+            //  return response()->json(['success' => true]);
+             return response()->json(['success' => true, 'link' => route('pawn.show', $ticket->id)]);
+
          }catch(\PDOException $e){
              \DB::rollBack();
              //  dd($e->getMessage());

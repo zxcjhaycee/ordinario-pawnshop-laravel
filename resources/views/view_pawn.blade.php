@@ -1,7 +1,7 @@
 @php
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
-
+@section('title', 'Pawn Ticket #: '.$ticket->ticket_number )
 @extends('layout')
 @section('content')
 <style>
@@ -24,6 +24,13 @@
          border-color: rgb(185, 74, 72) !important;
     }
 
+    .table_display tr td:first-child{
+    width:1%;
+    white-space:nowrap;
+    }
+    .table-borderless td, .table-borderless th {
+    border: none;
+    }
 </style>
 <div class="content">
     <div class="col-xl-12">
@@ -53,7 +60,7 @@
                      <a href="{{ route('pawn.repawn', ['id' => $ticket->inventory_id]) }}" class="btn btn-success float-right btn-responsive">Repawn</a>
                      @endif
                   @endif
-                    <h4 class="card-title"> {{ ucwords($routeName) }} Ticket</h4>
+                    <h4 class="card-title"> {{ ucwords($routeName) }} Pawn</h4>
 
                 </div>
     
@@ -70,10 +77,39 @@
                                 <div class="card-body">
                                 <div class="row">
                                 
-                                  <div class="col-xl-6">
+                                  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                       <h3 class="display-4">Details</h3>
-                                        <div class="col-xl-12 mt-4">
+                                        <div class="mt-4">
+                                        <div class="table-responsive material-datatables" style="overflow-y: hidden;">
 
+                                        <table class="table table-borderless table_display" style="margin:0 auto">
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Inventory # :</td>
+                                              <td>{{ $ticket->inventory->inventory_number }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Ticket # :</td>
+                                              <td>{{ $ticket->ticket_number }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Type :</td>
+                                              <td>{{ ucwords($ticket->transaction_type) }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Category :</td>
+                                              <td>{{ $ticket->inventory->item_category->item_category }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Loan Status :</td>
+                                              <td>{{ 'Outstanding' }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td style="text-align:right;font-weight:bold">Branch :</td>
+                                              <td>{{ $ticket->inventory->branch->branch }}</td>
+                                            </tr>
+                                        </table>
+                                        </div>
+                                          <!-- 
                                           <ul style="list-style-type:none;padding-left: 5px;">
                                           <li class="font-weight-bold" style="text-indent:11px">Inventory # : <span class="font-weight-normal">{{ $ticket->inventory->inventory_number }}</span></li>
                                             <li class="font-weight-bold mt-2" style="text-indent:30px">Ticket # : <span class="font-weight-normal">{{ $ticket->ticket_number }}</span></li>
@@ -82,17 +118,50 @@
                                             <li class="font-weight-bold mt-2" style="text-indent:8px">Loan Status : <span class="font-weight-normal">Outstanding</span> </li>
                                             <li class="font-weight-bold mt-2" style="text-indent:40px">Branch : <span class="font-weight-normal">{{ $ticket->inventory->branch->branch }}</span> </li>
                                           </ul>
-
+                                           -->
                                         </div>
                                   </div>
-                                    <div class="col-xl-6">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                       <h3 class="display-4">Customer</h3>
                                       <div class="row">
                                         <div class="col-xl-4">
                                           <img src="http://getdrawings.com/free-icon-bw/facebook-avatar-icon-25.png" class="rounded float-left" alt="..." style="width:150px">
                                         </div>
                                         <div class="col-xl-8">
-                                          <ul style="padding-left:5px;list-style-type:none">
+                                          <div class="table-responsive material-datatables" style="overflow-y: hidden;">
+
+                                            <table class="table table-borderless table_display" style="margin:0 auto">
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Full Name :</td>
+                                                  <td>{{ $ticket->inventory->customer->first_name." ".$ticket->inventory->customer->middle_name." ".$ticket->inventory->customer->last_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Address :</td>
+                                                  <td>{{ $ticket->inventory->customer->present_address }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Birthday :</td>
+                                                  <td>{{ date('F d, Y', strtotime($ticket->inventory->customer->birthdate)) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Sex :</td>
+                                                  <td>{{ ucwords($ticket->inventory->customer->sex) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Civil Status :</td>
+                                                  <td>{{ ucwords($ticket->inventory->customer->civil_status) }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Contact # :</td>
+                                                  <td>{{ $ticket->inventory->customer->contact_number }}</td>
+                                                </tr>
+                                                <tr>
+                                                  <td style="text-align:center;font-weight:bold">Email :</td>
+                                                  <td>{{ $ticket->inventory->customer->email }}</td>
+                                                </tr>
+                                            </table>
+                                          </div>
+                                          <!-- <ul style="padding-left:5px;list-style-type:none">
                                             <li class="font-weight-bold">Full Name : <span class="font-weight-normal"> {{ $ticket->inventory->customer->first_name." ".$ticket->inventory->customer->middle_name." ".$ticket->inventory->customer->last_name }} </span> </li>
                                             <li class="font-weight-bold">Address : <span class="font-weight-normal"> {{ $ticket->inventory->customer->present_address }}</span>  </li>
                                             <li class="font-weight-bold">Birthday : <span class="font-weight-normal"> {{ date('F d, Y', strtotime($ticket->inventory->customer->birthdate)) }}</span>  </li>
@@ -100,8 +169,8 @@
                                             <li class="font-weight-bold">Civil Status : <span class="font-weight-normal"> {{ ucwords($ticket->inventory->customer->civil_status) }}</span>  </li>
                                             <li class="font-weight-bold">Contact # : <span class="font-weight-normal"> {{ $ticket->inventory->customer->contact_number }}</span>  </li>
                                             <li class="font-weight-bold">Email : <span class="font-weight-normal"> {{ $ticket->inventory->customer->email }}</span>  </li>
-
                                           </ul>
+                                           -->
                                         </div>
                                         <!-- <div class="col-xl-6">Birthday:</div> -->
                                         <!-- <div class="col-xl-6">Sex:</div> -->
@@ -138,7 +207,7 @@
                                                         <td>{{ $value->inventory_items->item_karat }}</td>
                                                         <td>{{ $value->inventory_items->item_karat_weight }}</td>
                                                         <td>{{ $value->inventory_items->description }}</td>
-                                                        <td>{{ number_format($value->item_type_appraised_value,2) }}</td>
+                                                        <td>{{ number_format($value->item_name_appraised_value,2) }}</td>
                                                     
                                                     </tr>
                                                 @endforeach

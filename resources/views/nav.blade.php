@@ -3,6 +3,15 @@
         position: static;
         margin-top:-30px
   }
+  #branch_select{
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-color:#eeeeee;
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: -2px;
+    text-indent:5px;
+
+  }
 @media(max-width: 992px){
   .sidebar .nav li .dropdown-menu a, .sidebar .nav li a {
   color: #ffffff;
@@ -14,7 +23,8 @@
     color : #ffffff;
   }
   #branch_select {
-    color: #ffffff;
+    color: black;
+    background-position-y: -0px;
 
   }
   #branch_select option {
@@ -45,16 +55,26 @@
           </button>
           <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav" style="margin-top:-15px">
+              @if(Auth::user()->isAdmin() || Auth::user()->isManager())
               <li class="nav-item">
                 <a class="nav-link">
-                  <select name="branch_id" id="branch_select" class="form-control" style="width:190px;" onChange="changeBranch()">
+                  <select name="branch_id" id="branch_select" style="width:190px;border-radius:2px;font-size:15px" onChange="changeBranch()">
+                    @if(Auth::user()->isAdmin())
                       @foreach(\App\Branch::all() as $key => $value)
                         <option value="{{ $value->id }}" {{ Auth::user()->branch_id == $value->id ? 'selected' : '' }}>{{ $value->branch }}</option>
                       @endforeach
+                    @elseif(Auth::user()->isManager())
+                    @foreach(\App\Branch::whereIn('id', explode(',', Auth::user()->branches))->get() as $key => $value)
+                  
+                      <option value="{{ $value->id }}" {{ Auth::user()->branch_id == $value->id ? 'selected' : '' }}>{{ $value->branch }}</option>
+
+                    @endforeach
+                    @endif
+
                   </select>
                 </a>
-
               </li>
+              @endif
               <li class="nav-item dropdown">
                 <a class="nav-link" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">notifications</i>
@@ -67,7 +87,7 @@
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 <span> {{  Auth::user()->first_name }}  </span>  
+                <span> {{  Auth::user()->first_name }}  </span>  
                   <i class="material-icons">person</i>
 
                   <p class="d-lg-none d-md-block">

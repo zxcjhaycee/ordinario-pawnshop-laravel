@@ -1,7 +1,11 @@
 @php
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
-
+@if(isset($data->inventory->inventory_number))
+    @section('title', 'Update Ticket #: '. $data->ticket_number)
+@else
+    @section('title', 'Create Ticket')
+@endif
 @extends('layout')
 @section('content')
 <style>
@@ -87,7 +91,7 @@
                                         <label for="ticket_number" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">PT #: </label>
                                         <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 ticket_number_error" style="top:-17px;">
                                             <div class="form-group input @error('ticket_number') has-error is-focused @enderror">
-                                                <input type="number" readonly id="ticket_number" name="ticket_number" class="form-control" value="{{ isset($data->ticket_number) && $errors->isEmpty() ? $data->ticket_number : $ticket_number }}"/>
+                                                <input type="number" id="ticket_number" name="ticket_number" class="form-control" value="{{ isset($data->ticket_number) && $errors->isEmpty() ? $data->ticket_number : $ticket_number }}"/>
                                                 <span class="material-icons form-control-feedback">clear</span>
                                             </div>
                                             @error('ticket_number')
@@ -147,7 +151,7 @@
                                             <label for="transaction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Transaction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 transaction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('transaction_date') has-error is-focused @enderror">
-                                                    <input type="text" name="transaction_date"  class="form-control air_date_picker" onblur="transaction_dates(this)" value="{{ isset($data->transaction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->transaction_date)) : '' }}" autocomplete="off">
+                                                    <input type="text" name="transaction_date"  class="form-control transaction_picker" id="transaction_date" onblur="transaction_dates(this)" value="{{ isset($data->transaction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->transaction_date)) : date('m/d/Y') }}" autocomplete="off">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('transaction_date')
@@ -160,7 +164,7 @@
                                             <label for="maturity_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Maturity Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 maturity_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('maturity_date') has-error is-focused @enderror">
-                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($data->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->maturity_date)) : '' }}">
+                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($data->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->maturity_date)) : date('m/d/Y', strtotime('+1 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('maturity_date')
@@ -173,7 +177,7 @@
                                             <label for="expiration_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Expiration Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 expiration_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('expiration_date') has-error is-focused @enderror">
-                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($data->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->expiration_date)) : '' }}">
+                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($data->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->expiration_date)) : date('m/d/Y', strtotime('+4 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('expiration_date')
@@ -186,7 +190,7 @@
                                             <label for="auction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Auction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 auction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('auction_date') has-error is-focused @enderror">
-                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($data->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->auction_date)) : '' }}">
+                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($data->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->auction_date)) : date('m/d/Y', strtotime('+6 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('auction_date')
@@ -297,11 +301,31 @@
                                         </label>
                                         </div>
                                     </div>
-                                    <div class="col-xl-12 col-sm-12 container table-responsive" id="itemTable">
+                                    </div>
+                                    <!-- <div class="col-xl-12">
+                                        <div class="alert alert-danger" role="alert">
+                                            <ul style="list-style-type: none;" class="text-center">
+                                                <li>Material field is required!</li>
+                                                <li>Item type field is required!</li>
+                                                <li>Karat field is required!</li>
+                                                <li>Description field is required!</li>
+                                                <li>Image field is required!</li>
+                                            </ul>
+                                        </div>
+                                    </div> -->
+                                    <!-- <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 mx-auto">
+                                        <div class="alert alert-danger alert-dismissible fade show text-center" style="font-size:15px" role="alert">
+                                            <strong>Error!</strong> The material field is required!
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                        </div>
+                                    </div>                                    -->
+                                    <div class="table-responsive" id="itemTable">
                             @isset($data->item_tickets)
                                 @foreach($data->item_tickets as $key => $value)
                                     @if($data->inventory->item_category_id == 1)
-                                    <table class="table table-bordered mt-3 jewelry_table" width="100%">
+                                    <table class="table table-bordered mt-3 jewelry_table table_{{ $key }}_error" width="100%">
                                         <thead>
                                             <tr>
                                                 <td style="width:10%">Material <br> Item Type <br> Karat</td>
@@ -326,7 +350,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-group input item_type_weight_{{ $key }}_error ">
-                                                        <input class="form-control item_type_weight" type="number" name="item_type_weight[{{ $key }}]" value="{{ $value->inventory_items->item_type_weight }}" onKeyup="setKaratWeight(this);setAppraisedValue(this)">
+                                                        <input class="form-control item_type_weight" type="number" name="item_type_weight[{{ $key }}]" value="{{ $value->inventory_items->item_type_weight }}" step=".01" onKeyup="setKaratWeight(this);setAppraisedValue(this)">
                                                     </div>
                                                 </td>
                                                 <td>
@@ -364,10 +388,10 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_weight[{{ $key }}]" value="{{ $value->inventory_items->item_name_weight }}">
+                                                        <input class="form-control item_name_weight" type="number" name="item_name_weight[{{ $key }}]" value="{{ $value->inventory_items->item_name_weight }}" onKeyup="setKaratWeight(this);setAppraisedValue(this)" step=".01">
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ $value->item_name_appraised_value }}"  readonly>
+                                                        <input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ $value->item_name_appraised_value }}"  readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -384,7 +408,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ $value->inventory_items->item_karat_weight }}" readonly>
+                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ $value->inventory_items->item_karat_weight }}" step=".01" readonly>
                                                           <input type="hidden" class="count" value="{{ $key }}">
                                                           <input type="hidden" name="inventory_item_id[{{ $key }}]" id="inventory_item_id" value="{{ $value->inventory_item_id }}"  class="inventory_item_id">
                                                           <input type="hidden" name="ticket_item_id[{{ $key }}]" id="ticket_item_id" value="{{ $value->id }}"  class="ticket_item_id">
@@ -396,7 +420,7 @@
                                             </tbody>
                                         </table>
                                         @else
-                                        <table class="table table-bordered mt-3 non_jewelry_table" width="100%">
+                                        <table class="table table-bordered mt-3 non_jewelry_table table_{{ $key }}_error" width="100%">
                                             <thead>
                                                 <tr>
                                                 <td style="width:20%">Item Type <br/> Item Name</td>
@@ -418,8 +442,8 @@
                                                 </div>
                                             </td>
                                             <td rowspan="2">
-                                                <div class="form-group input item_type_appraised_value_{{ $key }}_error">
-                                                <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ $value->item_type_appraised_value }}" readonly >
+                                                <div class="form-group input item_name_appraised_value{{ $key }}_error">
+                                                <input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ $value->item_name_appraised_value }}" readonly >
                                                 </div>
                                             </td>
                                             <td rowspan=2 class="text-center">
@@ -466,7 +490,6 @@
                             @endisset
                                     </div>
                                       <button id="item_button" class="btn btn-warning btn-sm" type="button" onClick="addItem();"  {{ isset($data->item_tickets) ? '' :  'style=display:none' }}>ADD</button>
-                                </div>
                             
                             </div>
                          </div>
@@ -495,7 +518,7 @@
                                             <label for="principal" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Principal: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 principal_error" style="top:-17px;">
                                                 <div class="form-group input @error('principal') has-error is-focused @enderror">
-                                                    <input type="number"  id="principal" name="principal" class="form-control" value="{{ isset($data->principal) && $errors->isEmpty() ? $data->principal : 0 }}" readonly/>
+                                                    <input type="number"  id="principal" name="principal" class="form-control" onChange="setAppraisedByPrincipal(this.value)" value="{{ isset($data->principal) && $errors->isEmpty() ? $data->principal : 0 }}"/>
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('principal')
@@ -541,6 +564,7 @@
                                         </div>
                                 </div>
                             <div class="col-xl-6">
+                            <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -599,7 +623,8 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-
+                                </div>
+                                <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -657,6 +682,7 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                </div>
 
                             </div>
 
@@ -696,27 +722,37 @@
 
 <script>
     // nonJewelryTable(0);
+    // jewelryTable(0);
+    // $('.item_type').tooltip();
+    // $('.item_name').tooltip();
+    // $('.item_karat').tooltip();
     /*
     window.onbeforeunload = function(){  // back to top when the page reloads	
         window.scrollTo(0,0); 
     }
     */
+
+
+    
     const customer = document.querySelector('#customer_id');
     const route_customer = '/settings/customer/search';
     const table_customer = 'customer';
-    select2Initialized(customer,route_customer, table_customer);
+    const customer_placeholder = 'Select Customer...';
+    select2Initialized(customer,route_customer, table_customer, customer_placeholder);
 
     const other_charges = '.other_charges_select';
     const other_charges_route =  '{{ route("other_charges.search") }}' 
     const table_other_charges = 'charges';
+    const other_charges_placeholder = 'Select Charges...';
     // console.log(table_other_charges);
-    select2Initialized(other_charges,other_charges_route, table_other_charges);
+    select2Initialized(other_charges,other_charges_route, table_other_charges, other_charges_placeholder);
 
     const discount = '.discount_select';
     const discount_route =  '{{ route("other_charges.search") }}' 
     const table_discount = 'discount';
+    const discount_placeholder = 'Select Discount...';
     // console.log(table_other_charges);
-    select2Initialized(discount,discount_route,table_discount);
+    select2Initialized(discount,discount_route,table_discount, discount_placeholder);
     $(document).on('select2:select', '#customer_id, .other_charges_select, .discount_select', function (e) {
         const data = e.params.data;
         $('.attachment_id').attr('readonly', true);
@@ -738,14 +774,24 @@
 
 
         }
-
-        // if(data.id !== 'link'){
-        //     customer_attachment(data.id);
-        // }else{
-        //  }
-
     });
 
+    const transaction_picker = $('.transaction_picker').datepicker({
+    language: 'en',
+    todayButton: new Date(),
+    autoClose : true,
+    position: "bottom center"
+    });
+    transaction_picker.data('datepicker').selectDate(new Date($('.transaction_picker').val()));
+
+    $(document).on('change', '.transaction_picker', function(){
+        const transaction_date = new Date($(this).val());
+        if(transaction_date != 'Invalid Date'){
+            transaction_picker.data('datepicker').selectDate(transaction_date);
+            return;
+        }
+        $(this).val('');
+    });
     function customer_attachment(customer_id){
         $.ajax({
             type : 'GET',
@@ -770,12 +816,13 @@
 
     function setAppraisedComputation(){
         const item_type_appraised_value = document.querySelectorAll('.item_type_appraised_value');
+        const item_name_appraised_value = document.querySelectorAll('.item_name_appraised_value');
         const compute_appraised_value = document.getElementById('appraised_value');
         const principal = document.getElementById('principal');
         let total = 0;
-        for(let i = 0; i < item_type_appraised_value.length; i++){
+        for(let i = 0; i < item_name_appraised_value.length; i++){
 
-            total += parseFloat(item_type_appraised_value[i].value);
+            total += parseFloat(item_name_appraised_value[i].value);
 
         }
         compute_appraised_value.value = total.toFixed(2);
@@ -808,7 +855,9 @@
       add_item_button.removeAttribute('style');
         // console.log(non_jewelry_table);
         non_jewelry_table != null ? $('.non_jewelry_table').remove() : '';
+        jewelry_table == null ? $('.alert_error').remove() : '';
         if((type == 'checkbox' && jewelry_table == null) || type == null){
+            // $('.alert_error').remove();
             let jewelry_counter = length == 0 ? 0 : parseInt(count[length - 1].value) + 1;
             jewelryTable(jewelry_counter);
         }
@@ -817,17 +866,23 @@
          const length = count.length;
         //  jewelry_table.innerHTML = '';
         jewelry_table != null ? $('.jewelry_table').remove()  : '';
+        non_jewelry_table == null ? $('.alert_error').remove() : '';
 
          add_item_button.removeAttribute('style');
             // console.log(jewelry_table);
          if((type == 'checkbox' && non_jewelry_table == null) || type == null){
+            // $('.alert_error').remove();
             let non_jewelry_counter = length == 0 ? 0 : parseInt(count[length - 1].value) + 1;
             nonJewelryTable(non_jewelry_counter);
          }
     }
   }
 
+function setAppraisedByPrincipal(amount){
+    const net_proceeds = document.getElementById('net_proceeds');
 
+    net_proceeds.value = amount;
+}
 
 
 </script>

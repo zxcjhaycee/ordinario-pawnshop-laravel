@@ -10,6 +10,7 @@
                 @if ($item_category_id == 1)
                     <div class="col-md-6">
                         <h2 class="text-center">{{ $item_type->item_type }}</h2>
+                        <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                         <table class="table">
                             <thead>
                                 <tr>			
@@ -63,10 +64,12 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 @else
                     <div class="col-md-12">
                         <h2 class="text-center">{{ $item_type->item_type }}</h2>
+                        <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                         <table class="table">
                             <thead>
                                 <tr>			
@@ -110,6 +113,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 @endif
             @endforeach

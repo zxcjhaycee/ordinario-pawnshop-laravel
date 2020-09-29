@@ -42,7 +42,7 @@ class CreateTicketsTable extends Migration
             $table->softDeletes();
             $table->smallInteger('status')->default(0); // 0 - open , 1 - redeem, 2 - cancelled
             $table->smallInteger('repawn')->default(0); // to identify if the tickets is repawned
-            $table->date('foreclosed_date')->nullable();
+            // $table->date('foreclosed_date')->nullable();
             // $table->string('notice_yr', 5)->nullable();
             // $table->string('notice_ctrl', 20)->nullable();
             // $table->date('notice_date')->nullable(); 

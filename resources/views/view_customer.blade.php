@@ -3,6 +3,8 @@
 @endphp
 
 @extends('layout')
+@section('title', 'Customer : ' .$customer->first_name." ".$customer->middle_name." ".$customer->last_name)
+
 @section('content')
 <style>
 

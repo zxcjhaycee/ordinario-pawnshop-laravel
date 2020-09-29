@@ -26,12 +26,17 @@ class Pawn_ticket extends Model
     public function ticket_child(){
         return $this->belongsTo('App\Ticket', 'ticket_id');
     }
-
+    public function ticket_parent(){
+        return $this->belongsTo('App\Ticket', 'pawn_id');
+    }
     public function ticket_net(){
         return $this->belongsTo('App\Ticket', 'ticket_id');
         // ->selectRaw('id,SUM(net) as net')
         // ->where('transaction_type', '=', 'renew');
         // ->groupBy(['transaction_type']);
+    }
+    public function ticket_items(){
+        return $this->hasMany('App\Ticket_item', 'ticket_id', 'pawn_id');
     }
 
     // public function payment_all(){

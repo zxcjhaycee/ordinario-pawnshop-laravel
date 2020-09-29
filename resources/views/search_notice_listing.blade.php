@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Search Notice Listing')
 
 @section('content')
 <style>

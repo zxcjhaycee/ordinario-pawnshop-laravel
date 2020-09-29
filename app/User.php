@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'username', 'password', 'branch_id', 'access', 'auth_code'
+        'first_name', 'last_name', 'username', 'password', 'branch_id', 'access', 'auth_code', 'branches'
     ];
 
     /**
@@ -55,5 +55,9 @@ class User extends Authenticatable
     public function isStaff(){
         return Auth::user()->access == 'Staff';
     }
+
+    // public function managerBranches(){
+    //      return explode(',', Auth::user()->branches);
+    // }
 
 }

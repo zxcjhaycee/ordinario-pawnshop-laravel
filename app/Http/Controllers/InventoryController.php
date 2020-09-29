@@ -92,6 +92,7 @@ class InventoryController extends Controller
 
     }
     public function show(Request $request){
+        // dd('Hello!');
         $id = $request->id;
         $ticket = Ticket::with(['encoder', 'attachment', 'payment'])->where('inventory_id', $request->id)->get();
         // dd($ticket);

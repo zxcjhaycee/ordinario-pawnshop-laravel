@@ -16,7 +16,7 @@ class ForeclosedController extends Controller
         if ($request->ajax()){
             $foreclosed = \DB::table('inventories')
                         ->select(\DB::raw('tickets.ticket_number,tickets.transaction_date,tickets.maturity_date,tickets.expiration_date,pawn.principal,CONCAT(customers.first_name, " ", customers.last_name) as customer, 
-                        pawn.id as ticket_id, pawn.foreclosed_date,inventories.auction_date, notices.notice_date, inventories.item_category_id, inventories.id as inventory_id, notices.status'))
+                        pawn.id as ticket_id,inventories.auction_date, notices.notice_date, inventories.item_category_id, inventories.id as inventory_id, notices.status'))
                         ->join('tickets', function ($join) {
                             $join->on('tickets.inventory_id', '=', 'inventories.id')
                                 ->where('tickets.id', function($query){
@@ -36,7 +36,7 @@ class ForeclosedController extends Controller
                             $join->on('notices.ticket_id', '=', 'pawn.id')
                                 ->where('notices.status', 0);
                         })                       
-                        ->whereRaw('(tickets.expiration_date <= '.date('Ymd').' OR notices.notice_date IS NOT NULL)')
+                        ->whereRaw('(tickets.expiration_date <= '.date('Ymd').')')
 
                         ->where('inventories.status', 0)
                         ->where('inventories.branch_id', '=', \Auth::user()->branch_id)
@@ -78,16 +78,10 @@ class ForeclosedController extends Controller
                             // $view_route = route('branch.edit', ['id' => $row['id']]);
                             // $icon = isset($row->deleted_at) ? 'restore' : 'delete';
                             // $btn = '<button type="button" class="btn btn-sm ordinario-button" id="foreclosed"><span class="material-icons">lock</span></button>';                           
-                            if($row->foreclosed_date !== NULL && $row->notice_date !== NULL && $row->status == 0){
-                                $btn = '<button type="button" class="btn btn-sm btn-warning auction" id="'.$row->ticket_id.'"><span class="material-icons">store</span></button> ';
-
-                            }elseif($row->foreclosed_date === NULL && $row->notice_date !== NULL &&  $row->status == 0){
-                                $btn = '<a href="'.route('pawn.renew', ['id' => $row->inventory_id, 'pawn_id' => $row->ticket_id]).'" class="btn btn-success btn-sm"><span class="material-icons">autorenew</span></a>';
-                                $btn .= '<button type="button" class="btn btn-sm btn-warning btn-sm foreclosed" id="'.$row->ticket_id.'"><span class="material-icons">lock</span></button> ';
-                            }else{
-                                $btn = '<a href="'.route('pawn.renew', ['id' => $row->inventory_id, 'pawn_id' => $row->ticket_id]).'" class="btn btn-success btn-sm"><span class="material-icons">autorenew</span></a>';
+                            $btn = '<a href="'.route('pawn.renew', ['id' => $row->inventory_id, 'pawn_id' => $row->ticket_id]).'" class="btn btn-success btn-sm"><span class="material-icons">autorenew</span></a>';
+                            if($row->notice_date === NULL){
+                                $btn .= '<button type="button" class="btn btn-warning btn-sm notice" id="'.$row->ticket_id.'"><span class="material-icons">announcement</span></button>';
                             }
-                            // // $btn = '';
                                 return $btn;
                         })
                         ->rawColumns(['action','dates', 'item'])

@@ -55,7 +55,7 @@ class NoticeListingController extends Controller
             })
             ->whereMonth('tickets.expiration_date', '<=', $dateMonth)
             ->whereYear('tickets.expiration_date', '<=', $dateYear)
-            ->whereRaw('pawn.foreclosed_date IS NULL AND notices.notice_date IS NULL')
+            ->whereNull('notices.notice_date')
             ->where('inventories.branch_id', '=', $branch_value)
             ->where('inventories.status', 0)
                 ->get();                       
@@ -86,6 +86,7 @@ class NoticeListingController extends Controller
             $ticket = Ticket::find($value);
             $notice = Notice::create(['ticket_id'=> $value, 'inventory_id' => $ticket->inventory_id, 'notice_date' => date('Ymd'), 'notice_yr' => $yr, 'notice_ctrl' => $notice_ctrl_number]);
             
+            /*
             $inventory = Inventory::find($ticket->inventory_id);
             if($inventory->item_category_id == 1){
                 $inventory->update(array(
@@ -102,11 +103,23 @@ class NoticeListingController extends Controller
                     'expiration_date' => NULL,
                 ));
             }
+            */
         }
 
         return response()->json(['status' => 'success', 'link' => route('notice_listing.search', ['notice_yr' => $yr, 'notice_ctrl' => $notice_ctrl_number])]);
 
     }
+
+    public function single_store(Request $request){
+
+        $ticket = Ticket::find($request->id);
+        $notice = Notice::create(['ticket_id'=> $ticket->id, 'inventory_id' => $ticket->inventory_id, 'notice_date' => date('Ymd', strtotime($request['notice_date']))]);
+            
+
+        return response()->json(['status' => 'success', 'link' => route('notice_listing.search')]);
+
+    }
+
     public function print(MC_TableFpdf $fpdf, Request $request){
         // dd($request->jewelry_date);
         // $notice_listing = Ticket::with('notice')->where('notice_yr', '=', $request->notice_yr)->where('notice_ctrl', '=', $request->notice_ctrl)->get();
@@ -401,5 +414,28 @@ class NoticeListingController extends Controller
         $date = $request['notice_month_year'];
         $branch = $request['branch'];
         return redirect()->route('notice_listing.index', ['date' => $date, 'branch' => $branch]);
+    }
+
+    public function print_test(Request $request){
+        $notice_listing = \DB::table('notices')
+        ->select(\DB::raw('CONCAT(customers.first_name, " ", customers.last_name) as customer, customers.present_address, tickets.ticket_number'))
+        ->join('tickets', 'tickets.id', 'notices.ticket_id')
+        ->join('inventories', 'inventories.id', 'tickets.inventory_id')
+        ->join('customers', 'inventories.customer_id', 'customers.id')
+        ->where('notices.notice_yr', '=', $request->notice_yr)
+        ->where('notices.notice_ctrl', '=', $request->notice_ctrl)
+        ->get();
+        /*
+        $jewelry_auction = \DB::table('inventories')
+        ->select(\DB::raw('inventories.auction_date, inventories.item_category_id'))
+        ->join('tickets', 'tickets.inventory_id', 'inventories.id')
+        ->join('notices', 'notices.ticket_id', 'tickets.id')
+        ->where('notices.notice_yr', '=', $request->notice_yr)
+        ->where('notices.notice_ctrl', '=', $request->notice_ctrl)
+        ->groupBy('item_category_id')
+        ->get();
+        */
+        $pdf = \PDF::loadView('pdf.notice', array('data' => $notice_listing));
+        return $pdf->inline();
     }
 }

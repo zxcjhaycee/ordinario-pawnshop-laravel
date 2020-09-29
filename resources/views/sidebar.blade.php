@@ -43,6 +43,12 @@
                     <span class="sidebar-normal"> Expired </span>
                   </a>
                 </li>
+                <li class="nav-item {{ class_basename(Route::current()->controller) == 'AuctionController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('auction.index') }}">
+                    <span class="sidebar-mini"> <i class="material-icons">star</i> </span>
+                    <span class="sidebar-normal"> Auction </span>
+                  </a>
+                </li>
               </ul>
             </div>
           </li>

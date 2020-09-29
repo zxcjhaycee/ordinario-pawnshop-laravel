@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'Rates')
+
 @section('content')
 <style>
     .table-input {

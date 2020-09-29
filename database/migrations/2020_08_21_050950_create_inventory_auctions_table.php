@@ -17,8 +17,9 @@ class CreateInventoryAuctionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('inventory_id');
             $table->unsignedBigInteger('ticket_id');
-            $table->string('inventory_auction_number', 20);
-            $table->double('price', 10, 4);
+            $table->unsignedBigInteger('control_id');
+            // $table->string('inventory_auction_number', 20);
+            // $table->double('price', 10, 4);
             $table->softDeletes();
             $table->timestamps();
         });

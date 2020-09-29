@@ -1,8 +1,13 @@
 @php
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
-
 @extends('layout')
+@if(isset($data))
+    @section('title', 'Update Attachment : '. $data->type)
+@else
+    @section('title', 'Create Attachment')
+@endif
+
 @section('content')
 <style>
 

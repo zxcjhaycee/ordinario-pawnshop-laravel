@@ -24,6 +24,7 @@ class AddColumnUserTable extends Migration
             $table->enum('access', ['Administrator', 'Manager', 'Staff'])->after('branch_id');
             $table->integer('auth_code')->after('access');
             $table->string('username', 50)->unique()->after('last_name');
+            $table->string('branches', 10)->nullable()->after('auth_code');
 
 
         });

@@ -20,7 +20,7 @@ Route::middleware(['auth'])->group(function (){
     Route::prefix('pawn_auction')->group(function(){
         Route::get('pawn', 'PawnController@index')->name('pawn');
         Route::post('pawn_store', 'PawnController@store')->name('pawn_store');
-        Route::get('pawn_print/{id}/ticket_id/{ticket_id}', 'PawnController@pawnPrint')->name('pawn_print');
+        Route::get('pawn_print/{id}/ticket_id/{ticket_id}', 'PawnController@pawnPrint_test')->name('pawn_print');
         Route::resource('pawn', 'PawnController')->parameters(['pawn' => 'id']);
         Route::get('pawn/renew/{id}/{pawn_id?}', 'PawnController@showRenew')->name('pawn.renew');
         Route::get('pawn/renew/update/{ticket_id}/{id}', 'PawnController@showUpdateRenew')->name('renew_update');
@@ -37,7 +37,7 @@ Route::middleware(['auth'])->group(function (){
         Route::post('pawn/auction', 'PawnController@auction')->name('pawn.auction');
 
         Route::get('inventory/{page?}', 'InventoryController@index')->name('inventory.index');
-        Route::get('inventory/{id}', 'InventoryController@show')->name('inventory.show');
+        Route::get('inventory/{id}/show', 'InventoryController@show')->name('inventory.show');
 
         // Route::get('inventory/add/pawn/{id}', 'InventoryController@form_pawn')->name('inventory.add.pawn');
         Route::delete('inventory_item/{id}', 'InventoryController@removeItem')->name('inventory.removeItem');
@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function (){
         Route::post('inventory/auction', 'InventoryController@auction')->name('inventory.auction');
         Route::put('foreclosed/{pawn_id}', 'ForeclosedController@updateForeclosed')->name('foreclosed.update');
         Route::get('foreclosed', 'ForeclosedController@index')->name('foreclosed.index');
+        Route::resource('auction', 'AuctionController')->parameters(['auction' => 'id']);
 
         // Route::resource('inventory', 'InventoryController')->parameters(['inventory' => 'id']);
 
@@ -54,6 +55,7 @@ Route::middleware(['auth'])->group(function (){
 
         Route::prefix('reports')->group(function () {
             Route::post('notice_listing/store', 'Reports\NoticeListingController@store')->name('notice_listing.store');
+            Route::post('notice_listing/single_store', 'Reports\NoticeListingController@single_store')->name('notice_listing.single_store');
             Route::get('notice_listing/search/{notice_yr?}/{notice_ctrl?}', 'Reports\NoticeListingController@search')->name('notice_listing.search');
             Route::get('notice_listing/{date?}/{branch?}', 'Reports\NoticeListingController@index')->name('notice_listing.index');
             Route::post('notice_listing/search/', 'Reports\NoticeListingController@submitSearch')->name('notice_listing.search.submit');
@@ -70,17 +72,18 @@ Route::middleware(['auth'])->group(function (){
         Route::get('customer/search_attachment', 'CustomerController@search_attachment')->name('customer.search_attachment');
         Route::get('attachment/search', 'AttachmentController@search')->name('attachment.search');
         Route::get('other_charges/search', 'OtherChargesController@search')->name('other_charges.search');
+        Route::get('branch/search', 'BranchController@search')->name('branch.search');
         Route::get('rates.getItemType/{id}', 'RatesController@getItemType')->name('rates.getItemType');
         Route::get('rates.getKarat/{id}/{branch_id?}', 'RatesController@getKarat')->name('rates.getKarat');
 
         Route::middleware(['multiple:Administrator,Manager'])->group(function(){
             Route::resource('rates', 'RatesController')->except(['index']);
+            Route::put('branch/user_branch', 'BranchController@updateUserBranch')->name('branch.updateUserBranch');
             Route::get('/rates/{branch_id?}/{item_category_id?}', 'RatesController@index')->name('rates.index');
             Route::get('rates.getBranchItem', 'RatesController@getBranchItem')->name('rates.getBranchItem');
             Route::resource('other_charges', 'OtherChargesController')->parameters(['other_charges' => 'id']);
         });
         Route::middleware(['admin'])->group(function(){
-            Route::put('branch/user_branch', 'BranchController@updateUserBranch')->name('branch.updateUserBranch');
             Route::resource('branch', 'BranchController')->parameters(['branch' => 'id']);
             Route::resource('customer', 'CustomerController')->parameters(['customer' => 'id']);
             Route::resource('attachment', 'AttachmentController')->parameters(['attachment' => 'id']);

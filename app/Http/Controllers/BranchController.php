@@ -104,4 +104,23 @@ class BranchController extends Controller
         return response()->json(array('status' => 'success'));
 
     }
+    public function search(Request $request){
+        // dd($request->search);
+        $data = array();
+        if(isset($request->search)){
+            $branches = Branch::where('branch', 'like', '%'.$request->search.'%')->take(10)->get();
+            // dd($branches);
+            // dd($attachments[0]);
+            if($branches->count() > 0){
+                foreach($branches as $key => $value){
+                    $data[] = array(
+                        'id' => $value->id,
+                        'text' => $value->branch
+                    );
+                }
+            }
+        }
+
+        return response()->json($data);
+    }
 }

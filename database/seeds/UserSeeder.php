@@ -29,8 +29,9 @@ class UserSeeder extends Seeder
                     'last_name' => $faker->lastName,
                     'username' => 'manager',
                     'password' => '$2y$10$7sMiaTt4/qr29XjZG46oK.RjIdsIxMM/DFKTn3blLKotpz3l3xRUK',
-                    'branch_id' => rand(1, 3),
+                    'branch_id' => 1,
                     'access' => 'Manager',
+                    'branches' => 1,
                     // 'auth_code' => rand(1000, 9999)
                     'auth_code' => '2222'
                 ),

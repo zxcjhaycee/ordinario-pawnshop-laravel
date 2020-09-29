@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'User')
+
 @section('content')
 <style>
 

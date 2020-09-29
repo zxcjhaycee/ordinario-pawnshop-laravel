@@ -3,6 +3,11 @@
 @endphp
 
 @extends('layout')
+@if(isset($data))
+    @section('title', 'Update Branch : '. $data->branch)
+@else
+    @section('title', 'Create Branch')
+@endif
 @section('content')
 <style>
 
@@ -52,7 +57,7 @@
                                 <label for="address" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Address: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('address') has-error is-focused @enderror">
-		                                <input type="text" id="address" name="address" class="form-control" value="{{ isset($data->address) && $errors->isEmpty() ? $data->address : old('address') }}"/>
+		                                <input type="text" id="address" name="address"  class="form-control" value="{{ isset($data->address) && $errors->isEmpty() ? $data->address : old('address') }}"/>
                                         <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('address')

@@ -3,6 +3,13 @@
 @endphp
 
 @extends('layout')
+@if(isset($data))
+    @section('title', 'Update User : '. $data->first_name." ".$data->last_name)
+
+@else
+    @section('title', 'Create User')
+@endif
+
 @section('content')
 <style>
 
@@ -114,11 +121,12 @@
                                     @enderror
                                 </div>
                             </div>
+
                             <div class="row d-flex justify-content-center">
                                 <label for="access" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 ">Access: </label>
                                 <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
                                     <div class="form-group @error('access') has-error is-focused @enderror">
-                                        <select name="access" id="access" class="form-control">
+                                        <select name="access" id="access" class="form-control" onChange="checkAccess()">
                                                 <option></option>
                                                 <option value="Administrator" {{ old('access') == 'Administrator' || (isset($data) && $data->access == 'Administrator')  ? 'selected' : '' }}>
                                                 Administrator</option>
@@ -130,6 +138,29 @@
                                             <span class="material-icons form-control-feedback">clear</span>
                                     </div>
                                     @error('access')
+                                     <label class="text-danger">{{ $message }}</label>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row justify-content-center" id="branches_element" style="display:{{ old('access') == 'Manager' || isset($data) && $data->access == 'Manager' ? 'flex' : 'none' }}">
+                                <label for="branches" class="col-xl-3 col-lg-2 col-md-2 col-sm-2 mb-4 ">Branches: </label>
+                                <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7" style="top:-20px;">
+                                    <div class="form-group @error('branches') has-error is-focused @enderror">
+                                        <select name="branches[]" id="branches" class="form-control branch_select" multiple>
+
+                                                    @if(old('branches'))
+                                                        @foreach($branch->find(old('branches')) as $branchs)
+                                                         <option value="{{ $branchs->id }}" selected>{{ $branchs->branch }}</option>
+                                                        @endforeach
+                                                    @elseif(isset($data) && isset($branches))
+                                                        @foreach($branches as $branchs)
+                                                         <option value="{{ $branchs->id }}" selected>{{ $branchs->branch }}</option>
+                                                        @endforeach                                                    
+                                                    @endif
+                                        </select>                                        
+                                            <span class="material-icons form-control-feedback">clear</span>
+                                    </div>
+                                    @error('branches')
                                      <label class="text-danger">{{ $message }}</label>
                                     @enderror
                                 </div>
@@ -171,3 +202,34 @@
 </div>
 
 @endsection
+@push('scripts')
+<script>
+    const branch = document.querySelector('.branch_select');
+    const route = '{{ route('branch.search') }}';
+    select2Initialized(branch, route);    
+    /*
+    $(".attachment_type_select").on("select2:select", function (e) {
+    //   console.log(e.params);
+      if(e.params.data.text == 'Can\'t find? Add Attachment'){
+        window.open('{{ route('attachment.create') }}');
+        $(this).val(null).trigger("change");
+
+      }
+      
+    });
+    */
+
+   function checkAccess(){
+    const access = document.getElementById('access');
+    const branch = document.getElementById('branch_id');
+    const branches_element = document.getElementById('branches_element');
+    branches_element.style.display = 'none';
+    if(access.value == 'Manager'){
+        branches_element.style.display = 'flex';
+        // $('.branch_select').select2().val(['1']).trigger("change")
+
+    }
+    //    console.log(access.value);
+   }
+</script>
+@endpush

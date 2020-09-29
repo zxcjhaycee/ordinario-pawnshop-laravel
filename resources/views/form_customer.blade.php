@@ -3,6 +3,11 @@
 @endphp
 
 @extends('layout')
+@if(isset($data))
+    @section('title', 'Update Customer : '.$data->first_name." ".$data->middle_name." ".$data->last_name)
+@else
+    @section('title', 'Create Customer')
+@endif
 @section('content')
 <style>
 
@@ -110,7 +115,8 @@
                                     <label for="birthdate" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Birthdate: </label>
                                     <div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 birthdate_error" style="top:-20px;">
                                         <div class="form-group input @error('birthdate') has-error is-focused @enderror">
-                                            <input type="text" id="birthdate" name="birthdate" class="form-control air_date_picker" value="{{ isset($data->birthdate) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->birthdate)) : old('birthdate') }}"/>
+                                            <input type="text" id="birthdate" name="birthdate" class="form-control birthdate_picker" autocomplete="off"   value="{{ isset($data->birthdate) && $errors->isEmpty() ? date('m/d/Y', strtotime($data->birthdate)) : old('birthdate') }}"/>
+                                            
                                             <span class="material-icons form-control-feedback">clear</span>
                                         </div>
                                         @error('birthdate')
@@ -301,6 +307,9 @@
                                 <div class="card-text">
                                     <h4 class="card-title">Permanent Address</h4>
                                 </div>
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-sm" id="copy_present">Copy Present</button>
+                                </div>
                             </div>
                             <div class="card-body card-body-form">
                             <div class="row d-flex justify-content-center">
@@ -378,7 +387,7 @@
                             <div class="card-body card-body-form">
                             <div class="row d-flex justify-content-center">
                                 <label for="attachment_type" class="col-xl-3 col-lg-3 col-md-2 col-sm-4 ">Type: </label>
-                                <div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 attachment_type_0_error"  style="top:-20px;">
+                                <div class="col-xl-8 col-lg-5 col-md-5 col-sm-7 attachment_type_0_error"  style="top:-10px;">
                                     <div class="form-group input @error("attachment_type") has-error is-focused @enderror">
                                         <select name="attachment_type[0]" id="attachment_type" class="form-control attachment_type_select">
                                         <option></option>
@@ -447,9 +456,23 @@
 @endsection
 @push('scripts')
 <script>
+    $(document).ready(function(){
+        
+        $(document).on('change', '#birthdate', function(){
+            const birthdate = new Date($(this).val());
+            if(birthdate != 'Invalid Date'){
+                birthdate_picker.data('datepicker').selectDate(birthdate);
+                return;
+            }
+            $(this).val('');
+        });
+        $('#birthdate').mask("00/00/0000", {placeholder: "mm/dd/yyyy"});
+
+
+    })
     const attachment = document.querySelector('.attachment_type_select');
     const route = '{{ route('attachment.search') }}';
-    select2Initialized(attachment, route);    
+    select2Initialized(attachment, route, null, 'Select Attachment...');    
     $(".attachment_type_select").on("select2:select", function (e) {
     //   console.log(e.params);
       if(e.params.data.text == 'Can\'t find? Add Attachment'){
@@ -458,6 +481,31 @@
 
       }
 
+    });
+    const birthdate_picker = $('.birthdate_picker').datepicker({
+    language: 'en',
+    todayButton: new Date(),
+    autoClose : true,
+    position: "bottom center"
+    });
+    if($('.birthdate_picker').val() != ''){
+        birthdate_picker.data('datepicker').selectDate(new Date($('.birthdate_picker').val()));
+    }
+
+    $('#copy_present').click(function(){
+        // console.log("Test");
+        const present_address = $('#present_address').val();
+        const present_address_two = $('#present_address_two').val();
+        const present_area = $('#present_area').val();
+        const present_city = $('#present_city').val();
+        const present_zip_code = $('#present_zip_code').val();
+
+        $('#permanent_address').val(present_address);
+        $('#permanent_address_two').val(present_address_two);
+        $('#permanent_area').val(present_area);
+        $('#permanent_city').val(present_city);
+        $('#permanent_zip_code').val(present_zip_code);
+        
     });
 </script>
 @endpush

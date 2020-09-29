@@ -1,7 +1,11 @@
 @php
  $routeName = substr(Route::currentRouteName(), strpos(Route::currentRouteName(), ".") + 1); // to identify if add or update
 @endphp
-
+@if(isset($tickets_current))
+    @section('title', 'Update Ticket #: '. $tickets_current->ticket_number)
+@else
+    @section('title', 'Create Ticket')
+@endif
 @extends('layout')
 @section('content')
 <style>
@@ -144,7 +148,7 @@
                                             <label for="transaction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Transaction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 transaction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('transaction_date') has-error is-focused @enderror">
-                                                    <input type="text" name="transaction_date"  class="form-control transaction_picker" onblur="transaction_dates(this)" value="{{ isset($tickets_current) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->transaction_date)) : '' }}" autocomplete="off">
+                                                    <input type="text" name="transaction_date"  class="form-control transaction_picker" id="transaction_date" onblur="transaction_dates(this)" value="{{ isset($tickets_current) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->transaction_date)) : date('m/d/Y') }}" autocomplete="off">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('transaction_date')
@@ -157,7 +161,7 @@
                                             <label for="maturity_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Maturity Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 maturity_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('maturity_date') has-error is-focused @enderror">
-                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($tickets_current->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->maturity_date)) : '' }}">
+                                                    <input type="text" name="maturity_date" id="maturity_date" class="form-control" readonly value="{{ isset($tickets_current->maturity_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->maturity_date)) : date('m/d/Y', strtotime('+1 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('maturity_date')
@@ -170,7 +174,7 @@
                                             <label for="expiration_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Expiration Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 expiration_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('expiration_date') has-error is-focused @enderror">
-                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($tickets_current->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->expiration_date)) : '' }}">
+                                                <input type="text" name="expiration_date" id="expiration_date" class="form-control"  readonly value="{{ isset($tickets_current->expiration_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->expiration_date)) : date('m/d/Y', strtotime('+4 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('expiration_date')
@@ -183,7 +187,7 @@
                                             <label for="auction_date" class="col-xl-4 col-lg-2 col-md-2 col-sm-4 ">Auction Date: </label>
                                             <div class="col-xl-8 col-lg-6 col-md-5 col-sm-7 auction_date_error" style="top:-17px;">
                                                 <div class="form-group input @error('auction_date') has-error is-focused @enderror">
-                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($tickets_current->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->auction_date)) : '' }}">
+                                                <input type="text" name="auction_date" id="auction_date" class="form-control" readonly value="{{ isset($tickets_current->auction_date) && $errors->isEmpty() ? date('m/d/Y', strtotime($tickets_current->auction_date)) : date('m/d/Y', strtotime('+6 month')) }}">
                                                     <span class="material-icons form-control-feedback">clear</span>
                                                 </div>
                                                 @error('auction_date')
@@ -305,7 +309,7 @@
                                     @isset($inventory->pawnTickets->item_tickets)
                                     @foreach($inventory->pawnTickets->item_tickets as $key => $value)
                                         @if($inventory->item_category_id == 1)
-                                    <table class="table table-bordered mt-3 jewelry_table" width="100%">
+                                    <table class="table table-bordered mt-3 jewelry_table table_{{ $key }}_error" width="100%">
                                         <thead>
                                             <tr>
                                                 <td style="width:10%">Material <br> Item Type <br> Karat</td>
@@ -338,7 +342,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-group input item_type_appraised_value_{{ $key }}_error">
-                                                        <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? round($value->item_type_appraised_value,2) :  round($price[$key],2) }}" readonly >
+                                                        <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? round($value->item_type_appraised_value,2) :  $value->item_type_appraised_value }}" readonly >
                                                     </div>
                                                 </td>
                                                 <td rowspan=3 class="text-center">
@@ -370,10 +374,10 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_name_weight : $value->inventory_items->item_name_weight }}"  {{ $value->item_status == 'old' || Route::currentRouteName() == 'pawn.repawn' ? 'disabled' : ''  }}>
+                                                        <input class="form-control item_name_weight" type="number" name="item_name_weight[{{ $key }}]" onKeyup="setKaratWeight(this);setAppraisedValue(this)" value="{{ isset($tickets_current) ? $value->inventory_items->item_name_weight : $value->inventory_items->item_name_weight }}"  {{ $value->item_status == 'old' || Route::currentRouteName() == 'pawn.repawn' ? 'disabled' : ''  }}>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_name_appraised_value : 0 }}"  readonly>
+                                                        <input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_name_appraised_value : $value->item_name_appraised_value }}"  readonly>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -390,9 +394,9 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_karat_weight :  $value->item_karat_weight }}"  {{ $value->item_status == 'old' || Route::currentRouteName() == 'pawn.repawn' ? 'disabled' : ''  }}>
+                                                        <input class="form-control karat_weight" type="number" name="item_karat_weight[{{ $key }}]" value="{{ isset($tickets_current) ? $value->inventory_items->item_karat_weight :  $value->inventory_items->item_karat_weight }}"  {{ $value->item_status == 'old' || Route::currentRouteName() == 'pawn.repawn' ? 'disabled' : ''  }}>
                                                           <input type="hidden" class="count" value="{{ $key }}">
-                                                          <input type="hidden" name="inventory_item_id[{{ $key }}]" id="inventory_item_id" value="{{ isset($tickets_current) ? $value->inventory_item_id :  $value->id }}" class="inventory_item_id">
+                                                          <input type="hidden" name="inventory_item_id[{{ $key }}]" id="inventory_item_id" value="{{ isset($tickets_current) ? $value->inventory_item_id :  $value->inventory_item_id }}" class="inventory_item_id">
                                                           @isset($tickets_current)
                                                           <input type="hidden" name="ticket_item_id[{{ $key }}]" id="ticket_item_id" value="{{ $value->id  }}"  class="ticket_item_id">
                                                           <input type="hidden" name="item_status[{{ $key }}]" id="item_status" value="{{ $value->item_status  }}"  class="item_status">
@@ -406,7 +410,7 @@
                                             </tbody>
                                         </table>
                                         @else
-                                        <table class="table table-bordered mt-3 non_jewelry_table" width="100%">
+                                        <table class="table table-bordered mt-3 non_jewelry_table table_{{ $key }}_error" width="100%">
                                             <thead>
                                                 <tr>
                                                 <td style="width:20%">Item Type <br/> Item Name</td>
@@ -432,8 +436,8 @@
                                                 </div>
                                             </td>
                                             <td rowspan="2">
-                                                <div class="form-group input item_type_appraised_value_{{ $key }}_error">
-                                                <input class="form-control item_type_appraised_value" type="number" name="item_type_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_type_appraised_value : round($price[$key],2) }}" readonly >
+                                                <div class="form-group input item_name_appraised_value{{ $key }}_error">
+                                                <input class="form-control item_name_appraised_value" type="number" name="item_name_appraised_value[{{ $key }}]" value="{{ isset($tickets_current) ? $value->item_name_appraised_value : $value->item_name_appraised_value }}" readonly >
                                                 </div>
                                             </td>
                                             <td rowspan=2 class="text-center">
@@ -557,6 +561,7 @@
                                         </div>
                                 </div>
                             <div class="col-xl-6">
+                            <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -612,6 +617,8 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                </div>
+                                <div class="table-responsive material-datatables" style="overflow-y: hidden;">
 
                                 <table class="table table-bordered">
                                     <thead>
@@ -668,6 +675,7 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                </div>
 
                             </div>
 
@@ -675,9 +683,8 @@
 
                             </div>
                          </div>
-                         @if(!(Auth::user()->isAdmin()))
-                         <input type="hidden" name="branch_id" id="branch_id" class="form-control" value="{{ Auth::user()->branch_id }}">
-                         @endif                         <input type="hidden" name="processed_by" id="processed_by" class="form-control" value="{{ Auth::user()->id }}">
+                         <input type="hidden" name="branch_id" id="branch_id" class="form-control" value="{{ $inventory->branch_id }}">
+                          <input type="hidden" name="processed_by" id="processed_by" class="form-control" value="{{ Auth::user()->id }}">
                          <input type="hidden" name="transaction_type" id="transaction_type" class="form-control" value="repawn">
                          <input type="hidden" name="inventory_id" id="inventory_id" class="form-control" value="{{ $inventory->id }}">
                         @isset($tickets_current)
@@ -714,19 +721,23 @@
     const customer = document.querySelector('#customer_id');
     const route_customer = '/settings/customer/search';
     const table_customer = 'customer';
-    select2Initialized(customer,route_customer, table_customer);
+    const customer_placeholder = 'Select Customer...';
+    select2Initialized(customer,route_customer, table_customer, customer_placeholder);
 
     const other_charges = '.other_charges_select';
     const other_charges_route =  '{{ route("other_charges.search") }}' 
     const table_other_charges = 'charges';
+    const other_charges_placeholder = 'Select Charges...';
     // console.log(table_other_charges);
-    select2Initialized(other_charges,other_charges_route, table_other_charges);
+    select2Initialized(other_charges,other_charges_route, table_other_charges, other_charges_placeholder);
 
     const discount = '.discount_select';
     const discount_route =  '{{ route("other_charges.search") }}' 
     const table_discount = 'discount';
+    const discount_placeholder = 'Select Discount...';
+
     // console.log(table_other_charges);
-    select2Initialized(discount,discount_route,table_discount);
+    select2Initialized(discount,discount_route,table_discount, discount_placeholder);
     $(document).on('select2:select', '#customer_id, .other_charges_select, .discount_select', function (e) {
         const data = e.params.data;
         $('.attachment_id').attr('readonly', true);
@@ -756,7 +767,7 @@
 
     });
 
-    $('.transaction_picker').datepicker({
+    const transaction_picker = $('.transaction_picker').datepicker({
     language: 'en',
     todayButton: new Date(),
     autoClose : true,
@@ -765,7 +776,16 @@
     // inline : true,
     // minDate: new Date() // Now can select only dates, which goes after today
   });
+  transaction_picker.data('datepicker').selectDate(new Date($('.transaction_picker').val()));
 
+    $(document).on('change', '.transaction_picker', function(){
+        const transaction_date = new Date($(this).val());
+        if(transaction_date != 'Invalid Date'){
+            transaction_picker.data('datepicker').selectDate(transaction_date);
+            return;
+        }
+        $(this).val('');
+    });
     function customer_attachment(customer_id){
         $.ajax({
             type : 'GET',
@@ -790,12 +810,13 @@
 
     function setAppraisedComputation(){
         const item_type_appraised_value = document.querySelectorAll('.item_type_appraised_value');
+        const item_name_appraised_value = document.querySelectorAll('.item_name_appraised_value');
         const compute_appraised_value = document.getElementById('appraised_value');
         const principal = document.getElementById('principal');
         let total = 0;
-        for(let i = 0; i < item_type_appraised_value.length; i++){
+        for(let i = 0; i < item_name_appraised_value.length; i++){
 
-            total += parseFloat(item_type_appraised_value[i].value);
+            total += parseFloat(item_name_appraised_value[i].value);
 
         }
         compute_appraised_value.value = total.toFixed(2);

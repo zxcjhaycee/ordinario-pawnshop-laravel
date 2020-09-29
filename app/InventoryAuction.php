@@ -10,6 +10,6 @@ class InventoryAuction extends Model
     //
     use SoftDeletes;
 
-    protected $fillable = ['inventory_id', 'ticket_id', 'inventory_auction_number', 'price'];
+    protected $fillable = ['inventory_id', 'ticket_id', 'control_id'];
 
 }

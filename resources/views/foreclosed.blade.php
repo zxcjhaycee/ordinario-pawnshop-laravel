@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Expired Pawn')
 @section('content')
 <style>
 
@@ -54,7 +55,7 @@
                     <h4 class="card-title">Expired</h4>
 
                 </div>
-    
+                
                  <div class="card-body">
                         @include('alert')
                     <div class="alert_message"></div>
@@ -113,44 +114,32 @@
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ],
         drawCallback: function( settings ) {
-          console.log("Test");
-            $('.foreclosed').popover({
+
+
+                $('.notice').popover({
                     html: true,
-                    title : 'Warning',
+                    title : 'Notice Listing',
                     trigger: 'manual',
                     container: 'body',
-
                     content: function () {
-                        return '<h6>Are you sure you want to foreclose this item?</h6><div><button class="btn btn-sm float-right btn-danger send_foreclose" id="'+$(this).attr('id')+'">Foreclose</button></div>';
+                                      return '<form method="POST" onSubmit="singleNoticeForm(event, this)" >'+
+                                      '<input type="date" name="notice_date" class="form-control notice_picker" placeholder="Date" value="{{ date("Y-m-d") }}" required/>'+
+                                      '@csrf'+
+                                      '<input type="hidden" name="id" class="form-control" value="'+$(this).attr('id')+'"/>'+
+                                      '<div><button type="submit" class="btn btn-sm float-right btn-danger">Submit</button></div>'+
+                                      '</form>';
                     }
                 }).click(function(e) {
                     $(this).popover('toggle');
-                    $('.foreclosed').not(this).popover('hide');
+                    $('.notice').not(this).popover('hide');
 
                     e.stopPropagation();
                 });
-                $('.auction').popover({
-                                  html: true,
-                                  title : 'Auction',
-                                  trigger: 'manual',
-                                  container: 'body',
-                                  content: function () {
-                                      return '<form method="POST" onSubmit="auctionForm(event, this)" ><input type="text" name="inventory_auction_number" class="form-control" placeholder="Auction Inventory Code" required/>'+
-                                      '@csrf'+
-                                      '<input type="number" name="price" class="form-control" placeholder="Cost" required/>'+
-                                      '<input type="hidden" name="id" class="form-control" value="'+$(this).attr('id')+'"/>'+
-                                      '<div><button type="submit" class="btn btn-sm float-right btn-danger">Auction</button></div>'+
-                                      '</form>';
-                                  }
-                              }).click(function(e) {
-                                  $(this).popover('toggle');
-                                  $('.auction').not(this).popover('hide');
-                                  e.stopPropagation();
-                              });
+
 
 
                 $('body').on('click', function (e) {
-                    $('.foreclosed, .auction').each(function () {
+                    $('.notice').each(function () {
                         if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
                             $(this).popover('hide');
                         }
@@ -165,6 +154,7 @@
     });
 
     // console.log(table.state());
+    /*
     $(document).on('click', '.send_foreclose', function(){
         const pawn_id = $(this).attr('id');
         const url =  '/pawn_auction/foreclosed/'+pawn_id; 
@@ -189,7 +179,7 @@
           }
         })
     });
-
+  */
     function format ( d ) {
             return '<table cellpadding="1" cellspacing="0" border="0">'+
                 '<tr class="child_row">'+
@@ -222,7 +212,8 @@
             row.child( format(row.data()) ).show();
             tr.addClass('shown');
         }
-    });
+
+      });
     
 
       });
