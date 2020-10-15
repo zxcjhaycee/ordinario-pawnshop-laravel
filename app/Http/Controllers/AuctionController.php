@@ -85,9 +85,9 @@ class AuctionController extends Controller
             ));
         }
         $auction = Auction::create(array('control_id' => $control_id, 
-        'auction_date' => $request['auction_date'], 
-        'inventory_auction_number' => $request['inventory_auction_number'],
-        'price' => $request['price']
+        'auction_date' => $request['auction_date']
+        // 'inventory_auction_number' => $request['inventory_auction_number'],
+        // 'price' => $request['price']
          ));
 
 

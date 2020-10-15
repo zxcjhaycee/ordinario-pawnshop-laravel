@@ -39,7 +39,7 @@
         <span style="font-size:20px;font-weight:bold;position:relative;top:-15px">Tel No: 0544403834</span>
     </div>
     <div class="content">
-        <p>{{ date('M d, Y', strtotime($data->notice_date)) }}</p>
+        <p>{{ date('M d, Y') }}</p>
         <p>Dear Sir/Madam</p>
         <p>This is to remind you that the following articles are expired. To avoid foreclosure, this management hereby
         advices you to renew or redeem your pawned article(s) before the date below otherwise this office shall

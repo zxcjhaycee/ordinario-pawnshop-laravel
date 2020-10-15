@@ -63,14 +63,19 @@
             </a>
             <div class="collapse {{  Route::current()->getPrefix() == '/reports' ? 'show' : ''  }}" id="reports" style="">
               <ul class="nav">
-              {{--
                 <li class="nav-item {{ class_basename(Route::current()->controller) == 'NoticeListingController' ? 'active' : '' }}">
-                  <a class="nav-link" href="/reports/notice_listing">
+                  <a class="nav-link" href="{{ route('notice_listing.index') }}">
                     <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
                     <span class="sidebar-normal"> Notice Listing </span>
                   </a>
                 </li>
-               --}}
+                <li class="nav-item {{ class_basename(Route::current()->controller) == 'CashFlowController' ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ route('cash_flow.index', ['branch_id' => Auth::user()->branch_id, 'date' => date('Y-m-d')]) }}">
+                    <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
+                    <span class="sidebar-normal"> Cash Flow Statement </span>
+                  </a>
+                </li>
+              {{--
                 <li class="nav-item {{ class_basename(Route::current()->controller) == 'NoticeListingController' ? 'active' : '' }} ">
                   <a class="nav-link" data-toggle="collapse" href="#noticeCollapse" aria-expanded="{{ class_basename(Route::current()->controller) == 'NoticeListingController' ? 'true' : 'false' }}">
                   <span class="sidebar-mini"> <i class="material-icons">book</i> </span>
@@ -97,7 +102,7 @@
                     </ul>
                   </div>
                 </li>
-
+                --}}
               </ul>
             </div>
           </li>

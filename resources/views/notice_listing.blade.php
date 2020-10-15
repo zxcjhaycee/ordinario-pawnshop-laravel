@@ -75,13 +75,18 @@
                 </div>
                 <div class="card-body">
                 <div class="row">
-                    <div class="col-xl-7 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
+                    <div class="col-xl-10 col-lg-12 col-md-12 col-sm-12 col-12 mb-4">
                       <form action="{{ route('notice_listing.create.search.submit') }}" method="post" class="row">
                         @csrf
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
-                            <input type="text" name="notice_month_year" data-id=""  data-min-view="months" data-view="months" data-date-format="MM yyyy" class="form-control air_date_picker" placeholder="Month / Year" value="{{ isset($date) ? $date : '' }}">
+                          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-12">
+                            <input type="text" name="from_date" id="from_date"  data-min-view="months" data-view="months" data-date-format="MM yyyy" class="form-control notice_date_picker" placeholder="Month / Year" value="{{ $from_date ?? '' }}" autocomplete="off">
                           </div>
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
+                          {{--
+                          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-12">
+                            <input type="text" name="to_date" id="to_date"  data-min-view="months" data-view="months" data-date-format="MM yyyy" class="form-control notice_date_picker" placeholder="To" value="{{ $to_date ?? '' }}" autocomplete="off">
+                          </div>
+                          --}}
+                          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-12">
                             <div class="dropdown bootstrap-select show-tick">
                               <select class="selectpicker" data-size="7" data-style="select-with-transition" title="Branch" tabindex="-98" name="branch">
                                   @foreach($branch as $branches)
@@ -90,22 +95,25 @@
                             </select>
                             </div>
                           </div>
-                          <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12 mt-2 text-center-jc">
+                          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-12 mt-2 text-center-jc">
                             <button type="submit" class="btn btn-default btn-sm-jc"><i class="material-icons">search</i></button>
                           </div>
                           </form>
                       </div>
-                    {{--
-                      <div class="col-xl-5 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
+                      @isset($from_date)
+                      <div class="col-xl-10 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
                         <form  method="POST" class="row" onSubmit="noticeListingForm(event, this)">
                           @csrf
-                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
+                          <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4 col-12">
+                                <input type="text" name="notice_date" data-id="" class="form-control air_date_picker" placeholder="Notice" autocomplete="off" required>
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4 col-12">
                                 <input type="text" name="jewelry_date" data-id="" class="form-control air_date_picker" placeholder="Jewelry" autocomplete="off" required>
                             </div>
-                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
+                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4 col-12">
                                 <input type="text" name="non_jewelry_date" data-id="" class="form-control air_date_picker" placeholder="Non-Jewelry" autocomplete="off" required>
                             </div>
-                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12 mt-2 text-center-jc">
+                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4 col-12 mt-2 text-center-jc">
                                 <!-- <a href="reports/notice_listing_print" target="_blank" class="btn btn-default btn-warning btn-sm-jc"><i class="material-icons">archive</i></a> -->
                                 <button type="submit" class="btn btn-default btn-warning btn-sm-jc"><i class="material-icons">archive</i></button>
                                 <!-- change to button if finalized -->
@@ -114,7 +122,7 @@
 
 
                       </div>
-                      --}}
+                      @endisset
                 </div>
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                       <table class="table table-hover notice_listing_table">
@@ -127,6 +135,7 @@
                                   <th>Customer</th>
                                   <th>Last Transaction</th>
                                   <th>Address</th>
+                                  <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -155,13 +164,14 @@
         serverSide: true,
         stateSave: true, // statesaving of datatable
         bDestroy: true, // for re-initialized 
-        ajax: "{{ route('notice_listing.index', ['date' => $date, 'branch' => $branch_value]) }}",
+        ajax: "{{ route('notice_listing.index', ['from_date' => $from_date,  'branch' => $branch_value]) }}",
         columns: [
             {data: 'checkbox', name: 'checkbox', orderable: false, targets: 0, searchable: false},
             {data: 'ticket_number', name: 'ticket_number'},
             {data: 'customer', name: 'customer'},
             {data: 'transaction_date', name: 'transaction_date'},
             {data: 'present_address', name: 'present_address'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
         ],
         order: [[1, 'asc']] 
 
@@ -169,6 +179,19 @@
 
 
   });
+  const notice_date_picker = $('.notice_date_picker').datepicker({
+    language: 'en',
+    autoClose : true,
+    position: "bottom center",
+    // inline : true,
+    // minDate: new Date() // Now can select only dates, which goes after today
+  });
+  if($('#from_date').val() != ''){
+    $('#from_date').data('datepicker').selectDate(new Date($('#from_date').val()));
+  }
+  // $('#to_date').data('datepicker').selectDate(new Date($('#to_date').val()));
+  // notice_date_picker.data('datepicker').selectDate(new Date($('.notice_date_picker').val()));
+
   function toggle(source) {
         checkboxes = document.querySelectorAll('.item');
         for(var i=0, n=checkboxes.length;i<n;i++) {

@@ -948,6 +948,7 @@ function auctionForm(event, element){
     let checkbox = $("input:checkbox[name=auction]:checked").map(function(){return $(this).val()}).get();
     // console.log(checkbox.length);
     if(checkbox.length == 0){
+      alert('Nothing selected!');
       return false;
     }
     const form_data = new FormData(element);

@@ -17,11 +17,14 @@ class NoticeListingController extends Controller
 
     public function index(Request $request){
         $branch = Branch::all();
-        $date = $request['date'];
+        $from_date = $request['from_date'];
+        $to_date = $request['to_date'];
         $branch_value = $request['branch'];
         if ($request->ajax()){
-            $dateYear = date('Y', strtotime($request['date']));
-            $dateMonth = date('m', strtotime($request['date']));
+            $from_dateYear = date('Y', strtotime($request['from_date']));
+            $from_dateMonth = date('m', strtotime($request['from_date']));
+            // $to_dateYear = date('Y', strtotime($request['to_date']));
+            // $to_dateMonth = date('m', strtotime($request['to_date']));
             $branch_value = $request['branch'];
             /*
             $notice_listing = \DB::table('tickets')
@@ -53,8 +56,10 @@ class NoticeListingController extends Controller
                 $join->on('notices.ticket_id', '=', 'pawn.id')
                     ->where('notices.status', 0);
             })
-            ->whereMonth('tickets.expiration_date', '<=', $dateMonth)
-            ->whereYear('tickets.expiration_date', '<=', $dateYear)
+            ->whereMonth('tickets.expiration_date', '<=', $from_dateMonth)
+            ->whereYear('tickets.expiration_date', '<=', $from_dateYear)
+            // ->whereMonth('tickets.expiration_date', '<=', $to_dateMonth)
+            // ->whereYear('tickets.expiration_date', '<=', $to_dateYear)
             ->whereNull('notices.notice_date')
             ->where('inventories.branch_id', '=', $branch_value)
             ->where('inventories.status', 0)
@@ -67,26 +72,29 @@ class NoticeListingController extends Controller
                         ->addColumn('checkbox', function($row){
                             return '<input type="checkbox" name="notice" value="'.$row->ticket_id.'" class="item" onClick="toggleState()"/>';
                         })
+                        ->addColumn('action', function($row){
+                            return '<a href="'.route('single_print', $row->ticket_id).'" target="_blank">View Notice</a>';
+                        })
                         ->rawColumns(['action', 'checkbox'])
                         ->make(true);
             }
         
-        return view('notice_listing', compact('branch', 'date','branch_value'));
+        return view('notice_listing', compact('branch', 'from_date', 'branch_value'));
     }
 
     public function store(Request $request){
         $ids = json_decode($request->id);
         // dd($id);
-        $yr = date('y');
-        $notice_ctrl = Notice::max('notice_ctrl') + 1;
-        $notice_ctrl_number = sprintf('%05d', $notice_ctrl);
+        // $yr = date('y');
+        // $notice_ctrl = Notice::max('notice_ctrl') + 1;
+        // $notice_ctrl_number = sprintf('%05d', $notice_ctrl);
         $jewelry_auction_date = date('Y-m-d', strtotime($request['jewelry_date']));
         $non_auction_date = date('Y-m-d', strtotime($request['non_jewelry_date']));
+        $notice_date = date('Y-m-d', strtotime($request['notice_date']));
         foreach($ids as $key => $value){
             $ticket = Ticket::find($value);
-            $notice = Notice::create(['ticket_id'=> $value, 'inventory_id' => $ticket->inventory_id, 'notice_date' => date('Ymd'), 'notice_yr' => $yr, 'notice_ctrl' => $notice_ctrl_number]);
+            $notice = Notice::create(['ticket_id'=> $value, 'inventory_id' => $ticket->inventory_id, 'notice_date' => $notice_date]);
             
-            /*
             $inventory = Inventory::find($ticket->inventory_id);
             if($inventory->item_category_id == 1){
                 $inventory->update(array(
@@ -103,10 +111,9 @@ class NoticeListingController extends Controller
                     'expiration_date' => NULL,
                 ));
             }
-            */
         }
 
-        return response()->json(['status' => 'success', 'link' => route('notice_listing.search', ['notice_yr' => $yr, 'notice_ctrl' => $notice_ctrl_number])]);
+        return response()->json(['status' => 'success', 'link' => route('notice_listing_print', ['notice_date' => $notice_date])]);
 
     }
 
@@ -389,9 +396,8 @@ class NoticeListingController extends Controller
     public function single_print(Request $request){
         // $pdf = \PDF::make('pdf.test');
         $data = \DB::table('inventories')
-        ->select(\DB::raw('notices.notice_date, tickets.ticket_number, tickets.principal, inventories.auction_date'))
+        ->select(\DB::raw('tickets.ticket_number, tickets.principal, inventories.auction_date'))
         ->join('tickets', 'tickets.inventory_id', 'inventories.id')
-        ->join('notices' , 'notices.ticket_id', 'tickets.id')
         ->where('tickets.id', '=', $request->id)
         ->first();
         $data_items = \DB::table('ticket_items')
@@ -411,9 +417,10 @@ class NoticeListingController extends Controller
 
     public function submitCreateSearch(Request $request){
         // dd($request);
-        $date = $request['notice_month_year'];
+        $from_date = $request['from_date'];
+        $to_date = $request['to_date'];
         $branch = $request['branch'];
-        return redirect()->route('notice_listing.index', ['date' => $date, 'branch' => $branch]);
+        return redirect()->route('notice_listing.index', ['from_date' => $from_date, 'branch' => $branch]);
     }
 
     public function print_test(Request $request){
@@ -422,8 +429,7 @@ class NoticeListingController extends Controller
         ->join('tickets', 'tickets.id', 'notices.ticket_id')
         ->join('inventories', 'inventories.id', 'tickets.inventory_id')
         ->join('customers', 'inventories.customer_id', 'customers.id')
-        ->where('notices.notice_yr', '=', $request->notice_yr)
-        ->where('notices.notice_ctrl', '=', $request->notice_ctrl)
+        ->where('notices.notice_date', '=', $request->notice_date)
         ->get();
         /*
         $jewelry_auction = \DB::table('inventories')

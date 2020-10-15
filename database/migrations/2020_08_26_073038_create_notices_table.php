@@ -17,8 +17,8 @@ class CreateNoticesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('inventory_id');
             $table->unsignedBigInteger('ticket_id');
-            $table->string('notice_yr', 5)->nullable();
-            $table->string('notice_ctrl', 20)->nullable();
+            // $table->string('notice_yr', 5)->nullable();
+            // $table->string('notice_ctrl', 20)->nullable();
             $table->date('notice_date');
             $table->smallInteger('status')->default(0); // 1 - renew
             $table->softDeletes(); 

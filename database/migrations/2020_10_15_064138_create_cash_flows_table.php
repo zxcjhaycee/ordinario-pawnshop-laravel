@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAuctionsTable extends Migration
+class CreateCashFlowsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateAuctionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('auctions', function (Blueprint $table) {
+        Schema::create('cash_flows', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('control_id');
-            $table->date('auction_date');	
-            // $table->string('inventory_auction_number', 20);
-            // $table->double('price', 10, 4);
+            $table->unsignedBigInteger('branch_id');
+            $table->decimal('grand_total', 8, 2);
+            $table->date('date');
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateAuctionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('auctions');
+        Schema::dropIfExists('cash_flows');
     }
 }

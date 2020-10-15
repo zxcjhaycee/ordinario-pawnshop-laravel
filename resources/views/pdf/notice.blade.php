@@ -44,7 +44,7 @@
     </div>
     <div class="content">
         <div class="ctrl">
-            <h4>NOTICE LISTING: 20-00001</h4>
+            <h4>NOTICE LISTING:</h4>
         </div>
         <table style="width:100%">
             <tr>

@@ -72,15 +72,17 @@ form .form-group select.form-control {
                         @include('alert')
                     <div class="alert_message"></div>
 
-                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-12 col-12 mb-4">
+                    <div class="col-xl-12 col-lg-10 col-md-10 col-sm-12 col-12">
                         <form  method="POST" class="row" onSubmit="auctionForm(event, this)">
                           @csrf
+                          {{--
                             <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4 col-12">
                                 <input type="text" name="inventory_auction_number" data-id="" class="form-control" placeholder="Inventory Auction Number" autocomplete="off" required>
                             </div>
                             <div class="col-xl-2 col-lg-4 col-md-4 col-sm-4 col-12">
                                 <input type="number" name="price" data-id="" class="form-control" placeholder="Price" autocomplete="off" step=".01" required>
                             </div>
+                            --}}
                             <div class="col-xl-2 col-lg-4 col-md-4 col-sm-4 col-12">
                                 <input type="text" name="auction_date" data-id="" class="form-control air_date_picker" placeholder="Auction Date" autocomplete="off" required>
                             </div>

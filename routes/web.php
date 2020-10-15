@@ -57,11 +57,17 @@ Route::middleware(['auth'])->group(function (){
             Route::post('notice_listing/store', 'Reports\NoticeListingController@store')->name('notice_listing.store');
             Route::post('notice_listing/single_store', 'Reports\NoticeListingController@single_store')->name('notice_listing.single_store');
             Route::get('notice_listing/search/{notice_yr?}/{notice_ctrl?}', 'Reports\NoticeListingController@search')->name('notice_listing.search');
-            Route::get('notice_listing/{date?}/{branch?}', 'Reports\NoticeListingController@index')->name('notice_listing.index');
+            Route::get('notice_listing/{from_date?}/{branch?}', 'Reports\NoticeListingController@index')->name('notice_listing.index');
             Route::post('notice_listing/search/', 'Reports\NoticeListingController@submitSearch')->name('notice_listing.search.submit');
             Route::post('notice_listing/create/search', 'Reports\NoticeListingController@submitCreateSearch')->name('notice_listing.create.search.submit');
             Route::get('notice_listing_print/{id}', 'Reports\NoticeListingController@single_print')->name('single_print');
-            Route::get('notice_listing_print/{notice_yr}/{notice_ctrl}', 'Reports\NoticeListingController@print')->name('notice_listing_print');
+            Route::get('notice_listing_print/{notice_date}/masterlist', 'Reports\NoticeListingController@print_test')->name('notice_listing_print');
+
+            Route::get('cash_flow/{date?}/{branch_id?}', 'Reports\CashFlowController@index')->name('cash_flow.index');
+            Route::post('cash_flow', 'Reports\CashFlowController@store')->name('cash_flow.store');
+            Route::put('cash_flow/{cashFlow}', 'Reports\CashFlowController@update')->name('cash_flow.update');
+            Route::post('cash_flow/submit', 'Reports\CashFlowController@submit')->name('cash_flow.submit');
+            // Route::resource('cash_flow', 'Reports\CashFlowController')->only(['index']);
 
             // Route::get('notice_listing_print/{jewelry_date}/{non_jewelry_date}', ['as' => 'notice_listing_print', 'uses' => 'Reports\NoticeListingController@print'])->name('notice_listing_print');
         });
