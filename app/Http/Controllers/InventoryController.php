@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Branch;
 use Illuminate\Http\Request;
 use App\Inventory_item;
 use App\Inventory;
@@ -20,6 +21,42 @@ class InventoryController extends Controller
     //
 
     public function index(Request $request){
+        $branch = Branch::all();
+        $branch_selected = isset($request['branch_id']) ? $request['branch_id'] : \Auth::user()->branch_id;
+        $loan_type = isset($request['loan_type']) ? $request['loan_type'] : 'ALL';
+        $date = isset($request['date']) ? $request['date'] : date('Ymd');
+        switch($request['loan_type']){
+            case 'Active':
+                $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', $branch_selected)
+                            ->where('maturity_date', '>', $request['date'])
+                            ->where('status', 0)
+                            ->get();
+            break;
+            case 'Matured':
+                $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', $branch_selected)
+                            ->where('maturity_date', '<', $request['date'])
+                            ->where('expiration_date', '>', $request['date'])
+                            ->where('status', 0)
+                            ->get();
+            break;
+            case 'Expired':
+                $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', $branch_selected)
+                            ->where('expiration_date', '<', $request['date'])
+                            ->where('status', 0)
+                            ->get();
+            break;
+            default:
+                $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', $branch_selected)
+                            ->where('status', 0)        
+                            ->get();
+
+        }
+        $principal_total = $customer->sum(function ($customer) {
+            return $customer->pawnTickets->principal;
+        });
+
+        // dd($date);
+        // dd($loan_type);
         // dd($request['page']);
         // dd(1);
         // $data = Inventory::with(['customer', 'pawnTickets'])->first();
@@ -31,8 +68,12 @@ class InventoryController extends Controller
         //             ->whereNotIn('transaction_type', ['pawn', 'repawn']);
         // })->sum('net');
         // dd($data->pawnTickets->pawn_parent);
+        // $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', $branch_selected)
+        // ->where('maturity_date' > $request['date'])
+        // ->where('expiration_date' > $request['date'])
+        // ->get();
+        // dd($customer);
         if ($request->ajax()){
-            $customer = Inventory::with(['customer', 'pawnTickets'])->where('branch_id', \Auth::user()->branch_id)->get();
 
                 return Datatables::of($customer)
                         ->addIndexColumn()
@@ -40,24 +81,26 @@ class InventoryController extends Controller
                         ->editColumn('transaction_date', function ($data) {
                             return date('m/d/Y', strtotime($data->transaction_date));
                         })
+                        ->editColumn('pawn_dates', function ($data) {
+                            $maturity = isset($data->maturity_date) ?  date('m/d/Y', strtotime($data->maturity_date)) : "";
+                            $expiry = isset($data->expiration_date) ? date('m/d/Y', strtotime($data->expiration_date)) : "";
+                            return $maturity.'<br/>'.$expiry;
+                        })
                         ->editColumn('customer', function ($data) {
                             return $data->customer->first_name." ".$data->customer->last_name;
                         })
-                        ->editColumn('net', function ($data) {
-                            $net = $data->pawnTickets->whereIn('transaction_type', ['pawn', 'repawn'])->where('inventory_id', $data->id)->latest()->first();
-                            return number_format($net->net, 2);
-                        })
-                        ->editColumn('gross', function ($data) {
+                        // ->editColumn('net', function ($data) {
+                        //     $net = $data->pawnTickets->whereIn('transaction_type', ['pawn', 'repawn'])->where('inventory_id', $data->id)->latest()->first();
+                        //     return number_format($net->net, 2);
+                        // })
+                        // ->editColumn('gross', function ($data) {
 
-                            $payment = isset($data->inventory_payment) ? $data->inventory_payment->where('inventory_id', $data->id)->sum('amount') : NULL;
+                        //     $payment = isset($data->inventory_payment) ? $data->inventory_payment->where('inventory_id', $data->id)->sum('amount') : NULL;
 
-                            // dd($data->id);
-                            $total_net = $data->pawnTickets->where('inventory_id', $data->id)->where('status', 0)->sum('net');
+                        //     $total_net = $data->pawnTickets->where('inventory_id', $data->id)->where('status', 0)->sum('net');
 
-                            // dd($total_net);
-                            // dd($total_net - $payment);
-                            return number_format($total_net - $payment ,2);
-                        })
+                        //     return number_format($total_net - $payment ,2);
+                        // })
                         ->editColumn('principal', function ($data) {
                             $principal = $data->pawnTickets->whereIn('transaction_type', ['pawn', 'repawn'])->where('inventory_id', $data->id)->latest()->first();
                             return number_format($principal->principal, 2);
@@ -76,12 +119,12 @@ class InventoryController extends Controller
             
                             return $btn;
                         })
-                        ->rawColumns(['action', 'ticket_date', 'transaction_status'])
+                        ->rawColumns(['action', 'ticket_date', 'transaction_status', 'pawn_dates'])
                         ->make(true);
 
                     }
             
-        return view('inventory');
+        return view('inventory', compact('branch', 'branch_selected', 'loan_type', 'date', 'principal_total'));
     }
 
     public function create(){
@@ -154,6 +197,17 @@ class InventoryController extends Controller
 
         return back()->with('status', 'The status was succesfully updated to Auction!');
     }
+
+    public function submit(Request $request){
+
+        return redirect()->route('inventory.index', [
+                                                    'branch' => $request->branch_id, 
+                                                    'date' => date('Y-m-d', strtotime($request->date)), 
+                                                    'loan_type' => $request->loan_type
+                                                    ]
+                                );
+    }
+
 
 
 

@@ -61,6 +61,7 @@
                 </div>
     
                  <div class="card-body">
+                   
                     @include('alert')
 
                     <div class="card">
@@ -93,6 +94,10 @@
                                               <tr>
                                                 <td style="text-align:right;font-weight:bold">Branch :</td>
                                                 <td>{{ $inventory->branch->branch }}</td>
+                                              </tr>
+                                              <tr>
+                                                <td style="text-align:right;font-weight:bold">Principal :</td>
+                                                <td>{{ number_format($inventory->pawnTickets->principal,2) }}</td>
                                               </tr>
                                           </table>
                                         </div>

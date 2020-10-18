@@ -72,7 +72,6 @@ form .form-group select.form-control {
                         @include('alert')
                     <div class="alert_message"></div>
 
-                    <div class="col-xl-12 col-lg-10 col-md-10 col-sm-12 col-12">
                         <form  method="POST" class="row" onSubmit="auctionForm(event, this)">
                           @csrf
                           {{--
@@ -94,7 +93,6 @@ form .form-group select.form-control {
                           </form>
 
 
-                      </div>
 
                     <div class="table-responsive material-datatables" style="overflow-y: hidden;">
                       <table class="table table-hover auction_table">

@@ -79,9 +79,9 @@ class ForeclosedController extends Controller
                             // $icon = isset($row->deleted_at) ? 'restore' : 'delete';
                             // $btn = '<button type="button" class="btn btn-sm ordinario-button" id="foreclosed"><span class="material-icons">lock</span></button>';                           
                             $btn = '<a href="'.route('pawn.renew', ['id' => $row->inventory_id, 'pawn_id' => $row->ticket_id]).'" class="btn btn-success btn-sm"><span class="material-icons">autorenew</span></a>';
-                            if($row->notice_date === NULL){
-                                $btn .= '<button type="button" class="btn btn-warning btn-sm notice" id="'.$row->ticket_id.'"><span class="material-icons">announcement</span></button>';
-                            }
+                            // if($row->notice_date === NULL){
+                            //     $btn .= '<button type="button" class="btn btn-warning btn-sm notice" id="'.$row->ticket_id.'"><span class="material-icons">announcement</span></button>';
+                            // }
                                 return $btn;
                         })
                         ->rawColumns(['action','dates', 'item'])

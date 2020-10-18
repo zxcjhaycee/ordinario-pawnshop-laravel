@@ -36,15 +36,16 @@ Route::middleware(['auth'])->group(function (){
         Route::get('pawn/repawn/{id?}', 'PawnController@repawn')->name('pawn.repawn');
         Route::post('pawn/auction', 'PawnController@auction')->name('pawn.auction');
 
-        Route::get('inventory/{page?}', 'InventoryController@index')->name('inventory.index');
+        Route::get('inventory/{branch?}/{date?}/{loan_type?}', 'InventoryController@index')->name('inventory.index');
         Route::get('inventory/{id}/show', 'InventoryController@show')->name('inventory.show');
 
         // Route::get('inventory/add/pawn/{id}', 'InventoryController@form_pawn')->name('inventory.add.pawn');
         Route::delete('inventory_item/{id}', 'InventoryController@removeItem')->name('inventory.removeItem');
         Route::delete('inventory_other_charges/{id}', 'InventoryController@removeOtherCharges')->name('inventory.removeOtherCharges');
+        Route::post('inventory/submit', 'InventoryController@submit')->name('inventory.submit');
         Route::post('inventory/auction', 'InventoryController@auction')->name('inventory.auction');
         Route::put('foreclosed/{pawn_id}', 'ForeclosedController@updateForeclosed')->name('foreclosed.update');
-        Route::get('foreclosed', 'ForeclosedController@index')->name('foreclosed.index');
+        Route::get('expired', 'ForeclosedController@index')->name('foreclosed.index');
         Route::resource('auction', 'AuctionController')->parameters(['auction' => 'id']);
 
         // Route::resource('inventory', 'InventoryController')->parameters(['inventory' => 'id']);
